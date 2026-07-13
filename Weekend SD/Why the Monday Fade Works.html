@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Why the Monday Fade Works</title>
+<style>
+    :root{--bg:#f7f8fa;--card:#ffffff;--ink:#1f2733;--muted:#6b7683;--line:#e3e7ee;
+          --ok:#0b8a5f;--okbg:#e7f6ef;--bad:#c0392b;--badbg:#fbe9e7;--warn:#b9770a;--warnbg:#fdf3e3;--accent:#2c5cc5;
+          --a:#0b8a5f;--abg:#e7f6ef;--b:#2c5cc5;--bbg:#eef3fb;--c:#b9770a;--cbg:#fdf3e3;}
+    *{box-sizing:border-box;}
+    body{margin:0;background:var(--bg);color:var(--ink);
+         font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+    .wrap{max-width:1040px;margin:0 auto;padding:34px 26px 70px;}
+    h1{font-size:27px;margin:0 0 4px;letter-spacing:-.2px;}
+    .sub{color:var(--muted);font-size:13.5px;margin:0 0 22px;}
+    h2{font-size:19px;margin:38px 0 12px;padding-bottom:7px;border-bottom:2px solid var(--line);}
+    h3{font-size:15px;margin:20px 0 8px;color:#33404f;}
+    .answer{background:linear-gradient(180deg,#f2f7ff,#ffffff);border:1px solid #ccdcf5;border-left:5px solid var(--accent);
+            border-radius:12px;padding:18px 20px;margin:6px 0 8px;font-size:15px;line-height:1.6;}
+    .answer b{color:#173a86;}
+    table{border-collapse:collapse;width:100%;margin:8px 0 6px;background:var(--card);
+          border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:13px;}
+    th,td{padding:7px 10px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;}
+    th{background:#eef1f6;font-weight:650;color:#3a4553;font-size:12px;letter-spacing:.2px;}
+    tr:last-child td{border-bottom:none;}
+    td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;
+                  font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:12.4px;}
+    tr.hl td{background:#eef3fb;}
+    .badge{font-size:10.5px;font-weight:800;padding:2px 7px;border-radius:5px;letter-spacing:.3px;white-space:nowrap;}
+    .bok{background:var(--okbg);color:var(--ok);} .bwarn{background:var(--warnbg);color:var(--warn);}
+    .bmut{background:#eef1f6;color:var(--muted);} .bb{background:var(--bbg);color:var(--b);}
+    .grade{font-size:12px;font-weight:800;padding:3px 10px;border-radius:20px;letter-spacing:.3px;white-space:nowrap;}
+    .gA{background:var(--abg);color:var(--a);border:1px solid #bfe6d4;}
+    .gB{background:var(--bbg);color:var(--b);border:1px solid #ccdcf5;}
+    .gC{background:var(--cbg);color:var(--c);border:1px solid #f0d9a8;}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0;margin:16px 0;overflow:hidden;}
+    .card .hd{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--line);}
+    .card .hd .n{font-size:12px;font-weight:800;color:var(--muted);width:22px;}
+    .card .hd .t{font-size:16px;font-weight:750;flex:1;}
+    .card .bd{padding:14px 18px;}
+    .card.A{border-top:3px solid var(--a);} .card.B{border-top:3px solid var(--b);} .card.C{border-top:3px solid var(--c);}
+    .kv{display:grid;grid-template-columns:150px 1fr;gap:4px 12px;margin:8px 0;font-size:13.5px;}
+    .kv .k{color:var(--muted);font-weight:600;}
+    .kill{background:#fbe9e7;border:1px solid #f3c9c2;border-radius:8px;padding:9px 12px;margin:10px 0 4px;font-size:13px;}
+    .impl{background:#e7f6ef;border:1px solid #bfe6d4;border-radius:8px;padding:9px 12px;margin:6px 0 2px;font-size:13px;}
+    .kill b,.impl b{letter-spacing:.2px;}
+    .chart{width:100%;height:auto;display:block;}
+    .chart .grid{stroke:#eef1f6;stroke-width:1;} .chart .axis{stroke:#c4ccd6;stroke-width:1;}
+    .chart .ytick{font:10px monospace;fill:var(--muted);text-anchor:end;}
+    .chart .xtick{font:11px sans-serif;fill:var(--ink);text-anchor:middle;}
+    .chart .val{font:11px monospace;fill:#fff;text-anchor:middle;font-weight:700;}
+    .chart .lit{font:10px sans-serif;fill:var(--c);text-anchor:middle;}
+    .chart .ylab{font:11px sans-serif;fill:var(--muted);text-anchor:middle;}
+    .kpis{display:flex;flex-wrap:wrap;gap:12px;margin:10px 0;}
+    .kpi{flex:1 1 150px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;}
+    .kpi .v{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums;}
+    .kpi .l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-top:2px;}
+    .spec{background:#fbfaf5;border:1px solid #ece3c9;border-radius:12px;padding:14px 18px;margin:16px 0;font-size:13.5px;}
+    .spec h3{margin-top:0;color:#8a6a12;}
+    .declared{background:#eef3fb;border:1px solid #ccdcf5;border-radius:12px;padding:16px 18px;margin:14px 0;}
+    p{margin:9px 0;} ul{margin:8px 0;padding-left:20px;} li{margin:5px 0;}
+    code{background:#eef1f6;padding:1px 6px;border-radius:4px;font-size:12.5px;
+         font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;}
+    a.src{color:#2c5cc5;word-break:break-all;text-decoration:none;border-bottom:1px dotted #9db6e6;}
+    .foot{color:var(--muted);font-size:12px;margin-top:40px;border-top:1px solid var(--line);padding-top:14px;}
+    .glossary{font-size:12.5px;color:var(--muted);}
+    .pill{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;background:#eef1f6;color:#3a4553;margin-right:4px;}
+</style></head><body><div class="wrap">
+
+<h1>Why the Monday Fade Works</h1>
+<p class="sub">The mechanism behind the edge &mdash; an evidence-ranked explanation, not a backtest &middot;
+BTC-perp, in-sample 2019-09-09 &rarr; 2024-12-31 UTC (277 weekends) &middot; own-data checks + cited literature &middot;
+weekend = Friday 17:00 New York &rarr; Monday 02:00 Dubai.</p>
+
+<!-- ============================= ONE-PARAGRAPH ANSWER ============================= -->
+<div class="answer">
+<b>The short answer.</b> The Monday fade works because the weekend is a <b>liquidity vacuum</b>: with the CME and
+the US index-futures shut from Friday 17:00 NY, BTC drifts and <b>overshoots</b> its weekend range on thin order
+books &mdash; but the Friday-close price stays a <b>magnet</b>. When CME and US index futures <b>reopen Sunday 18:00 NY</b>,
+real two-way flow floods back in a sharp 3-hour volatility burst (in our data the hottest hour of the whole weekend,
+t&nbsp;=&nbsp;+9) and drags price back toward the Friday close / weekend base. Our own candles reproduce the documented
+<b>&ldquo;CME gap&rdquo; fill curve almost exactly</b> &mdash; 67.9% of weekend gaps fill within 48h (published figure
+&#8776;67%), 79.4% by the following Friday (&#8776;77%), 95.7% eventually. The trade does <b>not</b> fade the stretch
+itself (fading naked stretch levels loses every variant). It fades the <b>failed breakout</b> &mdash; the instant a
+thin-book push above the weekend range gets <b>rejected</b> because returning liquidity refuses to follow. That
+rejection is the tell that the overshoot was a <b>liquidity grab, not real demand</b>, and it makes the base a target.
+So the edge = weekend vacuum (why it overshoots) &plus; CME/TradFi return (why and <em>when</em> it snaps back)
+&plus; gap magnetism (<em>where</em> it snaps back to), with the failed-breakout filter separating the grabs from the
+genuine trends. The classic &ldquo;Mondays are green&rdquo; seasonality is <b>not</b> the driver &mdash; on our sample
+it is statistically indistinguishable from noise.
+</div>
+
+<div class="kpis">
+  <div class="kpi"><div class="v">67.9%</div><div class="l">our gaps filled &le;48h (lit &#8776;67%)</div></div>
+  <div class="kpi"><div class="v">79.4%</div><div class="l">filled by next Friday (lit &#8776;77%)</div></div>
+  <div class="kpi"><div class="v">0.528%</div><div class="l">Sun 18-21 NY burst hr |move| (t=+9)</div></div>
+  <div class="kpi"><div class="v">277 / 277</div><div class="l">weekends with a CME gap</div></div>
+</div>
+
+<h2>How to read this</h2>
+<p><b>Evidence grades.</b> Every mechanism carries a grade for how well the <em>evidence</em> supports it &mdash; not
+how good the story sounds.</p>
+<table><thead><tr><th style="width:70px">Grade</th><th>Meaning</th></tr></thead><tbody>
+<tr><td><span class="grade gA">A &middot; confirmed</span></td><td>Confirmed in <b>our own IS data</b> with an executable, deterministic check.</td></tr>
+<tr><td><span class="grade gB">B &middot; cited</span></td><td>Supported by a <b>credible external study</b> (peer-reviewed paper, exchange research desk, or a quant write-up with stated methodology).</td></tr>
+<tr><td><span class="grade gC">C &middot; theory</span></td><td><b>Theory or trader folklore</b> &mdash; plausible, widely repeated, but without hard quantitative proof (or not checkable on our data).</td></tr>
+</tbody></table>
+<p class="glossary"><b>Plain-language notes.</b> &ldquo;CME gap&rdquo; = the price jump between where CME Bitcoin futures
+<em>closed</em> Friday and where they <em>reopen</em> Sunday evening, because spot/perp keeps trading 24/7 while CME is shut.
+&ldquo;Gap fill&rdquo; = price later trading back to the Friday-close level. &ldquo;Failed breakout&rdquo; = price pokes above
+(or below) the weekend range then gets rejected back inside. &ldquo;t&rdquo; = t-statistic; with ~277 weekends,
+|t|&nbsp;&lt;&nbsp;2 is noise, |t|&nbsp;&ge;&nbsp;2 clears the usual bar for a single test.</p>
+
+<!-- ============================= FILL CURVE CHART ============================= -->
+<h2>The one picture: our weekend gaps fill on the documented schedule</h2>
+<p>For all 277 in-sample weekends we measured the CME weekend gap (Friday 17:00 NY close price vs the Sunday 18:00 NY
+reopen price) and asked <b>by when does price trade back through the Friday-close level.</b> The bars are our data;
+the orange markers are the independent published fill rates. They land on top of each other.</p>
+<div class="card"><div class="bd">
+<svg class="chart" viewBox="0 0 900 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cumulative CME weekend gap fill rate by horizon, our data versus literature">
+  <!-- gridlines 0,25,50,75,100 -->
+  <line class="grid" x1="60" y1="270" x2="860" y2="270"/><text class="ytick" x="54" y="273">0%</text>
+  <line class="grid" x1="60" y1="212.5" x2="860" y2="212.5"/><text class="ytick" x="54" y="215.5">25%</text>
+  <line class="grid" x1="60" y1="155" x2="860" y2="155"/><text class="ytick" x="54" y="158">50%</text>
+  <line class="grid" x1="60" y1="97.5" x2="860" y2="97.5"/><text class="ytick" x="54" y="100.5">75%</text>
+  <line class="grid" x1="60" y1="40" x2="860" y2="40"/><text class="ytick" x="54" y="43">100%</text>
+  <line class="axis" x1="60" y1="270" x2="860" y2="270"/>
+  <!-- bars: +3h 29.60 ; endMon 58.12 ; +48h 67.87 ; nextFri 79.42 ; ever 95.67 -->
+  <rect x="92" y="201.9" width="96" height="68.1" rx="3" fill="#7d93c9"><title>by Sun 21:00 NY (+3h): 29.6%</title></rect>
+  <text class="val" x="140" y="217">29.6%</text><text class="xtick" x="140" y="290">end of burst</text><text class="xtick" x="140" y="304" style="fill:#6b7683">Sun 21:00 NY (+3h)</text>
+  <rect x="252" y="136.3" width="96" height="133.7" rx="3" fill="#5f7bc0"><title>by end of Monday (Tue 00:00 Dubai): 58.1%</title></rect>
+  <text class="val" x="300" y="151">58.1%</text><text class="xtick" x="300" y="290">end of Monday</text><text class="xtick" x="300" y="304" style="fill:#6b7683">Tue 00:00 Dubai</text>
+  <rect x="412" y="113.9" width="96" height="156.1" rx="3" fill="#3f68c7"><title>within 48h of reopen: 67.9%</title></rect>
+  <text class="val" x="460" y="129">67.9%</text><text class="xtick" x="460" y="290">within 48h</text>
+  <circle cx="460" cy="115.9" r="5" fill="#e08a1e" stroke="#fff" stroke-width="1.3"><title>literature: ~67% within 48h (2022-2025)</title></circle>
+  <text class="lit" x="460" y="304">lit &#8776;67%</text>
+  <rect x="572" y="87.3" width="96" height="182.7" rx="3" fill="#2c5cc5"><title>by next Friday 17:00 NY: 79.4%</title></rect>
+  <text class="val" x="620" y="102">79.4%</text><text class="xtick" x="620" y="290">next Friday</text>
+  <circle cx="620" cy="92.9" r="5" fill="#e08a1e" stroke="#fff" stroke-width="1.3"><title>literature: ~77% of CME gaps eventually fill (2018-2026)</title></circle>
+  <text class="lit" x="620" y="304">lit &#8776;77%</text>
+  <rect x="732" y="50" width="96" height="220" rx="3" fill="#173a86"><title>ever, within the in-sample window: 95.7%</title></rect>
+  <text class="val" x="780" y="65">95.7%</text><text class="xtick" x="780" y="290">ever (in IS)</text>
+  <text class="ylab" x="22" y="155" transform="rotate(-90 22 155)">share of weekend gaps filled</text>
+  <!-- legend -->
+  <rect x="600" y="20" width="12" height="12" rx="2" fill="#2c5cc5"/><text class="lit" style="fill:#3a4553" x="660" y="30">our IS data (277 weekends)</text>
+  <circle cx="770" cy="26" r="5" fill="#e08a1e"/><text class="lit" style="fill:#3a4553" x="820" y="30">published rate</text>
+</svg>
+</div></div>
+<p><b>What this means.</b> The Friday-close price is not an arbitrary level &mdash; it behaves as a genuine attractor,
+on the same timetable third parties document for the CME gap. That is the quantitative backbone of &ldquo;the base is a
+target.&rdquo; Median absolute gap size on our sample was <b>1.19%</b> (90th percentile 4.55%); the median time from
+the Sunday reopen to the fill was <b>14 hours</b> &mdash; i.e. price typically returns to the Friday level <em>during
+Monday</em>, which is exactly the fade&rsquo;s playing field.</p>
+
+<!-- ============================= MECHANISM CARDS ============================= -->
+<h2>Mechanism cards, ranked by evidence</h2>
+
+<!-- CARD 1 -->
+<div class="card A"><div class="hd"><span class="n">1</span><span class="t">CME weekend-gap magnetism &mdash; the Friday-close price is a target</span><span class="grade gA">GRADE A</span></div>
+<div class="bd">
+<p>CME Bitcoin futures traded on a <b>Sunday-evening&ndash;to&ndash;Friday-afternoon</b> schedule for the whole of our
+in-sample window (they only went 24/7 on 2026-05-29, well after our data ends). They <b>closed Friday 16:00 Chicago
+(=17:00 New York)</b> and <b>reopened Sunday 17:00 Chicago (=18:00 New York)</b>. Because spot and perps keep trading
+through that ~25-hour blackout, the reopen almost always prints away from the Friday close &mdash; the &ldquo;gap.&rdquo;
+The well-worn observation is that these gaps tend to <b>fill</b> (price comes back to the Friday level). We tested it on
+our own candles and it holds, matching the published numbers.</p>
+<div class="kv">
+  <div class="k">Our data (A)</div><div>277/277 weekends had a gap. Filled: <b>29.6%</b> by end of the Sunday burst, <b>58.1%</b> by end of Monday, <b>67.9%</b> within 48h, <b>79.4%</b> by the next Friday, <b>95.7%</b> ever. Down-gaps filled <b>100%</b> of the time eventually (up-gaps 92.9%). Small gaps (&lt;0.5%) filled 97% by next Friday; big gaps (&ge;2%) only 58.9%.</div>
+  <div class="k">Literature (B)</div><div>~<b>77%</b> of CME BTC gaps (2018&ndash;2026) eventually fill; ~<b>67%</b> within 48h (2022&ndash;2025); gaps &lt;&#36;500 fill ~85% in 1&ndash;2 weeks and &lt;&#36;700 ~92% within 30 trading days; CoinDesk counted <b>79 of 80</b> recent gaps filled before the 24/7 switch.</div>
+</div>
+<div class="kill"><b>What would kill this:</b> if a placebo level the same distance away got touched just as often (i.e. fills are ordinary volatility/mean-reversion, not CME-specific) &mdash; and if fading-to-the-base doesn&rsquo;t actually improve realised R over a fixed target. Also watch the post-2026 24/7 regime: if snap-backs persist with no gap, the &ldquo;gap&rdquo; framing was cosmetic and the real cause is the liquidity/flow story in cards 2&ndash;3.</div>
+<div class="impl"><b>Implication for the trade:</b> the weekend base / Friday-close level is a real magnet &rarr; use <b>levels-as-targets exits</b>, bank profit at the base rather than trailing forever. But scale ambition with stretch size: on &ge;2% overshoots only ~59% fill by Friday, so don&rsquo;t hold the whole position for a full fill on the biggest stretches.</div>
+</div></div>
+
+<!-- CARD 2 -->
+<div class="card A"><div class="hd"><span class="n">2</span><span class="t">Weekend liquidity vacuum &rarr; TradFi-return volatility burst</span><span class="grade gA">GRADE A / B</span></div>
+<div class="bd">
+<p>Weekends are thin. Institutional desks and the ETF/CME complex step back, so order books hollow out and the same
+order size moves price further. Price wanders. Then the US session returns &mdash; and the single sharpest,
+most reliable event in the whole weekend is the burst right at the <b>Sunday 18:00&ndash;21:00 NY</b> window,
+exactly when CME crypto <em>and</em> the S&amp;P/Nasdaq index futures reopen. That is when the fuel to snap the
+overshoot back arrives.</p>
+<div class="kv">
+  <div class="k">Our data (A)</div><div>The Sunday 18:00&ndash;21:00 NY hour averages <b>0.528%</b> absolute move vs <b>0.320%</b> for a typical weekend hour &mdash; Welch <b>t=+9.0</b>, the hottest window of the weekend (the run-in, Sun 16:00&ndash;18:00 NY, is also elevated, t=+3.8). Direction is a coin-flip; only the <em>energy</em> spikes. The window is locked to New-York wall-clock, i.e. to the US session, not to any Dubai/UTC hour.</div>
+  <div class="k">Literature (B)</div><div>Kaiko: weekend share of BTC volume fell from ~24&ndash;25% (2018) to ~13&ndash;16% (2024); weekday volume now runs ~2&times; weekend. BridgePort: on weekends bid-ask spreads widen ~<b>11%</b>, effective depth for a &#36;100k trade drops ~<b>9%</b>, displayed liquidity ~<b>5%</b>. Thinner books &rarr; larger % moves from smaller orders.</div>
+</div>
+<div class="kill"><b>What would kill this:</b> if an identical volatility burst showed up at 18:00 NY on random weekdays (then it isn&rsquo;t the weekend-vacuum-plus-TradFi-return that matters, just a daily US-open effect) &mdash; or if the burst tracked a Dubai/UTC clock rather than the New-York session. Neither is what we see.</div>
+<div class="impl"><b>Implication for the trade:</b> don&rsquo;t fade into the vacuum <em>before</em> TradFi returns &mdash; the snap-back fuel arrives with the Sunday 18:00&ndash;21:00 NY burst. Time entries around/after that window; the burst is the catalyst that turns a stretched overshoot into a reversion.</div>
+</div></div>
+
+<!-- CARD 3 -->
+<div class="card B"><div class="hd"><span class="n">3</span><span class="t">The failed breakout is a liquidity grab / stop-hunt &mdash; not real demand</span><span class="grade gB">GRADE A obs. / B&ndash;C mech.</span></div>
+<div class="bd">
+<p>This is the heart of the edge and the subtlest part. Fading the stretch <em>as such</em> loses. What pays is fading the
+<b>failure</b>: the weekend push above the range gets rejected, on a big-volume candle, back through the moving average.
+The interpretation &mdash; Annie&rsquo;s thesis, and the &ldquo;Sunday scam-wick&rdquo; folklore &mdash; is that thin books
+let price be run <em>into</em> the resting stop/liquidation orders above the range (a liquidity grab), and once that fuel
+is spent with no genuine buyers behind it, price collapses back. The <b>rejection is the signature of a grab</b>; a
+breakout that <em>holds</em> had real demand and should not be faded.</p>
+<div class="kv">
+  <div class="k">Our data (A, for the observation)</div><div>Fading naked statistical-stretch levels <b>lost in all 48 variants</b> tested. Joining a <em>held</em> breakout was borderline-positive (+0.31R, t=2.3). Fading the <em>failed</em> breakout returned <b>+0.382R over 91 Monday trades in-sample</b> and <b>+0.54R out-of-sample</b>. So the edge lives specifically in the failure signal, not the stretch &mdash; consistent with &ldquo;the overshoot was a grab.&rdquo;</div>
+  <div class="k">Literature (B&ndash;C, for the mechanism)</div><div>BitMEX&rsquo;s own research (&ldquo;Scamwicks and Stop Cascades&rdquo;) lays out the order-book mechanics: in a thin book one side gets swept, the last price gaps to the next resting orders, tripping stops/liquidations in a cascade that reverses once exhausted. Trader-education and liquidation-heatmap tools (Coinglass) show stop clusters pooling just above range highs. Weekend breakouts are widely cited as failing ~70&ndash;80% of the time in thin conditions. The specific &ldquo;smart-money hunts your stop&rdquo; framing (ICT liquidity sweep) is folklore (Grade C); the order-book cascade is documented (Grade B).</div>
+</div>
+<div class="kill"><b>What would kill this:</b> if fading <em>held</em> breakouts paid as well as fading <em>failed</em> ones &mdash; our data already refutes that. The live risk is regime: if weekend liquidity keeps deepening (post-ETF, and after CME&rsquo;s 2026 move to 24/7), grabs may get rarer and the failure edge could fade. Monitor it out-of-sample.</div>
+<div class="impl"><b>Implication for the trade:</b> the entry trigger <em>must be a confirmed failure</em> &mdash; a rejection candle with a ~200%-of-average volume spike pushing back through the 50-EMA &mdash; not merely reaching a stretch level. This filter <b>is</b> the edge; protect it and never loosen it into a naked stretch-fade.</div>
+</div></div>
+
+<!-- CARD 4 -->
+<div class="card B"><div class="hd"><span class="n">4</span><span class="t">Classic Monday / weekend seasonality &mdash; context, not cause</span><span class="grade gB">GRADE B lit. / not our driver</span></div>
+<div class="bd">
+<p>There is a real academic literature on day-of-week and weekend effects in crypto. But on <em>our</em> sample the
+&ldquo;Mondays are green&rdquo; daily seasonality is <b>not significant</b>, and the trade&rsquo;s direction is a coin-flip &mdash;
+so this is background colour, not the engine. Importantly, the most careful intraday work agrees with us: the daily effect
+largely <em>evaporates</em> once you look hour-by-hour, surviving only as a narrow burst when US participants log back on.</p>
+<div class="kv">
+  <div class="k">Our data (A)</div><div>Monday close-to-close mean is <b>+0.415% (t=+1.68) on UTC days, +0.321% (t=+1.29) on Dubai days</b> &mdash; both noise (|t|&lt;2). No weekday clears the multiple-test bar. The Monday edge is therefore <b>not</b> a daily-return anomaly; it is intraday and structural.</div>
+  <div class="k">Literature (B)</div><div>Caporale &amp; Plastun (2019) find day-of-week anomalies in crypto (strongest early-sample); Kaya/Aydemir report Bitcoin Monday returns significantly higher with elevated Mon/Thu volatility; a 2025 study finds negative weekend crypto returns predict Monday <em>equity</em> declines (asymmetric, loss-aversion). A quant re-examination (mlquants) shows the daily effect mostly vanishes intraday <b>except a Sunday 23:00&ndash;00:00 UTC burst</b> as US retail returns &mdash; the same &ldquo;price discovery restarts when the crowd comes back&rdquo; story as our card 2.</div>
+</div>
+<div class="kill"><b>What would kill this as a cause:</b> nothing to kill &mdash; it is <em>already</em> not the cause on our sample. The value here is negative knowledge: it tells us the edge is not seasonal drift.</div>
+<div class="impl"><b>Implication for the trade:</b> do <b>not</b> lean on &ldquo;Mondays go up.&rdquo; Trade the <em>structure</em> (failed breakout &rarr; base) in whichever direction the failure points; keep the play direction-agnostic.</div>
+</div></div>
+
+<!-- CARD 5 -->
+<div class="card C"><div class="hd"><span class="n">5</span><span class="t">Funding-rate weekend patterns on perps</span><span class="grade gC">GRADE C</span></div>
+<div class="bd">
+<p>Perp funding is a real, periodic force, but a clean <em>weekend-specific</em> funding pattern that would drive the
+Monday fade is <b>not well documented</b>, and we can&rsquo;t test it here (our candle file has no funding column). Best
+treated as a possible minor tailwind, not a pillar.</p>
+<div class="kv">
+  <div class="k">What is documented (B)</div><div>Funding is exchanged every 8 hours at <b>00:00 / 08:00 / 16:00 UTC</b>. Extreme positive funding (&gt;0.10% per 8h) tends to precede corrections (crowded longs); extreme negative precedes short-squeezes. But the raw funding&rarr;next-return link is weak (Fulgur Ventures: R&sup2;&#8776;<b>0.003</b>).</div>
+  <div class="k">What is speculative (C)</div><div>The idea that funding predictably <em>flattens over the weekend</em> (leverage demand drops with liquidity) and that imbalances <em>build into Monday</em> is repeated by desks but not cleanly quantified in the sources found; behaviour looks conditional on the broader regime rather than a fixed weekly cycle.</div>
+</div>
+<div class="kill"><b>What would kill this:</b> if measured weekend funding is flat/uninformative relative to weekdays, or adds nothing on top of cards 1&ndash;3 in a joint test, the mechanism is moot.</div>
+<div class="impl"><b>Implication for the trade:</b> at most a confluence flag &mdash; if a weekend overshoot coincides with extreme funding in the overshoot&rsquo;s direction, the failed-breakout fade has extra reason to work (crowded, forced to unwind). Do not size on it; treat as unproven until we pull a funding series and check.</div>
+</div></div>
+
+<!-- ============================= OWN-DATA CHECK ============================= -->
+<h2>Our-data check &mdash; the CME weekend-gap fill test</h2>
+<p>The Grade-A backbone (card 1, and the fill-curve chart) comes from a single deterministic script,
+<code>weekend_gap_check.py</code>, run over the in-sample window only (2019-09-09 &rarr; 2024-12-31). It is a pure
+function of the candles: no randomness, no wall-clock, no run-order dependence. Two runs produce a byte-identical
+output CSV (verified by md5, below).</p>
+
+<h3>Method (exactly what the script does)</h3>
+<ul>
+<li><b>Anchors</b> (pinned in New-York local time so US daylight-saving is handled by the tz database): Friday CME
+close = <b>17:00 NY</b>; Sunday CME reopen = <b>18:00 NY</b>. The brief&rsquo;s phrase &ldquo;Monday CME-open-time
+price&rdquo; resolves to this Sunday-evening reopen &mdash; the CME&rsquo;s first print of the new week, and the print the
+gap is measured against.</li>
+<li><b>Gap</b> = reopen price &minus; Friday-close price (using the 1-minute close as-of each anchor). Up-gap if the
+weekend rallied while CME was shut, down-gap if it sold off.</li>
+<li><b>Fill</b> = the first 1-minute bar after the reopen whose [low, high] range straddles the Friday-close price
+(price trades back through that level).</li>
+<li><b>Fill-by-when</b> horizons, chronological from the reopen: <span class="pill">Sun 21:00 NY (+3h)</span>
+<span class="pill">end of Monday (Tue 00:00 Dubai)</span> <span class="pill">reopen + 48h</span>
+<span class="pill">next Fri 17:00 NY</span> <span class="pill">ever in IS</span>.</li>
+<li><b>Note on the weekend window:</b> its close (Monday 02:00 Dubai = Sunday 22:00 UTC) coincides with the CME reopen
+&mdash; so the &ldquo;weekend window&rdquo; ends exactly when CME comes back, which is <em>why</em> the first meaningful
+fill horizon is +3h, not something inside the weekend.</li>
+</ul>
+
+<h3>Headline results (all 277 weekends)</h3>
+<table><thead><tr><th>Horizon</th><th class="num">All</th><th class="num">Gap-up (n=168)</th><th class="num">Gap-down (n=109)</th><th>vs literature</th></tr></thead><tbody>
+<tr><td>by Sun 21:00 NY (end of burst, +3h)</td><td class="num">29.6%</td><td class="num">32.1%</td><td class="num">25.7%</td><td>&mdash;</td></tr>
+<tr><td>by end of Monday (Tue 00:00 Dubai)</td><td class="num">58.1%</td><td class="num">60.1%</td><td class="num">55.0%</td><td>&mdash;</td></tr>
+<tr class="hl"><td>within 48h of reopen</td><td class="num">67.9%</td><td class="num">67.9%</td><td class="num">67.9%</td><td>&#8776;67% (2022&ndash;2025)</td></tr>
+<tr class="hl"><td>by next Friday 17:00 NY</td><td class="num">79.4%</td><td class="num">78.0%</td><td class="num">81.7%</td><td>&#8776;77% (2018&ndash;2026)</td></tr>
+<tr><td>ever within IS</td><td class="num">95.7%</td><td class="num">92.9%</td><td class="num">100.0%</td><td>&ldquo;79 of 80&rdquo; = 98.8% (recent)</td></tr>
+</tbody></table>
+<p style="font-size:13px;color:var(--muted)">Median absolute gap 1.19% (p90 4.55%); 60.6% of reopens were above the Friday close; median time-to-fill 14.0h (up-gaps 12.2h, down-gaps 16.5h). Fill-by-size (ever / by next Friday): &lt;0.5% 98.7% / 97.3%; 0.5&ndash;1% 96.1% / 88.2%; 1&ndash;2% 93.4% / 80.3%; &ge;2% 94.4% / 58.9% &mdash; the classic &ldquo;small gaps fill fast, big gaps can stay open for weeks&rdquo; shape.</p>
+
+<div class="declared">
+<b>Reproduce it (deterministic, double-run proof).</b>
+<pre style="white-space:pre-wrap;font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;font-size:12px;margin:8px 0 0">cd "Strategy Codex/Weekend SD/research"
+python3 -m py_compile weekend_gap_check.py            # compiles clean
+python3 weekend_gap_check.py ; md5 weekend_gap_stats.csv
+python3 weekend_gap_check.py ; md5 weekend_gap_stats.csv   # identical hash
+# -> MD5 (weekend_gap_stats.csv) = 12f40d279e7d5610161514f57d0f80c3  (both runs)</pre>
+</div>
+
+<!-- ============================= LITERATURE TABLE ============================= -->
+<h2>Literature &amp; sources (citations)</h2>
+<p style="font-size:13px;color:var(--muted)">URLs are shown as plain text and as (inert) links; this page loads no
+external resources. Grades: B = credible cited study/desk research; C = folklore/theory. Access the links yourself to
+verify; the numbers above are transcribed from these pages as of July 2026.</p>
+<table><thead><tr><th style="width:52px">Mech.</th><th>Source &amp; key figure</th><th style="width:60px">Grade</th><th>URL</th></tr></thead><tbody>
+<tr><td>1 · CME gap</td><td>CME Group &mdash; cryptocurrency-futures FAQ (session hours: Sun 17:00 CT &rarr; Fri 16:00 CT)</td><td><span class="badge bb">B</span></td><td><a class="src" href="https://www.cmegroup.com/articles/faqs/frequently-asked-questions-cryptocurrency-futures.html">cmegroup.com/articles/faqs/frequently-asked-questions-cryptocurrency-futures.html</a></td></tr>
+<tr><td>1 · CME gap</td><td>Phemex Academy &mdash; ~77% of CME BTC gaps fill (2018&ndash;2026); &lt;&#36;500 ~85% in 1&ndash;2 wk</td><td><span class="badge bb">B</span></td><td><a class="src" href="https://phemex.com/academy/cme-futures-gap">phemex.com/academy/cme-futures-gap</a></td></tr>
+<tr><td>1 · CME gap</td><td>Bitget Academy &mdash; gaps &lt;&#36;700 fill ~92% within 30 trading days</td><td><span class="badge bb">B</span></td><td><a class="src" href="https://www.bitget.com/academy/cme-bitcoin-gap">bitget.com/academy/cme-bitcoin-gap</a></td></tr>
+<tr><td>1 · CME gap</td><td>CoinDesk (2026-05-28) &mdash; 79 of 80 recent gaps filled; 3 open at 24/7 launch; Fri close &rarr; Sun reopen</td><td><span class="badge bb">B</span></td><td><a class="src" href="https://www.coindesk.com/markets/2026/05/28/bitcoin-s-famous-cme-gaps-are-about-to-disappear-though-three-remain-unresolved">coindesk.com/markets/2026/05/28/bitcoin-s-famous-cme-gaps-are-about-to-disappear</a></td></tr>
+<tr><td>2 · Liquidity</td><td>BlockEarner (cites Kaiko / BridgePort) &mdash; weekend volume 25%&rarr;16%; spreads +11%, depth &minus;9%, liquidity &minus;5%</td><td><span class="badge bb">B</span></td><td><a class="src" href="https://blockearner.com.au/blog/the-bitcoin-liquidity-gap-why-the-24-7-crypto-market-gets-volatile-when-wall-street-logs-off/">blockearner.com.au/blog/the-bitcoin-liquidity-gap-why-the-24-7-crypto-market-gets-volatile-when-wall-street-logs-off</a></td></tr>
+<tr><td>2 · Liquidity</td><td>MEXC / Kaiko &mdash; weekday BTC volume ~2&times; weekend; institutions dominate weekdays</td><td><span class="badge bb">B</span></td><td><a class="src" href="https://www.mexc.com/news/1020302">mexc.com/news/1020302</a></td></tr>
+<tr><td>2 · Liquidity</td><td>FinanceFeeds &mdash; Kaiko: weekend volume share 24% (2018) &rarr; 13% (2024)</td><td><span class="badge bb">B</span></td><td><a class="src" href="https://financefeeds.com/why-crypto-prices-drop-on-weekends/">financefeeds.com/why-crypto-prices-drop-on-weekends</a></td></tr>
+<tr><td>3 · Stop-hunt</td><td>BitMEX Blog &mdash; &ldquo;Scamwicks and Stop Cascades&rdquo; (order-book sweep &rarr; last-price gap &rarr; liquidation cascade)</td><td><span class="badge bb">B</span></td><td><a class="src" href="https://blog.bitmex.com/scamwicks-and-stop-cascades/">blog.bitmex.com/scamwicks-and-stop-cascades</a></td></tr>
+<tr><td>3 · Stop-hunt</td><td>MenthorQ &mdash; weekend breakouts fail ~70&ndash;80% in thin books; stops slip on wide spreads</td><td><span class="badge bwarn">C</span></td><td><a class="src" href="https://menthorq.com/guide/weekend-risk-in-crypto-trading/">menthorq.com/guide/weekend-risk-in-crypto-trading</a></td></tr>
+<tr><td>3 · Stop-hunt</td><td>LiquidityScan &mdash; ICT &ldquo;liquidity sweep / stop hunt&rdquo; concept (folklore framing)</td><td><span class="badge bwarn">C</span></td><td><a class="src" href="https://liquidityscan.io/blog/liquidity-sweep-explained-the-ict-stop-hunt">liquidityscan.io/blog/liquidity-sweep-explained-the-ict-stop-hunt</a></td></tr>
+<tr><td>4 · Seasonality</td><td>Caporale &amp; Plastun (2019), <i>Finance Research Letters</i> &mdash; day-of-week effect in crypto</td><td><span class="badge bb">B</span></td><td><a class="src" href="https://www.sciencedirect.com/science/article/pii/S1544612318304240">sciencedirect.com/science/article/pii/S1544612318304240</a></td></tr>
+<tr><td>4 · Seasonality</td><td>Kaya Aydemir &amp; Aydemir &mdash; day-of-week effect on Bitcoin return &amp; volatility (Monday higher)</td><td><span class="badge bb">B</span></td><td><a class="src" href="https://www.sciencedirect.com/science/article/abs/pii/S0275531918307827">sciencedirect.com/science/article/abs/pii/S0275531918307827</a></td></tr>
+<tr><td>4 · Seasonality</td><td>Crypto&ndash;stock weekend effect (2025), <i>FRL</i> &mdash; weekend BTC/ETH returns predict Monday equity moves (asymmetric)</td><td><span class="badge bb">B</span></td><td><a class="src" href="https://www.sciencedirect.com/science/article/pii/S1544612325019154">sciencedirect.com/science/article/pii/S1544612325019154</a></td></tr>
+<tr><td>4 · Seasonality</td><td>mlquants &mdash; daily DoW effect evaporates intraday except a Sun 23:00&ndash;00:00 UTC burst (US retail return)</td><td><span class="badge bb">B</span></td><td><a class="src" href="https://mlquants.substack.com/p/are-day-of-the-week-effects-in-cryptocurrencies">mlquants.substack.com/p/are-day-of-the-week-effects-in-cryptocurrencies</a></td></tr>
+<tr><td>5 · Funding</td><td>Bitget Academy &mdash; funding paid every 8h at 00/08/16 UTC; extremes precede reversals</td><td><span class="badge bb">B</span></td><td><a class="src" href="https://www.bitget.com/academy/12560603880561">bitget.com/academy/12560603880561</a></td></tr>
+<tr><td>5 · Funding</td><td>Fulgur Ventures &mdash; raw funding&rarr;return link is weak (R&sup2;&#8776;0.003)</td><td><span class="badge bb">B</span></td><td><a class="src" href="https://medium.com/@fulgur.ventures/bitcoin-funding-rates-and-price-predictability-27ce95535af1">medium.com/@fulgur.ventures/bitcoin-funding-rates-and-price-predictability-27ce95535af1</a></td></tr>
+<tr><td>5 · Funding</td><td>BitMEX Blog &mdash; XBTUSD funding mean-reversion (weak, conditional)</td><td><span class="badge bb">B</span></td><td><a class="src" href="https://blog.bitmex.com/xbtusd-funding-mean-reversion-strategy/">blog.bitmex.com/xbtusd-funding-mean-reversion-strategy</a></td></tr>
+</tbody></table>
+
+<!-- ============================= SPECULATION BOX ============================= -->
+<div class="spec">
+<h3>What&rsquo;s still speculation (be honest)</h3>
+<ul>
+<li><b>Causation vs correlation on the gap.</b> We confirmed gaps <em>fill</em> on schedule, but not that the CME gap
+<em>causes</em> the fill rather than being one label for ordinary volatility mean-reversion. A placebo-level test (does a
+random level the same distance away get touched as often?) is not yet run.</li>
+<li><b>The stop-hunt/liquidity-grab story is an interpretation.</b> Our data proves the <em>failed-breakout</em> filter
+adds edge; it does not prove <em>why</em> (resting-stop cascades). That the mechanism is the failure, not the stretch, is
+solid; that the failure is literally a stop-run is inference supported by exchange order-book write-ups, not by our
+candles.</li>
+<li><b>Funding (card 5) is essentially untested here</b> &mdash; no funding series in the candle file, and the
+weekend-specific periodicity is weakly documented. Treat as a hypothesis.</li>
+<li><b>Regime shift risk.</b> ETF-era deepening and CME&rsquo;s move to 24/7 (2026-05-29) remove the literal weekend
+gap and thin the vacuum. The mechanism could weaken going forward; the +0.54R out-of-sample result is encouraging but
+the causal chain must be re-checked on fresh data.</li>
+<li><b>Direction remains a coin-flip.</b> Nothing here gives an edge on <em>which way</em> Monday goes &mdash; only on
+fading confirmed failures back to the base.</li>
+</ul>
+</div>
+
+<!-- ============================= IMPLICATIONS ============================= -->
+<h2>Implications &mdash; how Igor should trade it</h2>
+<div class="declared">
+<ol style="margin:4px 0;padding-left:20px">
+<li><b>Treat the base as a real target, not hope.</b> The Friday-close / weekend-base level fills on a documented
+schedule (68% in 48h, 79% by Friday) &rarr; <b>exit at the base</b> (levels-as-targets), don&rsquo;t over-trail.</li>
+<li><b>Scale target ambition to stretch size.</b> Small overshoots almost always fill; on &ge;2% stretches only ~59%
+fill by Friday &rarr; take partials earlier / don&rsquo;t demand a full fill on the biggest moves.</li>
+<li><b>Enter with the Sunday burst, not before it.</b> The snap-back catalyst is the <b>Sunday 18:00&ndash;21:00 NY</b>
+reopen burst. Don&rsquo;t fade into the dead weekend; wait for TradFi flow to arrive.</li>
+<li><b>Require a confirmed failure, always.</b> Rejection of the range with a ~200%-volume candle back through the
+50-EMA <em>is</em> the edge. Never degrade the trigger into a naked stretch-fade &mdash; that loses.</li>
+<li><b>Stay direction-agnostic.</b> Ignore &ldquo;Mondays are green&rdquo; (noise on our data). Fade the failure whichever
+way it points.</li>
+<li><b>Use funding only as optional confluence.</b> Extreme weekend funding in the overshoot&rsquo;s direction is a
+&ldquo;nice-to-have&rdquo; tell of a crowded, unwind-prone book &mdash; never a sizing input until tested.</li>
+<li><b>Watch the regime.</b> Re-run the gap check and the failed-breakout edge on 2025&ndash;26 data periodically; if
+deepening liquidity / CME 24/7 kills the fill schedule, the mechanism &mdash; and the edge &mdash; is eroding.</li>
+</ol>
+</div>
+
+<div class="foot">
+Why the Monday Fade Works &middot; Weekend SD Trading / research task R1 &middot; own-data check
+<code>weekend_gap_check.py</code> over IS 2019-09-09&rarr;2024-12-31 (277 weekends), deterministic, double-run
+md5 <code>12f40d279e7d5610161514f57d0f80c3</code> on <code>weekend_gap_stats.csv</code>. Evidence grades: A = confirmed
+in our data, B = cited study/desk research, C = folklore/theory. This page is fully self-contained (no external resource
+loads); source URLs are shown as text for independent verification. Generated July 2026.
+</div>
+
+</div></body></html>

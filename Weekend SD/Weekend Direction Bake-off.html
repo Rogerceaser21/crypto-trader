@@ -1,0 +1,178 @@
+<meta charset="utf-8"><title>Weekend Direction Bake-off</title>
+<style>
+:root{--bg:#f7f8fa;--card:#ffffff;--ink:#1f2733;--muted:#6b7683;--line:#e3e7ee;
+--ok:#0b8a5f;--okbg:#e7f6ef;--bad:#c0392b;--badbg:#fbe9e7;--warn:#b9770a;--warnbg:#fdf3e3;--accent:#2c5cc5;}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--bg);color:var(--ink);
+font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+.wrap{max-width:1040px;margin:0 auto;padding:34px 26px 70px;}
+h1{font-size:26px;margin:0 0 4px;letter-spacing:-.2px;}
+.sub{color:var(--muted);font-size:13.5px;margin:0 0 22px;}
+h2{font-size:19px;margin:38px 0 12px;padding-bottom:7px;border-bottom:2px solid var(--line);}
+h3{font-size:15px;margin:20px 0 8px;color:#33404f;}
+.banner{border-radius:12px;padding:16px 18px;margin:0 0 8px;line-height:1.5;display:flex;gap:12px;align-items:flex-start;}
+.banner.bad{background:var(--badbg);border:1px solid #f2c6bf;}
+.banner .tag{font-size:12px;font-weight:800;letter-spacing:.5px;padding:3px 9px;border-radius:6px;white-space:nowrap;}
+.banner.bad .tag{background:var(--bad);color:#fff;}
+.verdict{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--accent);
+border-radius:10px;padding:14px 16px;margin:8px 0;font-size:14.5px;line-height:1.55;}
+table{border-collapse:collapse;width:100%;margin:8px 0 6px;background:var(--card);
+border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:13px;}
+th,td{padding:7px 10px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;}
+th{background:#eef1f6;font-weight:650;color:#3a4553;font-size:12px;letter-spacing:.2px;}
+tr:last-child td{border-bottom:none;}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;
+font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:12.4px;}
+tr.hl td{outline:2px solid #f0d9a8;outline-offset:-2px;}
+.badge{font-size:10.5px;font-weight:800;padding:2px 7px;border-radius:5px;letter-spacing:.3px;white-space:nowrap;}
+.bok{background:var(--okbg);color:var(--ok);} .bwarn{background:var(--warnbg);color:var(--warn);}
+.bmut{background:#eef1f6;color:var(--muted);}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:14px 0;}
+.kpis{display:flex;flex-wrap:wrap;gap:12px;margin:10px 0;}
+.kpi{flex:1 1 150px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;}
+.kpi .v{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums;}
+.kpi .l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-top:2px;}
+.honesty{background:#fbfaf5;border:1px solid #ece3c9;border-radius:12px;padding:14px 18px;margin:16px 0;font-size:13.5px;}
+.declared{background:#eef3fb;border:1px solid #ccdcf5;border-radius:12px;padding:16px 18px;margin:14px 0;}
+p{margin:9px 0;} ul{margin:8px 0;padding-left:20px;} li{margin:5px 0;}
+code{background:#eef1f6;padding:1px 6px;border-radius:4px;font-size:12.5px;}
+.foot{color:var(--muted);font-size:12px;margin-top:40px;border-top:1px solid var(--line);padding-top:14px;}
+.small{font-size:12.5px;color:var(--muted);}
+</style>
+<div class="wrap">
+
+<div class="banner bad"><span class="tag">VERDICT</span>
+<div><b>NO CREDIBLE DIRECTION RULE.</b> Across all 21 tested cells, <b>not one</b> mechanical rule beats
+plain always-long by a believable margin. The single positive-looking rule &mdash; late-Sunday momentum
+(D6, +0.31% per weekend, paired&nbsp;t&nbsp;=&nbsp;+1.03) &mdash;
+sits below the noise line and <b>disintegrates</b> when the entry moves by an hour (t swings +2.06&rarr;+1.03&rarr;+0.47).
+Every other rule actually <b>lost</b> to always-long. Keep the weekend leg long-only; there is no direction skill to harvest here.</div></div>
+
+<h1>Weekend Direction Bake-off</h1>
+<p class="sub">Can any mechanical rule pick the weekend's direction better than just staying long? &middot;
+in-sample 2019-09-09 &rarr; 2024-12-31 UTC &middot; 277 weekends &middot; 21 live cells &middot; no stops (pure direction test)</p>
+
+<div class="kpis">
+  <div class="kpi"><div class="v">0 / 21</div><div class="l">cells that beat long-only credibly</div></div>
+  <div class="kpi"><div class="v">+0.31%</div><div class="l">best excess vs long (D6&times;E4, t +1.03)</div></div>
+  <div class="kpi"><div class="v">&minus;1.91</div><div class="l">most extreme paired t (D5&times;E3 &mdash; a <i>loser</i>)</div></div>
+  <div class="kpi"><div class="v">0.14%</div><div class="l">round-trip cost applied every trade</div></div>
+</div>
+
+<h2>How the test works</h2>
+<p>Each rule makes one call per weekend &mdash; <b>long</b> or <b>short</b> &mdash; then holds with <b>no stop</b> to the
+weekend end. No stop is deliberate: a stop would mix exit skill into the score; holding the whole leg isolates
+<i>direction</i> skill alone. We then compare each rule to the <b>always-long baseline entered at the same moment</b>,
+weekend by weekend (a paired difference). The headline number is that mean <b>excess vs long</b> and its paired t-stat:
+positive and significant means the rule genuinely adds direction skill; anything else means it does not.</p>
+<div class="card"><svg class="chart" viewBox="0 0 1000 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Weekend leg timeline">
+  <line x1="60" y1="150" x2="945" y2="150" stroke="#c4ccd6" stroke-width="2"/>
+  <!-- tick positions -->
+  <g font-family="sans-serif">
+    <!-- entries E1 E2 E3 -->
+    <g>
+      <circle cx="120" cy="150" r="6" fill="#2c5cc5"/><text x="120" y="135" font-size="12" fill="#1f2733" text-anchor="middle" font-weight="700">E1</text>
+      <text x="120" y="180" font-size="10.5" fill="#6b7683" text-anchor="middle">Fri 17:00 NY</text>
+      <circle cx="245" cy="150" r="6" fill="#2c5cc5"/><text x="245" y="135" font-size="12" fill="#1f2733" text-anchor="middle" font-weight="700">E2</text>
+      <text x="245" y="180" font-size="10.5" fill="#6b7683" text-anchor="middle">Sat 00:00 Dubai</text>
+      <circle cx="470" cy="150" r="6" fill="#2c5cc5"/><text x="470" y="135" font-size="12" fill="#1f2733" text-anchor="middle" font-weight="700">E3</text>
+      <text x="470" y="180" font-size="10.5" fill="#6b7683" text-anchor="middle">Sun 12:00 Dubai</text>
+    </g>
+    <!-- base = weekend end -->
+    <line x1="660" y1="95" x2="660" y2="205" stroke="#0b8a5f" stroke-width="2" stroke-dasharray="4 3"/>
+    <text x="660" y="86" font-size="11" fill="#0b8a5f" text-anchor="middle" font-weight="700">BASE &middot; weekend end</text>
+    <text x="660" y="222" font-size="10.5" fill="#6b7683" text-anchor="middle">Mon 02:00 Dubai (Sun ~18:00 NY)</text>
+    <!-- E4 -->
+    <circle cx="780" cy="150" r="6" fill="#b9770a"/><text x="780" y="135" font-size="12" fill="#1f2733" text-anchor="middle" font-weight="700">E4</text>
+    <text x="780" y="180" font-size="10.5" fill="#6b7683" text-anchor="middle">Sun 21:00 NY</text>
+    <!-- Monday window close -->
+    <line x1="915" y1="95" x2="915" y2="205" stroke="#b9770a" stroke-width="2" stroke-dasharray="4 3"/>
+    <text x="915" y="86" font-size="11" fill="#b9770a" text-anchor="middle" font-weight="700">Mon-window close</text>
+    <text x="915" y="222" font-size="10.5" fill="#6b7683" text-anchor="middle">Tue 00:00 Dubai</text>
+    <!-- leg arrows to base for E1-E3 -->
+    <path d="M120 150 Q390 55 655 150" fill="none" stroke="#0b8a5f" stroke-width="1.5" opacity="0.55"/>
+    <path d="M245 150 Q450 70 655 150" fill="none" stroke="#0b8a5f" stroke-width="1.5" opacity="0.55"/>
+    <path d="M470 150 Q565 95 655 150" fill="none" stroke="#0b8a5f" stroke-width="1.5" opacity="0.55"/>
+    <!-- E4 leg to Mon-window close -->
+    <path d="M780 150 Q848 105 912 150" fill="none" stroke="#b9770a" stroke-width="1.8"/>
+    <text x="380" y="40" font-size="11.5" fill="#0b8a5f" font-weight="700">E1&ndash;E3 legs &rarr; exit at BASE (the weekend move)</text>
+    <text x="700" y="128" font-size="11" fill="#b9770a" font-weight="700">E4 leg &rarr; Mon-window close</text>
+  </g>
+</svg>
+<p class="small" style="margin:6px 2px 0">Blue dots are the four entry moments; green dashed line is the weekend end (base). Each rule
+picks long or short at an entry and holds to the exit. The score is how much that beats always-long entered at the very same dot.</p>
+</div>
+<p class="small">Exit note: E1&ndash;E3 enter before the weekend base (Mon 02:00 Dubai) and exit there &mdash; the weekend move.
+E4 (Sun 21:00 NY) lands 3&ndash;4h <i>after</i> that base, so it cannot exit there; it exits at the Monday-window close
+(Tue 00:00 Dubai), the same leg Phase&nbsp;4a called the &ldquo;Monday remainder.&rdquo; Within every entry column the rule and its
+long-only baseline share the identical entry and exit, so the comparison is apples-to-apples. This was fixed before any result was computed.</p>
+
+<h2>The full grid &mdash; excess vs always-long</h2>
+<p>Green = beat long-only that week on average; red = lost to it. The number is mean excess % per weekend; the small
+figure is its paired t-stat. A believable edge would be a column of solid greens with t&nbsp;&ge;&nbsp;3.</p>
+<table><thead><tr><th>Direction rule</th><th class="num">E1 &middot; Fri 17:00 NY</th><th class="num">E2 &middot; Sat 00:00 Dubai</th><th class="num">E3 &middot; Sun 12:00 Dubai</th><th class="num">E4 &middot; Sun 21:00 NY</th></tr></thead><tbody><tr><td><b>D1</b> &middot; Always long</td><td class="num" style="background:#f4f6f9;color:#6b7683">baseline</td><td class="num" style="background:#f4f6f9;color:#6b7683">baseline</td><td class="num" style="background:#f4f6f9;color:#6b7683">baseline</td><td class="num" style="background:#f4f6f9;color:#6b7683">baseline</td></tr><tr><td><b>D2</b> &middot; Recent drift (seasonality)</td><td class="num" style="background:rgb(225,154,147);color:#8a2f22">-0.180%<div style='font-size:10px;opacity:.75'>t -0.78</div></td><td class="num" style="background:rgb(223,150,142);color:#8a2f22">-0.190%<div style='font-size:10px;opacity:.75'>t -0.82</div></td><td class="num" style="background:rgb(216,129,120);color:#8a2f22">-0.236%<div style='font-size:10px;opacity:.75'>t -1.33</div></td><td class="num" style="background:rgb(205,97,85);color:#8a2f22">-0.310%<div style='font-size:10px;opacity:.75'>t -1.30</div></td></tr><tr><td><b>D3</b> &middot; Last week's chart shape</td><td class="num" style="background:rgb(220,141,133);color:#8a2f22">-0.209%<div style='font-size:10px;opacity:.75'>t -0.91</div></td><td class="num" style="background:rgb(228,166,159);color:#8a2f22">-0.153%<div style='font-size:10px;opacity:.75'>t -0.63</div></td><td class="num" style="background:rgb(212,117,107);color:#8a2f22">-0.263%<div style='font-size:10px;opacity:.75'>t -1.40</div></td><td class="num" style="background:rgb(215,125,116);color:#8a2f22">-0.245%<div style='font-size:10px;opacity:.75'>t -0.89</div></td></tr><tr><td><b>D4</b> &middot; Below or above last week's peak</td><td class="num" style="background:rgb(227,162,156);color:#8a2f22">-0.160%<div style='font-size:10px;opacity:.75'>t -0.74</div></td><td class="num" style="background:rgb(241,204,200);color:#8a2f22">-0.066%<div style='font-size:10px;opacity:.75'>t -0.29</div></td><td class="num" style="background:rgb(214,121,112);color:#8a2f22">-0.254%<div style='font-size:10px;opacity:.75'>t -1.37</div></td><td class="num" style="background:rgb(205,95,83);color:#8a2f22">-0.314%<div style='font-size:10px;opacity:.75'>t -1.12</div></td></tr><tr><td><b>D5</b> &middot; Which printed first last week</td><td class="num" style="background:rgb(209,109,98);color:#8a2f22">-0.282%<div style='font-size:10px;opacity:.75'>t -1.26</div></td><td class="num" style="background:rgb(217,132,123);color:#8a2f22">-0.230%<div style='font-size:10px;opacity:.75'>t -0.96</div></td><td class="num" style="background:rgb(198,76,63);color:#8a2f22">-0.357%<div style='font-size:10px;opacity:.75'>t -1.91</div></td><td class="num" style="background:rgb(238,193,189);color:#8a2f22">-0.090%<div style='font-size:10px;opacity:.75'>t -0.32</div></td></tr><tr><td><b>D6</b> &middot; Late-Sunday momentum</td><td class="num" style="background:#f4f6f9;color:#b7bfca">N/A</td><td class="num" style="background:#f4f6f9;color:#b7bfca">N/A</td><td class="num" style="background:#f4f6f9;color:#b7bfca">N/A</td><td class="num" style="background:rgb(59,162,126);color:#0b5e42">+0.313%<div style='font-size:10px;opacity:.75'>t +1.03</div></td></tr></tbody></table>
+<p class="small">D6 (late-Sunday momentum) can only act at 21:00 NY, so it exists at E4 only; the other three D6 cells are N/A.</p>
+
+<h2>Every cell, in full</h2>
+<p>21 live cells. <code>mean&nbsp;%</code> is the rule's own return; <code>excess</code> and its paired&nbsp;t are the
+test that matters. The highlighted row is the single strongest cell by |paired&nbsp;t| &mdash; and it is a <i>loser</i>.</p>
+<table><thead><tr><th>Cell</th><th>Rule (plain English)</th><th class="num">N</th><th class="num">win&nbsp;%</th>
+<th class="num">mean&nbsp;%</th><th class="num">median&nbsp;%</th><th class="num">t&nbsp;vs&nbsp;0</th><th class="num">PF</th>
+<th class="num">maxDD&nbsp;%</th><th class="num">excess&nbsp;%</th><th class="num">paired&nbsp;t</th></tr></thead>
+<tbody><tr><td><b>D1×E1</b></td><td>Always long</td><td class="num">277</td><td class="num">53.8%</td><td class="num" style="background:rgb(131,197,174);color:#0b5e42">+0.181</td><td class="num">+0.172</td><td class="num">+0.99</td><td class="num">1.21</td><td class="num">28.9</td><td class="num" style="background:#f4f6f9;color:#6b7683"><b>baseline</b></td><td class="num">–</td></tr><tr><td><b>D2×E1</b></td><td>Recent drift (seasonality)</td><td class="num">251</td><td class="num">45.4%</td><td class="num" style="background:rgb(212,237,227);color:#0b5e42">+0.034</td><td class="num">-0.140</td><td class="num">+0.18</td><td class="num">1.04</td><td class="num">52.2</td><td class="num" style="background:rgb(225,154,147);color:#8a2f22"><b>-0.180</b></td><td class="num">-0.78</td></tr><tr><td><b>D3×E1</b></td><td>Last week's chart shape</td><td class="num">277</td><td class="num">47.7%</td><td class="num" style="background:rgb(247,221,218);color:#8a2f22">-0.028</td><td class="num">-0.084</td><td class="num">-0.15</td><td class="num">0.97</td><td class="num">71.1</td><td class="num" style="background:rgb(220,141,133);color:#8a2f22"><b>-0.209</b></td><td class="num">-0.91</td></tr><tr><td><b>D4×E1</b></td><td>Below or above last week's peak</td><td class="num">277</td><td class="num">47.7%</td><td class="num" style="background:rgb(220,240,232);color:#0b5e42">+0.021</td><td class="num">-0.084</td><td class="num">+0.11</td><td class="num">1.02</td><td class="num">52.6</td><td class="num" style="background:rgb(227,162,156);color:#8a2f22"><b>-0.160</b></td><td class="num">-0.74</td></tr><tr><td><b>D5×E1</b></td><td>Which printed first last week</td><td class="num">277</td><td class="num">46.2%</td><td class="num" style="background:rgb(236,189,184);color:#8a2f22">-0.101</td><td class="num">-0.132</td><td class="num">-0.55</td><td class="num">0.90</td><td class="num">56.0</td><td class="num" style="background:rgb(209,109,98);color:#8a2f22"><b>-0.282</b></td><td class="num">-1.26</td></tr><tr><td><b>D1×E2</b></td><td>Always long</td><td class="num">277</td><td class="num">52.3%</td><td class="num" style="background:rgb(135,199,176);color:#0b5e42">+0.175</td><td class="num">+0.112</td><td class="num">+0.93</td><td class="num">1.19</td><td class="num">34.0</td><td class="num" style="background:#f4f6f9;color:#6b7683"><b>baseline</b></td><td class="num">–</td></tr><tr><td><b>D2×E2</b></td><td>Recent drift (seasonality)</td><td class="num">251</td><td class="num">44.6%</td><td class="num" style="background:rgb(225,243,235);color:#0b5e42">+0.012</td><td class="num">-0.176</td><td class="num">+0.06</td><td class="num">1.01</td><td class="num">65.5</td><td class="num" style="background:rgb(223,150,142);color:#8a2f22"><b>-0.190</b></td><td class="num">-0.82</td></tr><tr><td><b>D3×E2</b></td><td>Last week's chart shape</td><td class="num">277</td><td class="num">49.1%</td><td class="num" style="background:rgb(219,240,231);color:#0b5e42">+0.022</td><td class="num">-0.040</td><td class="num">+0.12</td><td class="num">1.02</td><td class="num">73.5</td><td class="num" style="background:rgb(228,166,159);color:#8a2f22"><b>-0.153</b></td><td class="num">-0.63</td></tr><tr><td><b>D4×E2</b></td><td>Below or above last week's peak</td><td class="num">277</td><td class="num">49.5%</td><td class="num" style="background:rgb(171,216,199);color:#0b5e42">+0.110</td><td class="num">-0.018</td><td class="num">+0.58</td><td class="num">1.12</td><td class="num">54.0</td><td class="num" style="background:rgb(241,204,200);color:#8a2f22"><b>-0.066</b></td><td class="num">-0.29</td></tr><tr><td><b>D5×E2</b></td><td>Which printed first last week</td><td class="num">277</td><td class="num">46.9%</td><td class="num" style="background:rgb(243,209,205);color:#8a2f22">-0.055</td><td class="num">-0.073</td><td class="num">-0.29</td><td class="num">0.95</td><td class="num">59.4</td><td class="num" style="background:rgb(217,132,123);color:#8a2f22"><b>-0.230</b></td><td class="num">-0.96</td></tr><tr><td><b>D1×E3</b></td><td>Always long</td><td class="num">277</td><td class="num">42.6%</td><td class="num" style="background:rgb(245,215,212);color:#8a2f22">-0.041</td><td class="num">-0.109</td><td class="num">-0.32</td><td class="num">0.94</td><td class="num">43.0</td><td class="num" style="background:#f4f6f9;color:#6b7683"><b>baseline</b></td><td class="num">–</td></tr><tr><td><b>D2×E3</b></td><td>Recent drift (seasonality)</td><td class="num">251</td><td class="num">42.6%</td><td class="num" style="background:rgb(210,110,100);color:#8a2f22">-0.279</td><td class="num">-0.182</td><td class="num">-2.10</td><td class="num">0.64</td><td class="num">65.8</td><td class="num" style="background:rgb(216,129,120);color:#8a2f22"><b>-0.236</b></td><td class="num">-1.33</td></tr><tr><td><b>D3×E3</b></td><td>Last week's chart shape</td><td class="num">277</td><td class="num">39.4%</td><td class="num" style="background:rgb(206,99,88);color:#8a2f22">-0.305</td><td class="num">-0.228</td><td class="num">-2.40</td><td class="num">0.63</td><td class="num">87.0</td><td class="num" style="background:rgb(212,117,107);color:#8a2f22"><b>-0.263</b></td><td class="num">-1.40</td></tr><tr><td><b>D4×E3</b></td><td>Below or above last week's peak</td><td class="num">277</td><td class="num">39.0%</td><td class="num" style="background:rgb(207,103,92);color:#8a2f22">-0.295</td><td class="num">-0.246</td><td class="num">-2.32</td><td class="num">0.64</td><td class="num">86.4</td><td class="num" style="background:rgb(214,121,112);color:#8a2f22"><b>-0.254</b></td><td class="num">-1.37</td></tr><tr class="hl"><td><b>D5×E3</b></td><td>Which printed first last week</td><td class="num">277</td><td class="num">36.8%</td><td class="num" style="background:rgb(192,58,44);color:#8a2f22">-0.399</td><td class="num">-0.296</td><td class="num">-3.15</td><td class="num">0.54</td><td class="num">113.8</td><td class="num" style="background:rgb(198,76,63);color:#8a2f22"><b>-0.357</b></td><td class="num">-1.91</td></tr><tr><td><b>D1×E4</b></td><td>Always long</td><td class="num">277</td><td class="num">48.4%</td><td class="num" style="background:rgb(193,227,214);color:#0b5e42">+0.070</td><td class="num">-0.124</td><td class="num">+0.35</td><td class="num">1.06</td><td class="num">48.9</td><td class="num" style="background:#f4f6f9;color:#6b7683"><b>baseline</b></td><td class="num">–</td></tr><tr><td><b>D2×E4</b></td><td>Recent drift (seasonality)</td><td class="num">251</td><td class="num">45.4%</td><td class="num" style="background:rgb(225,155,148);color:#8a2f22">-0.177</td><td class="num">-0.238</td><td class="num">-0.82</td><td class="num">0.87</td><td class="num">83.6</td><td class="num" style="background:rgb(205,97,85);color:#8a2f22"><b>-0.310</b></td><td class="num">-1.30</td></tr><tr><td><b>D3×E4</b></td><td>Last week's chart shape</td><td class="num">277</td><td class="num">43.7%</td><td class="num" style="background:rgb(225,156,149);color:#8a2f22">-0.175</td><td class="num">-0.375</td><td class="num">-0.87</td><td class="num">0.87</td><td class="num">65.9</td><td class="num" style="background:rgb(215,125,116);color:#8a2f22"><b>-0.245</b></td><td class="num">-0.89</td></tr><tr><td><b>D4×E4</b></td><td>Below or above last week's peak</td><td class="num">277</td><td class="num">43.3%</td><td class="num" style="background:rgb(215,126,116);color:#8a2f22">-0.244</td><td class="num">-0.377</td><td class="num">-1.21</td><td class="num">0.82</td><td class="num">75.6</td><td class="num" style="background:rgb(205,95,83);color:#8a2f22"><b>-0.314</b></td><td class="num">-1.12</td></tr><tr><td><b>D5×E4</b></td><td>Which printed first last week</td><td class="num">277</td><td class="num">47.7%</td><td class="num" style="background:rgb(248,224,221);color:#8a2f22">-0.020</td><td class="num">-0.203</td><td class="num">-0.10</td><td class="num">0.98</td><td class="num">61.9</td><td class="num" style="background:rgb(238,193,189);color:#8a2f22"><b>-0.090</b></td><td class="num">-0.32</td></tr><tr><td><b>D6×E4</b></td><td>Late-Sunday momentum</td><td class="num">277</td><td class="num">50.5%</td><td class="num" style="background:rgb(21,143,101);color:#0b5e42">+0.382</td><td class="num">+0.004</td><td class="num">+1.92</td><td class="num">1.37</td><td class="num">15.3</td><td class="num" style="background:rgb(59,162,126);color:#0b5e42"><b>+0.313</b></td><td class="num">+1.03</td></tr></tbody></table>
+
+<h2>Rule by rule</h2>
+<table><thead><tr><th>Rule</th><th>What it does</th><th>How it did</th></tr></thead><tbody><tr><td><b>D1</b> &middot; Always long <span class="badge bmut">baseline</span></td><td>Buy every weekend, no matter what. The yardstick every other rule must beat.</td><td>The yardstick. Long-only earned +0.181% per weekend at the Friday entry — small, positive, not significant (t +0.99). Every rule below is measured against this same-entry number.</td></tr><tr><td><b>D2</b> &middot; Recent drift (seasonality) <span class="badge bmut">worse than long</span></td><td>Look at the last 26 weekends' Monday-window returns. If they averaged up, go long; if down, go short. (First 26 weekends skipped as warm-up.)</td><td>Beat the baseline at <b>none</b> of its entries — excess was negative every time (worst -0.310% at E4, paired t -1.33). Following it would have <b>lost</b> money versus simply staying long.</td></tr><tr><td><b>D3</b> &middot; Last week's chart shape <span class="badge bmut">worse than long</span></td><td>Read last week with the calibrated weekly peak detector. A topping shape (an “M”) → short the weekend; a bottoming shape (a “W”) → long.</td><td>Beat the baseline at <b>none</b> of its entries — excess was negative every time (worst -0.263% at E3, paired t -1.40). Following it would have <b>lost</b> money versus simply staying long.</td></tr><tr><td><b>D4</b> &middot; Below or above last week's peak <span class="badge bmut">worse than long</span></td><td>Take the prior week's peak level from the same detector. If Friday's close sits below it → short; above it → long.</td><td>Beat the baseline at <b>none</b> of its entries — excess was negative every time (worst -0.314% at E4, paired t -1.37). Following it would have <b>lost</b> money versus simply staying long.</td></tr><tr><td><b>D5</b> &middot; Which printed first last week <span class="badge bmut">worse than long</span></td><td>Over last week (Mon 00:00 UTC → Fri 17:00 NY): if the week's HIGH came before its LOW → short the weekend; if the LOW came first → long.</td><td>Beat the baseline at <b>none</b> of its entries — excess was negative every time (worst -0.357% at E3, paired t -1.91). Following it would have <b>lost</b> money versus simply staying long.</td></tr><tr><td><b>D6</b> &middot; Late-Sunday momentum <span class="badge bwarn">noise</span></td><td>Watch the 3 hours after the Sunday futures open (Sun 18:00–21:00 NY). If price rose → go long; if it fell → go short. Can only act at 21:00 NY, so it exists at that entry only.</td><td>Its best cell (E4) beat the baseline by +0.313% but only at paired t +1.03 — below the |t|≥2 noise line, and it flips sign across entries. Not an edge.</td></tr></tbody></table>
+
+<h2>Coverage &amp; warm-up</h2>
+<ul>
+<li><b>Last week's chart shape (D3)</b> and <b>below/above last week's peak (D4)</b> use the reused, calibrated weekly
+peak detector (<code>detectors/patterns.py</code>, MAX_SHORTFALL = 0.35 per CALIBRATION_V2.md). On this sample it resolves a
+dominant M/W formation <b>every single week</b> &mdash; coverage <b>277/277</b> for D3 and <b>277/277</b> for D4.
+So there are no &ldquo;no-pattern&rdquo; skips; the detector always has an opinion (99 M, 140 W, 18 FDM, 20 FDW).</li>
+<li><b>Recent-drift seasonality (D2)</b> needs 26 completed weekends of history, so its first 26 weekends are warm-up
+(no trade): N = 251, not 277.</li>
+<li>All other rules trade all 277 weekends.</li>
+</ul>
+
+<h2>Sensitivity &mdash; move the entry by an hour</h2>
+<p>A real edge survives a small timing change. We re-ran the whole grid with every entry shifted &plusmn;1 hour and
+re-measured the two cells worth checking: the only positive one (D6&times;E4) and the strongest |t| one (D5&times;E3).</p>
+<table><thead><tr><th>Cell</th><th class="num">entry shift</th><th class="num">excess&nbsp;%</th>
+<th class="num">paired&nbsp;t</th><th class="num">N</th></tr></thead><tbody><tr><td>D6×E4 &middot; Late-Sunday momentum</td><td class="num">-60 min</td><td class="num" style="background:rgb(11,138,95);color:#0b5e42">+0.634%</td><td class="num">+2.06</td><td class="num">277</td></tr><tr><td>D6×E4 &middot; Late-Sunday momentum (registered)</td><td class="num">+0 min</td><td class="num" style="background:rgb(59,162,126);color:#0b5e42">+0.313%</td><td class="num">+1.03</td><td class="num">277</td></tr><tr><td>D6×E4 &middot; Late-Sunday momentum</td><td class="num">+60 min</td><td class="num" style="background:rgb(156,209,190);color:#0b5e42">+0.136%</td><td class="num">+0.47</td><td class="num">277</td></tr><tr><td>D5×E3 &middot; Which printed first last week</td><td class="num">-60 min</td><td class="num" style="background:rgb(192,58,44);color:#8a2f22">-0.398%</td><td class="num">-2.11</td><td class="num">277</td></tr><tr><td>D5×E3 &middot; Which printed first last week (registered)</td><td class="num">+0 min</td><td class="num" style="background:rgb(198,76,63);color:#8a2f22">-0.357%</td><td class="num">-1.91</td><td class="num">277</td></tr><tr><td>D5×E3 &middot; Which printed first last week</td><td class="num">+60 min</td><td class="num" style="background:rgb(201,84,72);color:#8a2f22">-0.339%</td><td class="num">-1.95</td><td class="num">277</td></tr></tbody></table>
+<p><b>Read.</b> D6&times;E4 is <b>fragile</b>: nudge the entry one hour earlier and it flickers to t&nbsp;=&nbsp;+2.06; one hour
+later and it collapses to t&nbsp;=&nbsp;+0.47. An edge that lives or dies on a 60-minute entry window is a timing artefact,
+not skill. D5&times;E3 hovers near t&nbsp;=&nbsp;&minus;2 across the shifts &mdash; consistently, it is a rule that <i>loses</i> to long-only.</p>
+
+<div class="honesty">
+<b>Honesty box.</b>
+<ul>
+<li><b>Multiple-comparison math.</b> With 21 cells, roughly <b>one</b> |t|&nbsp;&ge;&nbsp;2 is expected by pure luck. On the key
+paired-excess statistic, at the pre-registered entry times, <b>zero</b> cells even reach |t|&nbsp;&ge;&nbsp;2 &mdash; the most
+extreme is D5&times;E3 at t&nbsp;=&nbsp;&minus;1.91, and that is a rule that <i>hurts</i> you.</li>
+<li><b>The one that flickers over the line</b> (D6&times;E4 at &minus;1h, t&nbsp;=&nbsp;+2.06) is exactly the kind of lone
+|t|&nbsp;&ge;&nbsp;2 chance produces, and it fails the &plusmn;1h robustness check outright.</li>
+<li><b>Why they lose.</b> Almost every rule is <b>short-biased</b> (it calls a lot of shorts). 2019&ndash;2024 was net-bullish,
+so those shorts bled against a drifting-up tape &mdash; which is why long-only is hard to beat and the rules underperform it.</li>
+<li><b>Pre-registration honoured.</b> The grid was frozen up front; the E4 entry was deliberately set to the SUN-POST
+<i>close</i> (21:00 NY), not its open, for causality &mdash; decided before any number was seen. Nothing was added after results.</li>
+<li>This is the expected outcome: Phase&nbsp;4a already found only marginal direction signals (its best, the same late-Sunday
+momentum, cleared |t|&nbsp;&ge;&nbsp;2 for a single test but not the multiple-comparison bar). Phase&nbsp;4b confirms it as a
+full bake-off: <b>no rule earns its keep on direction.</b></li>
+</ul>
+</div>
+
+<div class="declared">
+<b>What this means for the strategy.</b> Trade the weekend leg <b>long-only</b> (or don't trade direction at all) &mdash;
+there is no mechanical filter here that improves on it. If the weekend leg is to earn anything, the edge has to come from
+somewhere other than picking up/down: sizing, the mean-reversion fade already studied, or an entirely different leg.
+Do not deploy any of D2&ndash;D6 as a direction filter.
+</div>
+
+<div class="foot">
+Engine: <code>Strategy Codex/Weekend SD/backtests/bt_weekend_direction.py</code> &middot; outputs
+<code>direction_cells.csv</code> (md5 e455d2dade3708bf926bdecc3173b4ac), <code>direction_trades.csv</code> (md5 5eee78666d8853ad601c6fd489374749) &middot;
+deterministic (two runs byte-identical) &middot; causal-only, in-sample &le; 2024-12-31 &middot; costs 0.05% fee/side + 0.02% slip/fill.
+Report generated by <code>make_direction_report.py</code>. BTCUSDT perp, 1m candles.
+</div>
+</div>

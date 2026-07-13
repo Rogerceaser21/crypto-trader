@@ -1,0 +1,212 @@
+//@version=6
+// ============================================================================
+// CT Rsi Div V6 — Replica    (Krown research R2.2 · gift-grade tool for Igor)
+// ============================================================================
+// A faithful, open-source reconstruction of The_Caretaker's "CT Rsi Div V6"
+// RSI-divergence study, built from the TradingView built-in "Divergence
+// Indicator" convention (the open-source root every community RSI-div script
+// shares). Plots Wilder RSI + a smoothing signal line, marks confirmed RSI
+// pivots, and flags the four classic divergence classes, each toggleable and
+// colour-coded, with an alertcondition() per class.
+//
+// WHY THIS EXISTS / WHAT IT IS NOT
+//   Krown uses divergence as OPTIONAL confluence for Strategy 1 (hidden
+//   divergence on the trade side sharpens entries; opposite-side regular
+//   divergence is a take-profit cue) and points at "phantom/hidden" divergences
+//   in his live short. The published literature finds NO isolated edge for RSI
+//   divergence in isolation (it needs structure/candle confirmation). So this
+//   is a faithful *tool*, NOT an edge claim. Treat the flags as confluence.
+//
+// CONFIRMATION LAG — READ THIS  (honest mode is the default)
+//   A pivot is only knowable `lbR` bars AFTER it prints (you must see the bars
+//   to its right come in higher/lower). So a divergence is only *real* at the
+//   CONFIRMATION bar = pivot bar + lbR. In the default (honest) mode the label
+//   and the alert fire AT the confirmation bar — exactly when the signal is
+//   actionable. The Caretaker-style look draws the divergence LINE back to the
+//   two pivot bars; that back-drawn line places a mark on history (it does not
+//   move afterwards, but it sits `lbR` bars in the past). Enable
+//   "Retro-draw line back to pivots" to reproduce that visual. Nothing here
+//   uses future data — but the retro line makes the signal LOOK earlier than it
+//   was tradable, hence it is OFF by default and clearly labelled.
+//
+// CONVENTIONS (locked to the TradingView built-in "Divergence Indicator")
+//   * Pivots are detected on the OSCILLATOR (RSI), not on price. Price is read
+//     at the RSI-pivot bar: `low` at pivot lows (bullish family), `high` at
+//     pivot highs (bearish family).
+//   * Defaults: RSI 14, lbL 5, lbR 5, rangeLower 5, rangeUpper 60.
+//   * A divergence needs the two consecutive pivots `rangeLower`..`rangeUpper`
+//     bars apart. The previous-pivot reference always advances to the newest
+//     pivot regardless of that gate.
+//   * reg. bull = price Lower-Low  & RSI Higher-Low   (bottoming)
+//     hid. bull = price Higher-Low & RSI Lower-Low    (uptrend continuation)
+//     reg. bear = price Higher-High& RSI Lower-High   (topping)
+//     hid. bear = price Lower-High & RSI Higher-High  (downtrend continuation)
+//
+// USAGE
+//   Add to chart -> opens in its own pane. Match the Python replica by keeping
+//   lbL=lbR (3/3 finds more, shallower pivots; 5/5 = TV default, cleaner). Turn
+//   on "Retro-draw" only for visual parity with Caretaker's chart. Wire the
+//   per-class alertcondition()s from the alert dialog. This file is NOT compiled
+//   locally — paste into TradingView's Pine editor; that is the compile check.
+//   It is deliberately kept to v6 built-ins (ta.rsi, ta.pivothigh/low, line.new,
+//   label.new, plotshape) to keep that paste low-risk.
+// ============================================================================
+
+indicator(title="CT Rsi Div V6 — Replica", shorttitle="CT RsiDiv Replica",
+     overlay=false, max_lines_count=500, max_labels_count=500)
+
+// ------------------------------- Inputs -------------------------------------
+grpR = "RSI"
+rsiLen = input.int(14, "RSI Length", minval=1, group=grpR)
+src    = input.source(close, "RSI Source", group=grpR)
+sigLen = input.int(9, "Signal MA Length (0 = off)", minval=0, group=grpR,
+     tooltip="Smoothing of the RSI, drawn as the white signal line. 0 hides it.")
+
+grpP = "Pivots / Range"
+lbL      = input.int(5, "Pivot Lookback Left (lbL)",  minval=1, group=grpP)
+lbR      = input.int(5, "Pivot Lookback Right (lbR) — also the confirmation lag in bars",
+     minval=1, group=grpP)
+rangeMin = input.int(5,  "Min bars between pivots (rangeLower)", minval=1, group=grpP)
+rangeMax = input.int(60, "Max bars between pivots (rangeUpper)", minval=1, group=grpP)
+
+grpC = "Classes (toggle)"
+showRegBull = input.bool(true, "Regular Bullish", group=grpC)
+showHidBull = input.bool(true, "Hidden Bullish",  group=grpC)
+showRegBear = input.bool(true, "Regular Bearish", group=grpC)
+showHidBear = input.bool(true, "Hidden Bearish",  group=grpC)
+
+grpD = "Display"
+retro    = input.bool(false, "Retro-draw line back to pivots (places marks in the past for visual parity)",
+     group=grpD)
+showPivs = input.bool(true, "Mark confirmed RSI pivots (dots at pivot bar)", group=grpD)
+showLbl  = input.bool(true, "Show class labels", group=grpD)
+
+grpK = "Colours"
+cRegBull = input.color(#26a69a, "Regular Bullish", group=grpK)   // teal-green
+cHidBull = input.color(#26c6da, "Hidden Bullish",  group=grpK)   // cyan
+cRegBear = input.color(#ef5350, "Regular Bearish", group=grpK)   // red
+cHidBear = input.color(#ff9800, "Hidden Bearish",  group=grpK)   // orange
+
+// -------------------------------- RSI ---------------------------------------
+osc = ta.rsi(src, rsiLen)                       // Wilder RSI (ta.rma internally)
+sig = sigLen > 0 ? ta.sma(osc, sigLen) : na     // white signal line
+
+plot(osc, "RSI", color=color.new(color.aqua, 0), linewidth=2)
+plot(sig, "Signal", color=color.new(color.white, 0), linewidth=1)
+
+// zone guides (cosmetic, mirrors the CT pane look)
+hUp  = hline(70, "Upper", color=color.new(color.green,  60), linestyle=hline.style_dotted)
+hMid = hline(50, "Mid",   color=color.new(color.gray,   50), linestyle=hline.style_dashed)
+hDn  = hline(30, "Lower", color=color.new(color.purple, 60), linestyle=hline.style_dotted)
+hTop = hline(100, "", display=display.none)
+hBot = hline(0,   "", display=display.none)
+fill(hUp, hTop, color=color.new(color.green,  92))
+fill(hDn, hBot, color=color.new(color.purple, 92))
+
+// ------------------------------- Pivots -------------------------------------
+pl = ta.pivotlow(osc, lbL, lbR)                 // NA unless a pivot low confirms
+ph = ta.pivothigh(osc, lbL, lbR)
+plFound = not na(pl)
+phFound = not na(ph)
+
+// persistent "previous pivot" trackers (self-consistent with the Python port)
+var int   plBar = na
+var float plOsc = na
+var float plLow = na
+var int   phBar = na
+var float phOsc = na
+var float phHigh = na
+
+// helper to draw a divergence line + label
+// hidden divergences draw DASHED (Caretaker's visual convention); regular = solid
+drawDiv(int x1, float y1, int x2, float y2, color col, string txt, bool up, bool dashed) =>
+    if retro
+        line.new(x1, y1, x2, y2, xloc=xloc.bar_index, color=col, width=2,
+             style=dashed ? line.style_dashed : line.style_solid)
+    if showLbl
+        // honest: label at the confirmation bar (bar_index); retro: at the pivot (x2)
+        lblX = retro ? x2 : bar_index
+        lblY = retro ? y2 : osc
+        style = up ? label.style_label_up : label.style_label_down
+        label.new(lblX, lblY, text=txt, xloc=xloc.bar_index, style=style,
+             color=col, textcolor=color.white, size=size.tiny)
+
+// class flags (global, for plotshape + alerts) --------------------------------
+bool regBull = false
+bool hidBull = false
+bool regBear = false
+bool hidBear = false
+
+// -------- bullish family: consecutive RSI pivot LOWS -------------------------
+if plFound
+    curBar = bar_index - lbR
+    curOsc = osc[lbR]
+    curLow = low[lbR]
+    if not na(plBar)
+        gap = curBar - plBar
+        inR = gap >= rangeMin and gap <= rangeMax
+        if inR
+            if curOsc > plOsc and curLow < plLow and showRegBull
+                regBull := true
+                drawDiv(plBar, plOsc, curBar, curOsc, cRegBull, "Bull", true, false)
+            if curOsc < plOsc and curLow > plLow and showHidBull
+                hidBull := true
+                drawDiv(plBar, plOsc, curBar, curOsc, cHidBull, "H Bull", true, true)
+    plBar := curBar
+    plOsc := curOsc
+    plLow := curLow
+
+// -------- bearish family: consecutive RSI pivot HIGHS ------------------------
+if phFound
+    curBar = bar_index - lbR
+    curOsc = osc[lbR]
+    curHigh = high[lbR]
+    if not na(phBar)
+        gap = curBar - phBar
+        inR = gap >= rangeMin and gap <= rangeMax
+        if inR
+            if curOsc < phOsc and curHigh > phHigh and showRegBear
+                regBear := true
+                drawDiv(phBar, phOsc, curBar, curOsc, cRegBear, "Bear", false, false)
+            if curOsc > phOsc and curHigh < phHigh and showHidBear
+                hidBear := true
+                drawDiv(phBar, phOsc, curBar, curOsc, cHidBear, "H Bear", false, true)
+    phBar := curBar
+    phOsc := curOsc
+    phHigh := curHigh
+
+// ------------------------- pivot dots (optional) ----------------------------
+// placed at the pivot bar (offset -lbR); they mark WHERE the pivot is, but only
+// become visible lbR bars later (confirmation). Purely cosmetic.
+plotshape(showPivs and plFound ? osc[lbR] : na, title="Pivot Low", offset=-lbR,
+     location=location.absolute, style=shape.circle, size=size.tiny,
+     color=color.new(color.lime, 0))
+plotshape(showPivs and phFound ? osc[lbR] : na, title="Pivot High", offset=-lbR,
+     location=location.absolute, style=shape.circle, size=size.tiny,
+     color=color.new(color.orange, 0))
+
+// -------------------- confirmation-bar shape markers ------------------------
+// honest markers at the confirmation bar (always at bar_index, no offset).
+plotshape(regBull, title="Regular Bullish (mark)", location=location.bottom,
+     style=shape.triangleup,   size=size.tiny, color=cRegBull)
+plotshape(hidBull, title="Hidden Bullish (mark)",  location=location.bottom,
+     style=shape.triangleup,   size=size.tiny, color=cHidBull)
+plotshape(regBear, title="Regular Bearish (mark)", location=location.top,
+     style=shape.triangledown, size=size.tiny, color=cRegBear)
+plotshape(hidBear, title="Hidden Bearish (mark)",  location=location.top,
+     style=shape.triangledown, size=size.tiny, color=cHidBear)
+
+// ------------------------------- Alerts -------------------------------------
+alertcondition(regBull, title="Regular Bullish divergence",
+     message="CT RsiDiv: Regular BULLISH divergence confirmed on {{ticker}} {{interval}}")
+alertcondition(hidBull, title="Hidden Bullish divergence",
+     message="CT RsiDiv: Hidden BULLISH divergence confirmed on {{ticker}} {{interval}}")
+alertcondition(regBear, title="Regular Bearish divergence",
+     message="CT RsiDiv: Regular BEARISH divergence confirmed on {{ticker}} {{interval}}")
+alertcondition(hidBear, title="Hidden Bearish divergence",
+     message="CT RsiDiv: Hidden BEARISH divergence confirmed on {{ticker}} {{interval}}")
+// convenience OR-alerts
+alertcondition(regBull or hidBull, title="Any Bullish divergence",
+     message="CT RsiDiv: BULLISH divergence (reg or hidden) on {{ticker}} {{interval}}")
+alertcondition(regBear or hidBear, title="Any Bearish divergence",
+     message="CT RsiDiv: BEARISH divergence (reg or hidden) on {{ticker}} {{interval}}")

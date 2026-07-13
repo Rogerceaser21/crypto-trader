@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Monday Counter-Trade Backtest</title>
+<style>
+    :root{--bg:#f6f7f9;--card:#fff;--ink:#1f2733;--muted:#6b7683;--line:#e3e7ee;
+      --ok:#0b8a5f;--okbg:#e7f6ef;--bad:#c0392b;--badbg:#fbe9e7;--warn:#b9770a;--warnbg:#fdf3e3;--accent:#2c5cc5;}
+    *{box-sizing:border-box;}
+    body{margin:0;background:var(--bg);color:var(--ink);
+      font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+    .wrap{max-width:1000px;margin:0 auto;padding:32px 24px 72px;}
+    h1{font-size:26px;margin:0 0 4px;letter-spacing:-.2px;}
+    .sub{color:var(--muted);font-size:13.5px;margin:0 0 20px;}
+    h2{font-size:19px;margin:38px 0 12px;padding-bottom:7px;border-bottom:2px solid var(--line);}
+    h3{font-size:15px;margin:20px 0 6px;color:#33404f;}
+    .banner{border-radius:12px;padding:18px 20px;font-size:16px;font-weight:600;margin:0 0 14px;
+      display:flex;gap:13px;align-items:flex-start;line-height:1.45;
+      background:var(--badbg);border:1px solid #f2c3bb;color:#a5281a;}
+    .banner .tag{font-size:12px;font-weight:800;letter-spacing:.5px;padding:4px 10px;border-radius:6px;
+      white-space:nowrap;background:var(--bad);color:#fff;}
+    .kpis{display:flex;flex-wrap:wrap;gap:12px;margin:12px 0 6px;}
+    .kpi{flex:1 1 150px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:13px 15px;}
+    .kpi .v{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;}
+    .kpi .v.neg{color:var(--bad);} .kpi .v.ok{color:var(--ok);}
+    .kpi .l{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-top:2px;}
+    table{border-collapse:collapse;width:100%;margin:10px 0;background:var(--card);
+      border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:13.5px;}
+    th,td{padding:8px 11px;text-align:left;border-bottom:1px solid var(--line);}
+    th{background:#eef1f6;font-weight:650;color:#3a4553;font-size:12.5px;}
+    tr:last-child td{border-bottom:none;}
+    td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;
+      font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:12.8px;}
+    td.pos{color:var(--ok);} td.neg{color:var(--bad);}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:14px 0;}
+    .chart{width:100%;height:auto;display:block;}
+    .chart .ttl{font:600 12.5px sans-serif;fill:var(--ink);}
+    .chart .grid{stroke:#eef1f6;stroke-width:1;}
+    .chart .ytick{font:11px monospace;fill:var(--muted);text-anchor:end;}
+    .chart .xtick{font:11px sans-serif;fill:var(--muted);}
+    .chart .dlab{font:600 12.5px sans-serif;}
+    .chart .dsub{font:10.5px sans-serif;fill:#8a94a0;}
+    .chart .dnote{font:600 11px sans-serif;}
+    /* heatmap */
+    table.heat{font-size:12px;}
+    table.heat td,table.heat th{padding:0;border:1px solid #e6e9ef;text-align:center;}
+    table.heat .kh{background:#2c3e50;color:#fff;font-weight:700;width:74px;padding:6px;vertical-align:middle;line-height:1.3;}
+    table.heat .kh-sub{font-weight:500;font-size:10.5px;opacity:.85;}
+    table.heat tr.subhead td{background:#eef1f6;color:#3a4553;font-weight:650;font-size:11px;padding:5px 4px;}
+    table.heat td.srcname{background:#f7f9fc;text-align:left;padding:6px 8px;font-weight:600;font-size:11.5px;color:#33404f;}
+    table.heat td.cell{padding:6px 4px;line-height:1.25;}
+    table.heat td.cell .av{display:block;font-weight:700;font-size:12.5px;font-variant-numeric:tabular-nums;}
+    table.heat td.cell .nn{display:block;font-size:10px;opacity:.85;font-variant-numeric:tabular-nums;}
+    table.heat td.untr{background:repeating-linear-gradient(45deg,#e9edf2,#e9edf2 6px,#dfe4ea 6px,#dfe4ea 12px);
+      color:#8a94a0;font-size:10.5px;font-style:italic;}
+    table.heat .sig{color:#7a1a10;font-weight:800;}
+    tr.kband td{border:none;padding:0;}
+    .pill{font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:5px;letter-spacing:.3px;}
+    .pill.bad{background:var(--badbg);color:var(--bad);}
+    .box{border-radius:12px;padding:16px 18px;margin:14px 0;border:1px solid;}
+    .box.honesty{background:#f4f6fb;border-color:#d9e0ee;}
+    .box.take{background:var(--warnbg);border-color:#f0d9a8;}
+    ul{margin:8px 0;padding-left:20px;} li{margin:4px 0;}
+    code{background:#eef1f6;padding:1px 6px;border-radius:4px;font-size:12.5px;
+      font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;}
+    .legend{display:flex;gap:14px;align-items:center;font-size:11.5px;color:var(--muted);margin:8px 0 2px;flex-wrap:wrap;}
+    .swatch{display:inline-block;width:16px;height:12px;border-radius:2px;border:1px solid #ccc;vertical-align:middle;margin-right:4px;}
+    .foot{color:var(--muted);font-size:12px;margin-top:40px;border-top:1px solid var(--line);padding-top:14px;}
+    p{margin:9px 0;}
+    </style></head><body><div class="wrap">
+
+<h1>Monday Counter-Trade at Weekend SD Levels &mdash; Backtest</h1>
+<p class="sub">Does fading BTC back toward the weekend base when Monday stretches to a statistical
+level have a real edge? Causal 1-minute test on 277 weekends, in-sample only
+(2019-09 &rarr; 2024-12-31), after realistic fees and slippage.</p>
+
+<div class="banner">
+  <span class="tag">&#10060; NO EDGE</span>
+  <span>Not one of the 48 tested variants makes money after costs; the least-bad version (min 50 trades) still loses -0.024R per trade (t = -0.33, statistically indistinguishable from a coin flip) and every neighbouring variant loses too.</span>
+</div>
+
+<div class="kpis">
+  <div class="kpi"><div class="v">48</div><div class="l">variants tested</div></div>
+  <div class="kpi"><div class="v neg">0</div><div class="l">positive after costs</div></div>
+  <div class="kpi"><div class="v neg">-0.024R</div><div class="l">best variant / trade</div></div>
+  <div class="kpi"><div class="v neg">-0.33</div><div class="l">best variant t-stat</div></div>
+  <div class="kpi"><div class="v neg">-0.30R</div><div class="l">avg across all 3,738 trades</div></div>
+</div>
+<p>Every knob was frozen <em>before</em> looking at results, all 48 combinations were run, and nothing
+was added afterwards. The honest read is blunt: the mechanical version of this trade loses money in
+every configuration, and the variants that lose <em>reliably</em> (21 of 48 are statistically significant)
+all lose &mdash; none win.</p>
+
+<h2>1 &middot; How the trade works</h2>
+<p>Each Monday (02:00 &rarr; Tuesday 00:00 Dubai) two fade levels sit around the weekend base &mdash; one
+above, one below &mdash; placed at <code>mean&nbsp;+&nbsp;k&middot;SD</code> of the historical Monday move.
+Whichever level price tags <em>first</em> is faded back toward base: a tag of the upper level is a
+<strong style="color:#c0392b">short</strong>, a tag of the lower level is a
+<strong style="color:#0b8a5f">long</strong>. Stop sits further out; target is base or the halfway point.
+One trade per weekend.</p>
+<div class="card"><svg viewBox="0 0 860 360" class="chart" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="How the Monday fade works"><line x1="130" y1="176" x2="830" y2="176" stroke="#2c3e50" stroke-width="2.2"/><text x="12" y="172" class="dlab" fill="#2c3e50">Weekend base</text><text x="12" y="187" class="dsub">close before Mon 02:00 Dubai</text><line x1="130" y1="92" x2="830" y2="92" stroke="#c0392b" stroke-width="1.6"/><text x="12" y="88" class="dlab" fill="#c0392b">UP level</text><text x="12" y="103" class="dsub">mean+k&middot;SD above &mdash; SHORT here</text><line x1="130" y1="46" x2="830" y2="46" stroke="#8e44ad" stroke-width="1.6" stroke-dasharray="6 4"/><text x="12" y="42" class="dlab" fill="#8e44ad">Stop</text><text x="12" y="57" class="dsub">1 SD (or p95) further up</text><line x1="130" y1="128" x2="830" y2="128" stroke="#e67e22" stroke-width="1.3" stroke-dasharray="6 4"/><text x="12" y="124" class="dlab" fill="#e67e22">Half target</text><text x="12" y="139" class="dsub">midpoint to base</text><line x1="130" y1="260" x2="830" y2="260" stroke="#0b8a5f" stroke-width="1.6"/><text x="12" y="256" class="dlab" fill="#0b8a5f">DOWN level</text><text x="12" y="271" class="dsub">mean+k&middot;SD below &mdash; LONG here</text><line x1="130" y1="306" x2="830" y2="306" stroke="#8e44ad" stroke-width="1.6" stroke-dasharray="6 4"/><text x="12" y="302" class="dlab" fill="#8e44ad">Stop</text><text x="12" y="317" class="dsub">1 SD (or p95) further down</text><line x1="130" y1="224" x2="830" y2="224" stroke="#e67e22" stroke-width="1.3" stroke-dasharray="6 4"/><text x="12" y="220" class="dlab" fill="#e67e22">Half target</text><text x="12" y="235" class="dsub">midpoint to base</text><line x1="480.0" y1="96" x2="480.0" y2="172" stroke="#c0392b" stroke-width="2.4" marker-end="url(#arrR)"/><line x1="550.0" y1="256" x2="550.0" y2="180" stroke="#0b8a5f" stroke-width="2.4" marker-end="url(#arrG)"/><defs><marker id="arrR" markerWidth="9" markerHeight="9" refX="4.5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#c0392b"/></marker><marker id="arrG" markerWidth="9" markerHeight="9" refX="4.5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#0b8a5f"/></marker></defs><text x="472.0" y="138" class="dnote" text-anchor="end" fill="#c0392b">fade down</text><text x="558.0" y="222" class="dnote" fill="#0b8a5f">fade up</text><text x="830" y="352" class="dsub" text-anchor="end">Monday window: Mon 02:00 &rarr; Tue 00:00 Dubai &middot; first level tagged wins</text></svg></div>
+
+<h2>2 &middot; The full 48-variant grid</h2>
+<p>Three level distances &times; four ways to estimate the levels &times; two targets &times; two stops.
+Colour = average profit per trade in R (deeper red = bigger loss). <strong>Every populated cell is red</strong>
+&mdash; there is no green anywhere. A <span class="sig">&lowast;</span> marks cells whose loss is
+statistically significant (|t|&nbsp;&ge;&nbsp;2.5).</p>
+<div class="legend">
+  <span><span class="swatch" style="background:#fdecea"></span>near break-even (still &lt;0)</span>
+  <span><span class="swatch" style="background:#c0392b"></span>heavy loss</span>
+  <span><span class="swatch" style="background:repeating-linear-gradient(45deg,#e9edf2,#e9edf2 4px,#dfe4ea 4px,#dfe4ea 8px)"></span>untradeable (stop inside entry)</span>
+</div>
+<div style="overflow-x:auto;"><table class="heat"><tr class="kband"><td class="kh" rowspan="5">k = 0<br><span class="kh-sub">at mean</span></td></tr><tr class="subhead"><td>stats source</td><td>Base &middot; 1&sigma;</td><td>Base &middot; p95</td><td>Half &middot; 1&sigma;</td><td>Half &middot; p95</td></tr><tr><td class="srcname">All-history (expanding)</td><td class="cell" style="background:rgb(252,234,232);color:#3a1512"><span class="av">-0.118R</span><span class="nn">N=158 &middot; t=-2.2</span></td><td class="cell" style="background:rgb(252,234,232);color:#3a1512"><span class="av">-0.109R <span class="sig">&lowast;</span></span><span class="nn">N=158 &middot; t=-2.5</span></td><td class="cell" style="background:rgb(252,234,232);color:#3a1512"><span class="av">-0.080R</span><span class="nn">N=158 &middot; t=-1.8</span></td><td class="cell" style="background:rgb(252,235,233);color:#3a1512"><span class="av">-0.069R</span><span class="nn">N=158 &middot; t=-2.0</span></td></tr><tr><td class="srcname">3-month (13 wk)</td><td class="cell" style="background:rgb(252,233,231);color:#3a1512"><span class="av">-0.156R</span><span class="nn">N=175 &middot; t=-2.3</span></td><td class="cell" style="background:rgb(252,234,231);color:#3a1512"><span class="av">-0.132R <span class="sig">&lowast;</span></span><span class="nn">N=175 &middot; t=-2.7</span></td><td class="cell" style="background:rgb(252,234,232);color:#3a1512"><span class="av">-0.091R</span><span class="nn">N=175 &middot; t=-1.8</span></td><td class="cell" style="background:rgb(252,234,232);color:#3a1512"><span class="av">-0.082R</span><span class="nn">N=175 &middot; t=-2.1</span></td></tr><tr><td class="srcname">1-month (4 wk)</td><td class="cell" style="background:rgb(251,231,229);color:#3a1512"><span class="av">-0.269R <span class="sig">&lowast;</span></span><span class="nn">N=203 &middot; t=-4.1</span></td><td class="cell" style="background:rgb(251,231,228);color:#3a1512"><span class="av">-0.290R <span class="sig">&lowast;</span></span><span class="nn">N=203 &middot; t=-4.6</span></td><td class="cell" style="background:rgb(251,232,230);color:#3a1512"><span class="av">-0.200R <span class="sig">&lowast;</span></span><span class="nn">N=203 &middot; t=-3.7</span></td><td class="cell" style="background:rgb(251,232,230);color:#3a1512"><span class="av">-0.200R <span class="sig">&lowast;</span></span><span class="nn">N=203 &middot; t=-3.8</span></td></tr><tr><td class="srcname">Confluence</td><td class="cell" style="background:rgb(252,234,232);color:#3a1512"><span class="av">-0.112R</span><span class="nn">N=81 &middot; t=-1.2</span></td><td class="cell" style="background:rgb(252,234,232);color:#3a1512"><span class="av">-0.090R</span><span class="nn">N=81 &middot; t=-1.2</span></td><td class="cell" style="background:rgb(253,236,234);color:#3a1512"><span class="av">-0.024R</span><span class="nn">N=81 &middot; t=-0.3</span></td><td class="cell" style="background:rgb(253,235,233);color:#3a1512"><span class="av">-0.033R</span><span class="nn">N=81 &middot; t=-0.5</span></td></tr><tr class="kband"><td class="kh" rowspan="5">k = 1<br><span class="kh-sub">mean+1&sigma;</span></td></tr><tr class="subhead"><td>stats source</td><td>Base &middot; 1&sigma;</td><td>Base &middot; p95</td><td>Half &middot; 1&sigma;</td><td>Half &middot; p95</td></tr><tr><td class="srcname">All-history (expanding)</td><td class="cell" style="background:rgb(249,228,226);color:#3a1512"><span class="av">-0.418R <span class="sig">&lowast;</span></span><span class="nn">N=43 &middot; t=-3.6</span></td><td class="cell" style="background:rgb(249,226,223);color:#3a1512"><span class="av">-0.526R <span class="sig">&lowast;</span></span><span class="nn">N=43 &middot; t=-2.9</span></td><td class="cell" style="background:rgb(250,229,227);color:#3a1512"><span class="av">-0.354R <span class="sig">&lowast;</span></span><span class="nn">N=43 &middot; t=-3.0</span></td><td class="cell" style="background:rgb(249,227,224);color:#3a1512"><span class="av">-0.496R <span class="sig">&lowast;</span></span><span class="nn">N=43 &middot; t=-2.9</span></td></tr><tr><td class="srcname">3-month (13 wk)</td><td class="cell" style="background:rgb(250,229,226);color:#3a1512"><span class="av">-0.389R <span class="sig">&lowast;</span></span><span class="nn">N=79 &middot; t=-3.7</span></td><td class="cell" style="background:rgb(250,229,227);color:#3a1512"><span class="av">-0.363R <span class="sig">&lowast;</span></span><span class="nn">N=79 &middot; t=-2.6</span></td><td class="cell" style="background:rgb(250,229,227);color:#3a1512"><span class="av">-0.368R <span class="sig">&lowast;</span></span><span class="nn">N=79 &middot; t=-3.9</span></td><td class="cell" style="background:rgb(250,229,227);color:#3a1512"><span class="av">-0.353R <span class="sig">&lowast;</span></span><span class="nn">N=79 &middot; t=-2.9</span></td></tr><tr><td class="srcname">1-month (4 wk)</td><td class="cell" style="background:rgb(249,228,226);color:#3a1512"><span class="av">-0.417R <span class="sig">&lowast;</span></span><span class="nn">N=117 &middot; t=-4.0</span></td><td class="cell" style="background:rgb(234,193,188);color:#3a1512"><span class="av">-2.295R <span class="sig">&lowast;</span></span><span class="nn">N=87 &middot; t=-4.0</span></td><td class="cell" style="background:rgb(251,231,229);color:#3a1512"><span class="av">-0.273R <span class="sig">&lowast;</span></span><span class="nn">N=117 &middot; t=-3.0</span></td><td class="cell" style="background:rgb(238,202,198);color:#3a1512"><span class="av">-1.786R <span class="sig">&lowast;</span></span><span class="nn">N=87 &middot; t=-3.1</span></td></tr><tr><td class="srcname">Confluence</td><td class="cell" style="background:rgb(250,229,226);color:#3a1512"><span class="av">-0.382R</span><span class="nn">N=16 &middot; t=-1.5</span></td><td class="cell" style="background:rgb(248,225,223);color:#3a1512"><span class="av">-0.566R</span><span class="nn">N=16 &middot; t=-1.4</span></td><td class="cell" style="background:rgb(251,231,228);color:#3a1512"><span class="av">-0.278R</span><span class="nn">N=16 &middot; t=-1.1</span></td><td class="cell" style="background:rgb(252,234,232);color:#3a1512"><span class="av">-0.122R</span><span class="nn">N=16 &middot; t=-0.3</span></td></tr><tr class="kband"><td class="kh" rowspan="5">k = 2<br><span class="kh-sub">mean+2&sigma;</span></td></tr><tr class="subhead"><td>stats source</td><td>Base &middot; 1&sigma;</td><td>Base &middot; p95</td><td>Half &middot; 1&sigma;</td><td>Half &middot; p95</td></tr><tr><td class="srcname">All-history (expanding)</td><td class="cell" style="background:rgb(249,227,224);color:#3a1512"><span class="av">-0.481R <span class="sig">&lowast;</span></span><span class="nn">N=21 &middot; t=-2.5</span></td><td class="cell" style="background:rgb(238,204,200);color:#3a1512"><span class="av">-1.715R <span class="sig">&lowast;</span></span><span class="nn">N=9 &middot; t=-5.5</span></td><td class="cell" style="background:rgb(250,230,227);color:#3a1512"><span class="av">-0.329R</span><span class="nn">N=21 &middot; t=-1.5</span></td><td class="cell" style="background:rgb(238,204,200);color:#3a1512"><span class="av">-1.715R <span class="sig">&lowast;</span></span><span class="nn">N=9 &middot; t=-5.5</span></td></tr><tr><td class="srcname">3-month (13 wk)</td><td class="cell" style="background:rgb(251,232,229);color:#3a1512"><span class="av">-0.228R</span><span class="nn">N=42 &middot; t=-1.2</span></td><td class="cell" style="background:rgb(165,40,26);color:#fff"><span class="av">-10.403R</span><span class="nn">N=1 &middot; t=+nan</span></td><td class="cell" style="background:rgb(251,232,230);color:#3a1512"><span class="av">-0.190R</span><span class="nn">N=42 &middot; t=-1.2</span></td><td class="cell" style="background:rgb(165,40,26);color:#fff"><span class="av">-10.403R</span><span class="nn">N=1 &middot; t=+nan</span></td></tr><tr><td class="srcname">1-month (4 wk)</td><td class="cell" style="background:rgb(251,232,230);color:#3a1512"><span class="av">-0.211R</span><span class="nn">N=75 &middot; t=-1.3</span></td><td class="cell untr" title="untradeable">untradeable</td><td class="cell" style="background:rgb(252,234,232);color:#3a1512"><span class="av">-0.118R</span><span class="nn">N=75 &middot; t=-0.9</span></td><td class="cell untr" title="untradeable">untradeable</td></tr><tr><td class="srcname">Confluence</td><td class="cell" style="background:rgb(249,227,224);color:#3a1512"><span class="av">-0.484R</span><span class="nn">N=7 &middot; t=-2.0</span></td><td class="cell untr" title="untradeable">untradeable</td><td class="cell" style="background:rgb(252,234,232);color:#3a1512"><span class="av">-0.095R</span><span class="nn">N=7 &middot; t=-0.3</span></td><td class="cell untr" title="untradeable">untradeable</td></tr></table></div>
+<p style="font-size:12.5px;color:#6b7683;">Distance k: <code>k=0</code> fades right at the average
+Monday level, <code>k=1</code> one SD further out, <code>k=2</code> two SD out. Sources: all-history
+expanding, trailing 3-month (13 weekends), trailing 1-month (4 weekends), and confluence (only trades
+when at least two of those agree within 0.25 percentage points).</p>
+
+<h2>3 &middot; The least-bad variant, in detail</h2>
+<p>Picked purely by rule &mdash; highest average R among variants with at least 50 trades. It is:
+<strong>Fade at the level itself (k=0), levels from the confluence of the three lookbacks, take profit halfway back to base, stop one SD beyond.</strong> N&nbsp;=&nbsp;81 trades.</p>
+<div class="kpis">
+  <div class="kpi"><div class="v neg">-0.024R</div><div class="l">avg / trade</div></div>
+  <div class="kpi"><div class="v">+0.376R</div><div class="l">median / trade</div></div>
+  <div class="kpi"><div class="v">64%</div><div class="l">win rate</div></div>
+  <div class="kpi"><div class="v neg">-0.33</div><div class="l">t-stat vs 0</div></div>
+  <div class="kpi"><div class="v">0.92</div><div class="l">profit factor</div></div>
+  <div class="kpi"><div class="v neg">-1.9R</div><div class="l">total</div></div>
+</div>
+<p>Look at the trap: a <strong>64% win rate</strong> and a <em>positive median</em>, yet the
+account still bleeds. That is the classic mean-reversion signature &mdash; win small and often, then give it
+all back (and more) on the occasional Monday that just keeps running against the fade. The equity curve
+climbs early and rolls over:</p>
+<div class="card"><svg viewBox="0 0 860 280" class="chart" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Equity curve in R"><line x1="52" y1="246.0" x2="840" y2="246.0" class="grid"/><text x="44" y="249.5" class="ytick">-5.8</text><line x1="52" y1="191.0" x2="840" y2="191.0" class="grid"/><text x="44" y="194.5" class="ytick">-2.5</text><line x1="52" y1="136.0" x2="840" y2="136.0" class="grid"/><text x="44" y="139.5" class="ytick">+0.7</text><line x1="52" y1="81.0" x2="840" y2="81.0" class="grid"/><text x="44" y="84.5" class="ytick">+3.9</text><line x1="52" y1="26.0" x2="840" y2="26.0" class="grid"/><text x="44" y="29.5" class="ytick">+7.1</text><line x1="52" y1="147.5" x2="840" y2="147.5" stroke="#9aa4b0" stroke-width="1.2" stroke-dasharray="4 3"/><polygon points="52,147.5 52.0,147.5 61.7,139.5 71.5,131.2 81.2,122.7 90.9,111.9 100.6,98.8 110.4,87.0 120.1,78.2 129.8,96.3 139.6,89.5 149.3,82.7 159.0,74.3 168.7,74.7 178.5,67.6 188.2,60.6 197.9,54.6 207.7,49.9 217.4,41.2 227.1,59.8 236.8,51.9 246.6,70.2 256.3,62.3 266.0,55.4 275.8,73.7 285.5,66.4 295.2,84.4 304.9,90.8 314.7,97.6 324.4,90.4 334.1,87.1 343.9,77.4 353.6,69.4 363.3,62.5 373.0,80.5 382.8,72.8 392.5,71.4 402.2,68.7 412.0,60.8 421.7,52.5 431.4,46.2 441.1,65.0 450.9,54.4 460.6,47.0 470.3,66.5 480.0,57.9 489.8,77.7 499.5,68.4 509.2,87.4 519.0,99.5 528.7,119.2 538.4,131.9 548.1,124.3 557.9,118.9 567.6,111.6 577.3,103.8 587.1,118.1 596.8,137.3 606.5,130.9 616.2,148.7 626.0,167.4 635.7,166.2 645.4,183.0 655.2,200.8 664.9,208.7 674.6,227.4 684.3,230.8 694.1,220.7 703.8,213.5 713.5,209.0 723.3,211.7 733.0,204.3 742.7,196.9 752.4,190.7 762.2,195.1 771.9,187.1 781.6,180.2 791.4,183.8 801.1,176.6 810.8,176.1 820.5,194.8 830.3,187.2 840.0,180.5 840,147.5" fill="rgba(192,57,43,0.10)"/><polyline points="52.0,147.5 61.7,139.5 71.5,131.2 81.2,122.7 90.9,111.9 100.6,98.8 110.4,87.0 120.1,78.2 129.8,96.3 139.6,89.5 149.3,82.7 159.0,74.3 168.7,74.7 178.5,67.6 188.2,60.6 197.9,54.6 207.7,49.9 217.4,41.2 227.1,59.8 236.8,51.9 246.6,70.2 256.3,62.3 266.0,55.4 275.8,73.7 285.5,66.4 295.2,84.4 304.9,90.8 314.7,97.6 324.4,90.4 334.1,87.1 343.9,77.4 353.6,69.4 363.3,62.5 373.0,80.5 382.8,72.8 392.5,71.4 402.2,68.7 412.0,60.8 421.7,52.5 431.4,46.2 441.1,65.0 450.9,54.4 460.6,47.0 470.3,66.5 480.0,57.9 489.8,77.7 499.5,68.4 509.2,87.4 519.0,99.5 528.7,119.2 538.4,131.9 548.1,124.3 557.9,118.9 567.6,111.6 577.3,103.8 587.1,118.1 596.8,137.3 606.5,130.9 616.2,148.7 626.0,167.4 635.7,166.2 645.4,183.0 655.2,200.8 664.9,208.7 674.6,227.4 684.3,230.8 694.1,220.7 703.8,213.5 713.5,209.0 723.3,211.7 733.0,204.3 742.7,196.9 752.4,190.7 762.2,195.1 771.9,187.1 781.6,180.2 791.4,183.8 801.1,176.6 810.8,176.1 820.5,194.8 830.3,187.2 840.0,180.5" fill="none" stroke="#c0392b" stroke-width="2"/><circle cx="840.0" cy="180.5" r="3.5" fill="#c0392b"/><text x="52" y="16" class="ttl">Cumulative R &mdash; best cell (81 trades, chronological)</text><text x="840" y="272" class="xtick" text-anchor="end">trade #81</text></svg></div>
+
+<h3>Year by year</h3>
+<table><thead><tr><th>Year</th><th class="num">N</th><th class="num">Win&nbsp;%</th>
+<th class="num">Avg&nbsp;R</th><th class="num">Total&nbsp;R</th></tr></thead><tbody><tr><td>2019</td><td class='num'>1</td><td class='num'>100%</td><td class='num pos'>+0.469</td><td class='num pos'>+0.47</td></tr><tr><td>2020</td><td class='num'>20</td><td class='num'>80%</td><td class='num pos'>+0.226</td><td class='num pos'>+4.52</td></tr><tr><td>2021</td><td class='num'>10</td><td class='num'>60%</td><td class='num neg'>-0.041</td><td class='num neg'>-0.41</td></tr><tr><td>2022</td><td class='num'>10</td><td class='num'>80%</td><td class='num pos'>+0.088</td><td class='num pos'>+0.88</td></tr><tr><td>2023</td><td class='num'>16</td><td class='num'>50%</td><td class='num neg'>-0.280</td><td class='num neg'>-4.49</td></tr><tr><td>2024</td><td class='num'>24</td><td class='num'>54%</td><td class='num neg'>-0.121</td><td class='num neg'>-2.90</td></tr></tbody></table>
+<p style="font-size:12.5px;color:#6b7683;">Note the recency: the profitable-looking years are the tiny early
+samples; the two biggest, most-recent years (2023&ndash;24) are both losers. Whatever worked in 2020 has
+not held up.</p>
+
+<h3>Long vs short</h3>
+<table><thead><tr><th>Side</th><th class="num">N</th><th class="num">Win&nbsp;%</th>
+<th class="num">Avg&nbsp;R</th><th class="num">Total&nbsp;R</th></tr></thead><tbody><tr><td>Long (fade DOWN)</td><td class='num'>38</td><td class='num'>71%</td><td class='num pos'>+0.062</td><td class='num pos'>+2.37</td></tr><tr><td>Short (fade UP)</td><td class='num'>43</td><td class='num'>58%</td><td class='num neg'>-0.100</td><td class='num neg'>-4.30</td></tr></tbody></table>
+<p style="font-size:12.5px;color:#6b7683;">Even the barely-green long side (+0.062R)
+is well inside noise and disappears in every other variant &mdash; not a real asymmetry to lean on.</p>
+
+<h3>How trades ended</h3>
+<p>46 hit target, 17 hit stop, 18 were still open at Tuesday 00:00 and closed at market.
+The wins are frequent but small; the stops are few but large enough to sink the total.</p>
+
+<h3>Does the neighbourhood agree?</h3>
+<p>Change any one knob of the least-bad variant and you land on an adjacent cell. All
+7 neighbours are shown below &mdash; <strong>every single one loses</strong>. This is not a lone
+unlucky cell surrounded by winners; the whole region is negative, which is exactly what &ldquo;no edge&rdquo;
+looks like.</p>
+<table><thead><tr><th>Change one knob to&hellip;</th><th class="num">N</th><th class="num">Avg&nbsp;R</th>
+<th class="num">t</th><th>Verdict</th></tr></thead><tbody><tr><td>distance k=1</td><td class='num'>16</td><td class='num neg'>-0.278</td><td class='num'>-1.13</td><td><span class='pill bad'>loses</span></td></tr><tr><td>distance k=2</td><td class='num'>7</td><td class='num neg'>-0.095</td><td class='num'>-0.27</td><td><span class='pill bad'>loses</span></td></tr><tr><td>source All-history (expanding)</td><td class='num'>158</td><td class='num neg'>-0.080</td><td class='num'>-1.79</td><td><span class='pill bad'>loses</span></td></tr><tr><td>source 3-month (13 wk)</td><td class='num'>175</td><td class='num neg'>-0.091</td><td class='num'>-1.75</td><td><span class='pill bad'>loses</span></td></tr><tr><td>source 1-month (4 wk)</td><td class='num'>203</td><td class='num neg'>-0.200</td><td class='num'>-3.73</td><td><span class='pill bad'>loses</span></td></tr><tr><td>target Base</td><td class='num'>81</td><td class='num neg'>-0.112</td><td class='num'>-1.20</td><td><span class='pill bad'>loses</span></td></tr><tr><td>stop p95</td><td class='num'>81</td><td class='num neg'>-0.033</td><td class='num'>-0.55</td><td><span class='pill bad'>loses</span></td></tr></tbody></table>
+
+<h2>4 &middot; Honesty box</h2>
+<div class="box honesty">
+<p style="margin-top:0;"><strong>Multiple testing.</strong> Running 48 variants, pure chance would be expected
+to throw up roughly <strong>2</strong> that look significant (|t|&nbsp;&ge;&nbsp;2) in a random direction.
+Here we got <strong>0 positive</strong> variants and <strong>21 significant ones at |t|&nbsp;&ge;&nbsp;2.5
+&mdash; all of them negative</strong> (21/21). So this is not a case of &ldquo;maybe one lucky
+cell&rdquo;; the losing is systematic. Pooling all 3,738 trades gives -0.300R each
+(-1121R total).</p>
+<p><strong>Same-minute ambiguity.</strong> When a stop and target could both be hit inside one 1-minute bar,
+the trade is booked as a loss (never assume the good fill came first). Weeks where the up-level and
+down-level tagged in the <em>same</em> minute would be skipped as ambiguous &mdash; that happened
+<strong>0 times</strong> across all cells (the two levels sit far enough apart in price that they never
+trigger in the same minute).</p>
+<p><strong>Untradeable variants.</strong> 4 of the 48 cells can't be traded at all: the
+<code>k=2 &middot; p95 stop</code> cells for the 1-month and confluence sources &mdash; at two SD out the entry
+is already beyond the 95th-percentile level, so a p95 stop would sit <em>inside</em> the entry (nonsensical).
+They are:
+<ul><li>k=2, 1-month (4 wk), Base target, p95 stop</li><li>k=2, 1-month (4 wk), Halfway target, p95 stop</li><li>k=2, Confluence, Base target, p95 stop</li><li>k=2, Confluence, Halfway target, p95 stop</li></ul>
+The same <code>k=2 &middot; p95</code> combination for the 3-month and all-history sources is only
+&ldquo;tradeable&rdquo; on a handful of freak heavy-tail weekends (N of 1 and 9) and is not read into.</p>
+<p style="margin-bottom:0;"><strong>No look-ahead.</strong> Every level for a given weekend is built from
+<em>completed prior weekends only</em> &mdash; the expanding all-history estimate uses all weekends before
+this one (minimum 20-weekend warm-up), never the full-sample constants, so early weekends can't borrow the
+future. Trailing windows use the previous 13 / 4 weekends. A weekend's own move never touches its own levels.</p>
+</div>
+
+<h2>5 &middot; What this means for how Igor trades it today</h2>
+<div class="box take">
+<p style="margin-top:0;">The <strong>SD level by itself is not an edge.</strong> Mechanically fading every
+Monday tag &mdash; any distance, any lookback, any target, any stop &mdash; loses money after costs. The
+seductive part (a ~64% hit rate) is exactly the trap: the fade wins small and often, then a
+runaway Monday hands back more than a dozen wins in one shot.</p>
+<p>So if the manual version has felt like it works, the edge is almost certainly in the parts a backtest
+can't see &mdash; <strong>which tags you skip, the higher-timeframe context you require, and how you cut or
+add by feel</strong> &mdash; not in the level. Two concrete takeaways:</p>
+<ul>
+  <li><strong>Don't automate it as a standing rule.</strong> There is no set-and-forget version here that
+  survives costs.</li>
+  <li><strong>If you keep trading it manually, treat the SD level as a location, not a signal.</strong>
+  It tells you <em>where</em> price is stretched; it does not tell you the fade will pay. The money has to
+  come from a filter on top (trend regime, confluence with other structure, only fading into a level that
+  also lines up with something) &mdash; and that filter is the thing worth testing next.</li>
+  <li><strong>The recent years are the worst.</strong> 2023&ndash;24 were the biggest losers, so any
+  &ldquo;it worked for me&rdquo; memory is more likely 2020&ndash;21 selection than a durable pattern.</li>
+</ul>
+</div>
+
+<h2>Methodology</h2>
+<ul>
+  <li><strong>Definitions reused, not recomputed.</strong> Weekend base, Monday window and the UP/DOWN move
+  distributions come straight from the Phase-1 <code>weekend_observations.csv</code> (277 clean weekends).</li>
+  <li><strong>Data.</strong> 2.80M one-minute BTCUSDT-perp bars, 2019-09-09 &rarr; 2024-12-31 UTC, in-sample
+  only. Nothing after 2024-12-31 is loaded &mdash; the 2025&ndash;26 block stays locked.</li>
+  <li><strong>Costs.</strong> 0.05% taker fee per side, 0.02% adverse slippage on every fill including stops
+  and market exits; fixed 1R = $100 on a $10k account, no compounding. Conventions taken verbatim from
+  <code>bt_engine.py</code>.</li>
+  <li><strong>Fills.</strong> Entry is limit-style at the level; stop / target checked bar-by-bar on 1-minute
+  candles from the entry bar onward; same-minute both-touched = loss.</li>
+  <li><strong>Determinism.</strong> Pure function of the inputs, stable sorts, no randomness. Two consecutive
+  runs produce byte-identical <code>sd_fade_cells.csv</code> and <code>sd_fade_trades.csv</code> (md5
+  verified).</li>
+</ul>
+
+<p class="foot">Generated from <code>bt_weekend_sd_fade.py</code> &middot; Weekend SD campaign, Phase 3
+&middot; paper analysis only, no live trades &middot; outputs <code>sd_fade_cells.csv</code> (48 rows) and
+<code>sd_fade_trades.csv</code> (3,738 trades).</p>
+
+</div></body></html>

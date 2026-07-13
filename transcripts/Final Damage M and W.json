@@ -1,0 +1,2537 @@
+[
+  {
+    "text": "Let's",
+    "start": 0,
+    "end": 0.86
+  },
+  {
+    "text": "talk",
+    "start": 0.86,
+    "end": 1.55
+  },
+  {
+    "text": "about",
+    "start": 1.55,
+    "end": 2.41
+  },
+  {
+    "text": "the",
+    "start": 2.71,
+    "end": 2.93
+  },
+  {
+    "text": "final",
+    "start": 2.98,
+    "end": 3.79
+  },
+  {
+    "text": "damage",
+    "start": 3.79,
+    "end": 4.86
+  },
+  {
+    "text": "M&W",
+    "start": 4.86,
+    "end": 5
+  },
+  {
+    "text": "in",
+    "start": 5,
+    "end": 5.6
+  },
+  {
+    "text": "a",
+    "start": 5.6,
+    "end": 5.67
+  },
+  {
+    "text": "little",
+    "start": 5.67,
+    "end": 6.08
+  },
+  {
+    "text": "bit",
+    "start": 6.08,
+    "end": 6.29
+  },
+  {
+    "text": "more",
+    "start": 6.29,
+    "end": 6.56
+  },
+  {
+    "text": "detail.",
+    "start": 6.68,
+    "end": 7.12
+  },
+  {
+    "text": "In",
+    "start": 7.12,
+    "end": 7.26
+  },
+  {
+    "text": "addition",
+    "start": 7.26,
+    "end": 7.83
+  },
+  {
+    "text": "to",
+    "start": 7.83,
+    "end": 7.96
+  },
+  {
+    "text": "this",
+    "start": 7.97,
+    "end": 8.25
+  },
+  {
+    "text": "type",
+    "start": 8.25,
+    "end": 8.53
+  },
+  {
+    "text": "of",
+    "start": 8.53,
+    "end": 8.67
+  },
+  {
+    "text": "M&W,",
+    "start": 8.67,
+    "end": 9.02
+  },
+  {
+    "text": "there's",
+    "start": 9.02,
+    "end": 9.51
+  },
+  {
+    "text": "another",
+    "start": 9.54,
+    "end": 10.01
+  },
+  {
+    "text": "type",
+    "start": 10.03,
+    "end": 10.23
+  },
+  {
+    "text": "called",
+    "start": 10.29,
+    "end": 10.72
+  },
+  {
+    "text": "the",
+    "start": 10.72,
+    "end": 10.93
+  },
+  {
+    "text": "final",
+    "start": 10.93,
+    "end": 11.28
+  },
+  {
+    "text": "damage",
+    "start": 11.28,
+    "end": 11.69
+  },
+  {
+    "text": "Mor",
+    "start": 11.72,
+    "end": 12
+  },
+  {
+    "text": "W.",
+    "start": 12,
+    "end": 12.3
+  },
+  {
+    "text": "If",
+    "start": 12.3,
+    "end": 12.45
+  },
+  {
+    "text": "you",
+    "start": 12.45,
+    "end": 12.68
+  },
+  {
+    "text": "see",
+    "start": 12.68,
+    "end": 12.91
+  },
+  {
+    "text": "a",
+    "start": 12.91,
+    "end": 12.97
+  },
+  {
+    "text": "Wwhere",
+    "start": 12.98,
+    "end": 13.43
+  },
+  {
+    "text": "the",
+    "start": 13.43,
+    "end": 13.66
+  },
+  {
+    "text": "second",
+    "start": 13.66,
+    "end": 14.12
+  },
+  {
+    "text": "peak",
+    "start": 14.12,
+    "end": 14.43
+  },
+  {
+    "text": "is",
+    "start": 14.43,
+    "end": 14.57
+  },
+  {
+    "text": "a",
+    "start": 14.58,
+    "end": 14.64
+  },
+  {
+    "text": "lower",
+    "start": 14.67,
+    "end": 15.03
+  },
+  {
+    "text": "low",
+    "start": 15.03,
+    "end": 15.25
+  },
+  {
+    "text": "than",
+    "start": 15.28,
+    "end": 15.57
+  },
+  {
+    "text": "the",
+    "start": 15.57,
+    "end": 15.77
+  },
+  {
+    "text": "first",
+    "start": 15.87,
+    "end": 16.18
+  },
+  {
+    "text": "peak",
+    "start": 16.18,
+    "end": 16.49
+  },
+  {
+    "text": "and",
+    "start": 16.52,
+    "end": 16.72
+  },
+  {
+    "text": "the",
+    "start": 16.72,
+    "end": 16.95
+  },
+  {
+    "text": "second",
+    "start": 16.95,
+    "end": 17.52
+  },
+  {
+    "text": "peak",
+    "start": 17.52,
+    "end": 17.86
+  },
+  {
+    "text": "is",
+    "start": 17.86,
+    "end": 18.01
+  },
+  {
+    "text": "a",
+    "start": 18.03,
+    "end": 18.11
+  },
+  {
+    "text": "hammer,",
+    "start": 18.11,
+    "end": 18.79
+  },
+  {
+    "text": "that's",
+    "start": 18.79,
+    "end": 19.29
+  },
+  {
+    "text": "what",
+    "start": 19.3,
+    "end": 19.64
+  },
+  {
+    "text": "we",
+    "start": 19.64,
+    "end": 19.8
+  },
+  {
+    "text": "call",
+    "start": 19.81,
+    "end": 20.08
+  },
+  {
+    "text": "at",
+    "start": 20.23,
+    "end": 20.32
+  },
+  {
+    "text": "TTC",
+    "start": 20.32,
+    "end": 20.57
+  },
+  {
+    "text": "a",
+    "start": 20.57,
+    "end": 20.63
+  },
+  {
+    "text": "final",
+    "start": 20.69,
+    "end": 20.99
+  },
+  {
+    "text": "damage",
+    "start": 21.11,
+    "end": 21.58
+  },
+  {
+    "text": "W.",
+    "start": 21.58,
+    "end": 21.96
+  },
+  {
+    "text": "What",
+    "start": 21.96,
+    "end": 22.19
+  },
+  {
+    "text": "it",
+    "start": 22.25,
+    "end": 22.39
+  },
+  {
+    "text": "means",
+    "start": 22.39,
+    "end": 22.75
+  },
+  {
+    "text": "is",
+    "start": 22.75,
+    "end": 22.89
+  },
+  {
+    "text": "either",
+    "start": 22.89,
+    "end": 23.36
+  },
+  {
+    "text": "the",
+    "start": 23.36,
+    "end": 23.54
+  },
+  {
+    "text": "market",
+    "start": 23.54,
+    "end": 23.91
+  },
+  {
+    "text": "makers",
+    "start": 23.91,
+    "end": 24.27
+  },
+  {
+    "text": "are",
+    "start": 24.28,
+    "end": 24.46
+  },
+  {
+    "text": "spiking",
+    "start": 24.46,
+    "end": 24.87
+  },
+  {
+    "text": "the",
+    "start": 24.89,
+    "end": 25.06
+  },
+  {
+    "text": "stocks",
+    "start": 25.07,
+    "end": 25.44
+  },
+  {
+    "text": "of",
+    "start": 25.44,
+    "end": 25.56
+  },
+  {
+    "text": "the",
+    "start": 25.56,
+    "end": 25.74
+  },
+  {
+    "text": "traders",
+    "start": 25.74,
+    "end": 26.17
+  },
+  {
+    "text": "who",
+    "start": 26.17,
+    "end": 26.35
+  },
+  {
+    "text": "got",
+    "start": 26.35,
+    "end": 26.47
+  },
+  {
+    "text": "it",
+    "start": 26.53,
+    "end": 26.65
+  },
+  {
+    "text": "right",
+    "start": 26.65,
+    "end": 26.96
+  },
+  {
+    "text": "on",
+    "start": 26.96,
+    "end": 27.08
+  },
+  {
+    "text": "the",
+    "start": 27.08,
+    "end": 27.26
+  },
+  {
+    "text": "first",
+    "start": 27.26,
+    "end": 27.66
+  },
+  {
+    "text": "low,",
+    "start": 27.66,
+    "end": 27.96
+  },
+  {
+    "text": "or",
+    "start": 27.96,
+    "end": 28.08
+  },
+  {
+    "text": "they",
+    "start": 28.08,
+    "end": 28.32
+  },
+  {
+    "text": "didn't",
+    "start": 28.32,
+    "end": 28.68
+  },
+  {
+    "text": "get",
+    "start": 28.68,
+    "end": 28.86
+  },
+  {
+    "text": "enough",
+    "start": 28.86,
+    "end": 29.23
+  },
+  {
+    "text": "commitment",
+    "start": 29.23,
+    "end": 29.84
+  },
+  {
+    "text": "on",
+    "start": 29.84,
+    "end": 29.95
+  },
+  {
+    "text": "the",
+    "start": 29.96,
+    "end": 30.14
+  },
+  {
+    "text": "first",
+    "start": 30.37,
+    "end": 30.44
+  },
+  {
+    "text": "low,",
+    "start": 30.44,
+    "end": 30.74
+  },
+  {
+    "text": "so",
+    "start": 30.74,
+    "end": 30.86
+  },
+  {
+    "text": "they",
+    "start": 30.86,
+    "end": 31.1
+  },
+  {
+    "text": "have",
+    "start": 31.1,
+    "end": 31.34
+  },
+  {
+    "text": "to",
+    "start": 31.34,
+    "end": 31.46
+  },
+  {
+    "text": "drop",
+    "start": 31.46,
+    "end": 31.7
+  },
+  {
+    "text": "it",
+    "start": 31.7,
+    "end": 31.92
+  },
+  {
+    "text": "again",
+    "start": 31.92,
+    "end": 32.3
+  },
+  {
+    "text": "lower",
+    "start": 32.3,
+    "end": 32.68
+  },
+  {
+    "text": "to",
+    "start": 32.68,
+    "end": 32.83
+  },
+  {
+    "text": "pick",
+    "start": 32.83,
+    "end": 33.13
+  },
+  {
+    "text": "up",
+    "start": 33.13,
+    "end": 33.28
+  },
+  {
+    "text": "more",
+    "start": 33.28,
+    "end": 33.58
+  },
+  {
+    "text": "contract.",
+    "start": 33.58,
+    "end": 34.44
+  },
+  {
+    "text": "This",
+    "start": 34.44,
+    "end": 34.71
+  },
+  {
+    "text": "works",
+    "start": 34.72,
+    "end": 35.07
+  },
+  {
+    "text": "the",
+    "start": 35.07,
+    "end": 35.28
+  },
+  {
+    "text": "same",
+    "start": 35.28,
+    "end": 35.56
+  },
+  {
+    "text": "way",
+    "start": 35.56,
+    "end": 35.77
+  },
+  {
+    "text": "with",
+    "start": 35.77,
+    "end": 36.05
+  },
+  {
+    "text": "the",
+    "start": 36.05,
+    "end": 36.26
+  },
+  {
+    "text": "Mhaving",
+    "start": 36.26,
+    "end": 36.75
+  },
+  {
+    "text": "a",
+    "start": 36.75,
+    "end": 36.82
+  },
+  {
+    "text": "higher",
+    "start": 36.82,
+    "end": 37.24
+  },
+  {
+    "text": "high",
+    "start": 37.24,
+    "end": 37.52
+  },
+  {
+    "text": "in",
+    "start": 37.52,
+    "end": 37.65
+  },
+  {
+    "text": "comparison",
+    "start": 37.67,
+    "end": 38.36
+  },
+  {
+    "text": "to",
+    "start": 38.43,
+    "end": 38.49
+  },
+  {
+    "text": "the",
+    "start": 38.51,
+    "end": 38.72
+  },
+  {
+    "text": "first",
+    "start": 38.72,
+    "end": 39.07
+  },
+  {
+    "text": "peak.",
+    "start": 39.07,
+    "end": 39.64
+  },
+  {
+    "text": "So",
+    "start": 39.64,
+    "end": 39.76
+  },
+  {
+    "text": "let's",
+    "start": 39.76,
+    "end": 40.06
+  },
+  {
+    "text": "say",
+    "start": 40.06,
+    "end": 40.24
+  },
+  {
+    "text": "the",
+    "start": 40.24,
+    "end": 40.42
+  },
+  {
+    "text": "trader",
+    "start": 40.42,
+    "end": 40.78
+  },
+  {
+    "text": "peaked",
+    "start": 40.78,
+    "end": 41.14
+  },
+  {
+    "text": "at",
+    "start": 41.14,
+    "end": 41.26
+  },
+  {
+    "text": "the",
+    "start": 41.26,
+    "end": 41.44
+  },
+  {
+    "text": "bottom",
+    "start": 41.44,
+    "end": 41.8
+  },
+  {
+    "text": "and",
+    "start": 41.8,
+    "end": 41.97
+  },
+  {
+    "text": "opened",
+    "start": 42.01,
+    "end": 42.2
+  },
+  {
+    "text": "a",
+    "start": 42.35,
+    "end": 42.4
+  },
+  {
+    "text": "long",
+    "start": 42.4,
+    "end": 42.64
+  },
+  {
+    "text": "position",
+    "start": 42.64,
+    "end": 43.11
+  },
+  {
+    "text": "and",
+    "start": 43.22,
+    "end": 43.3
+  },
+  {
+    "text": "had",
+    "start": 43.3,
+    "end": 43.48
+  },
+  {
+    "text": "a",
+    "start": 43.48,
+    "end": 43.54
+  },
+  {
+    "text": "really",
+    "start": 43.54,
+    "end": 43.95
+  },
+  {
+    "text": "nice",
+    "start": 43.96,
+    "end": 44.29
+  },
+  {
+    "text": "tight",
+    "start": 44.29,
+    "end": 44.71
+  },
+  {
+    "text": "stop",
+    "start": 44.71,
+    "end": 45.03
+  },
+  {
+    "text": "loss.",
+    "start": 45.03,
+    "end": 45.64
+  },
+  {
+    "text": "The",
+    "start": 45.64,
+    "end": 45.8
+  },
+  {
+    "text": "market",
+    "start": 45.8,
+    "end": 46.12
+  },
+  {
+    "text": "maker",
+    "start": 46.12,
+    "end": 46.39
+  },
+  {
+    "text": "moves",
+    "start": 46.39,
+    "end": 46.66
+  },
+  {
+    "text": "away",
+    "start": 46.66,
+    "end": 46.87
+  },
+  {
+    "text": "from",
+    "start": 46.87,
+    "end": 47.08
+  },
+  {
+    "text": "the",
+    "start": 47.08,
+    "end": 47.24
+  },
+  {
+    "text": "range",
+    "start": 47.24,
+    "end": 47.5
+  },
+  {
+    "text": "and",
+    "start": 47.51,
+    "end": 47.67
+  },
+  {
+    "text": "realizes",
+    "start": 47.67,
+    "end": 48.08
+  },
+  {
+    "text": "they",
+    "start": 48.12,
+    "end": 48.2
+  },
+  {
+    "text": "haven't",
+    "start": 48.35,
+    "end": 48.68
+  },
+  {
+    "text": "picked",
+    "start": 48.68,
+    "end": 49
+  },
+  {
+    "text": "up",
+    "start": 49,
+    "end": 49.1
+  },
+  {
+    "text": "enough",
+    "start": 49.1,
+    "end": 49.52
+  },
+  {
+    "text": "contracts.",
+    "start": 49.52,
+    "end": 50.52
+  },
+  {
+    "text": "So",
+    "start": 50.52,
+    "end": 50.64
+  },
+  {
+    "text": "they",
+    "start": 50.64,
+    "end": 50.88
+  },
+  {
+    "text": "come",
+    "start": 50.88,
+    "end": 51.12
+  },
+  {
+    "text": "back",
+    "start": 51.12,
+    "end": 51.36
+  },
+  {
+    "text": "drop",
+    "start": 51.36,
+    "end": 51.59
+  },
+  {
+    "text": "price",
+    "start": 51.59,
+    "end": 51.9
+  },
+  {
+    "text": "a",
+    "start": 51.9,
+    "end": 51.96
+  },
+  {
+    "text": "little",
+    "start": 51.96,
+    "end": 52.32
+  },
+  {
+    "text": "lower",
+    "start": 52.32,
+    "end": 52.62
+  },
+  {
+    "text": "than",
+    "start": 52.62,
+    "end": 52.85
+  },
+  {
+    "text": "the",
+    "start": 52.86,
+    "end": 53.04
+  },
+  {
+    "text": "first",
+    "start": 53.23,
+    "end": 53.34
+  },
+  {
+    "text": "peak",
+    "start": 53.34,
+    "end": 53.58
+  },
+  {
+    "text": "and",
+    "start": 53.58,
+    "end": 53.76
+  },
+  {
+    "text": "at",
+    "start": 53.76,
+    "end": 53.88
+  },
+  {
+    "text": "this",
+    "start": 53.88,
+    "end": 54.12
+  },
+  {
+    "text": "point",
+    "start": 54.12,
+    "end": 54.42
+  },
+  {
+    "text": "they",
+    "start": 54.42,
+    "end": 54.68
+  },
+  {
+    "text": "have",
+    "start": 54.68,
+    "end": 54.92
+  },
+  {
+    "text": "triggered",
+    "start": 54.92,
+    "end": 55.46
+  },
+  {
+    "text": "the",
+    "start": 55.46,
+    "end": 55.64
+  },
+  {
+    "text": "stock",
+    "start": 55.64,
+    "end": 55.94
+  },
+  {
+    "text": "losses",
+    "start": 55.94,
+    "end": 56.3
+  },
+  {
+    "text": "of",
+    "start": 56.3,
+    "end": 56.42
+  },
+  {
+    "text": "the",
+    "start": 56.42,
+    "end": 56.6
+  },
+  {
+    "text": "first",
+    "start": 56.6,
+    "end": 56.9
+  },
+  {
+    "text": "traders,",
+    "start": 56.9,
+    "end": 57.44
+  },
+  {
+    "text": "but",
+    "start": 57.44,
+    "end": 57.62
+  },
+  {
+    "text": "those",
+    "start": 57.62,
+    "end": 57.92
+  },
+  {
+    "text": "traders",
+    "start": 57.92,
+    "end": 58.34
+  },
+  {
+    "text": "were",
+    "start": 58.34,
+    "end": 58.58
+  },
+  {
+    "text": "actually",
+    "start": 58.58,
+    "end": 59.03
+  },
+  {
+    "text": "right",
+    "start": 59.07,
+    "end": 59.42
+  },
+  {
+    "text": "about",
+    "start": 59.44,
+    "end": 59.69
+  },
+  {
+    "text": "the",
+    "start": 59.69,
+    "end": 59.84
+  },
+  {
+    "text": "direction.",
+    "start": 59.84,
+    "end": 60.44
+  },
+  {
+    "text": "They",
+    "start": 60.44,
+    "end": 60.7
+  },
+  {
+    "text": "just",
+    "start": 60.7,
+    "end": 60.96
+  },
+  {
+    "text": "had",
+    "start": 60.96,
+    "end": 61.16
+  },
+  {
+    "text": "too",
+    "start": 61.16,
+    "end": 61.35
+  },
+  {
+    "text": "tight",
+    "start": 61.36,
+    "end": 61.69
+  },
+  {
+    "text": "a",
+    "start": 61.69,
+    "end": 61.75
+  },
+  {
+    "text": "stock",
+    "start": 61.75,
+    "end": 62.08
+  },
+  {
+    "text": "loss",
+    "start": 62.08,
+    "end": 62.34
+  },
+  {
+    "text": "and",
+    "start": 62.34,
+    "end": 62.54
+  },
+  {
+    "text": "the",
+    "start": 62.54,
+    "end": 62.73
+  },
+  {
+    "text": "market",
+    "start": 62.74,
+    "end": 63
+  },
+  {
+    "text": "maker",
+    "start": 63.15,
+    "end": 63.47
+  },
+  {
+    "text": "needed",
+    "start": 63.47,
+    "end": 63.87
+  },
+  {
+    "text": "more",
+    "start": 63.87,
+    "end": 64.13
+  },
+  {
+    "text": "contracts",
+    "start": 64.13,
+    "end": 64.73
+  },
+  {
+    "text": "and",
+    "start": 64.73,
+    "end": 64.93
+  },
+  {
+    "text": "stock",
+    "start": 64.93,
+    "end": 65.34
+  },
+  {
+    "text": "losses",
+    "start": 65.34,
+    "end": 65.67
+  },
+  {
+    "text": "are",
+    "start": 65.67,
+    "end": 65.83
+  },
+  {
+    "text": "the",
+    "start": 65.83,
+    "end": 65.99
+  },
+  {
+    "text": "easiest",
+    "start": 65.99,
+    "end": 66.37
+  },
+  {
+    "text": "way",
+    "start": 66.37,
+    "end": 66.53
+  },
+  {
+    "text": "for",
+    "start": 66.53,
+    "end": 66.69
+  },
+  {
+    "text": "the",
+    "start": 66.69,
+    "end": 66.85
+  },
+  {
+    "text": "market",
+    "start": 66.85,
+    "end": 67.18
+  },
+  {
+    "text": "maker",
+    "start": 67.18,
+    "end": 67.45
+  },
+  {
+    "text": "to",
+    "start": 67.45,
+    "end": 67.56
+  },
+  {
+    "text": "get",
+    "start": 67.56,
+    "end": 67.72
+  },
+  {
+    "text": "those",
+    "start": 67.72,
+    "end": 67.98
+  },
+  {
+    "text": "contracts.",
+    "start": 68.05,
+    "end": 68.74
+  },
+  {
+    "text": "So",
+    "start": 68.74,
+    "end": 68.89
+  },
+  {
+    "text": "when",
+    "start": 68.89,
+    "end": 69.2
+  },
+  {
+    "text": "you",
+    "start": 69.2,
+    "end": 69.43
+  },
+  {
+    "text": "see",
+    "start": 69.43,
+    "end": 69.65
+  },
+  {
+    "text": "a",
+    "start": 69.66,
+    "end": 69.73
+  },
+  {
+    "text": "lower",
+    "start": 69.73,
+    "end": 70.11
+  },
+  {
+    "text": "low",
+    "start": 70.11,
+    "end": 70.34
+  },
+  {
+    "text": "W,",
+    "start": 70.34,
+    "end": 70.56
+  },
+  {
+    "text": "as",
+    "start": 70.56,
+    "end": 70.71
+  },
+  {
+    "text": "long",
+    "start": 70.71,
+    "end": 71.01
+  },
+  {
+    "text": "as",
+    "start": 71.02,
+    "end": 71.17
+  },
+  {
+    "text": "it's",
+    "start": 71.17,
+    "end": 71.47
+  },
+  {
+    "text": "at",
+    "start": 71.47,
+    "end": 71.62
+  },
+  {
+    "text": "the",
+    "start": 71.65,
+    "end": 71.85
+  },
+  {
+    "text": "low",
+    "start": 71.91,
+    "end": 72.08
+  },
+  {
+    "text": "of",
+    "start": 72.08,
+    "end": 72.2
+  },
+  {
+    "text": "the",
+    "start": 72.32,
+    "end": 72.46
+  },
+  {
+    "text": "week",
+    "start": 72.46,
+    "end": 72.77
+  },
+  {
+    "text": "or",
+    "start": 72.77,
+    "end": 72.92
+  },
+  {
+    "text": "the",
+    "start": 72.92,
+    "end": 73.15
+  },
+  {
+    "text": "low",
+    "start": 73.15,
+    "end": 73.38
+  },
+  {
+    "text": "of",
+    "start": 73.38,
+    "end": 73.64
+  },
+  {
+    "text": "the",
+    "start": 73.64,
+    "end": 73.83
+  },
+  {
+    "text": "day,",
+    "start": 73.83,
+    "end": 74.13
+  },
+  {
+    "text": "it",
+    "start": 74.15,
+    "end": 74.26
+  },
+  {
+    "text": "has",
+    "start": 74.26,
+    "end": 74.45
+  },
+  {
+    "text": "to",
+    "start": 74.45,
+    "end": 74.57
+  },
+  {
+    "text": "be",
+    "start": 74.57,
+    "end": 74.69
+  },
+  {
+    "text": "in",
+    "start": 74.69,
+    "end": 74.81
+  },
+  {
+    "text": "the",
+    "start": 74.81,
+    "end": 75
+  },
+  {
+    "text": "right",
+    "start": 75,
+    "end": 75.31
+  },
+  {
+    "text": "place,",
+    "start": 75.31,
+    "end": 75.74
+  },
+  {
+    "text": "or",
+    "start": 75.74,
+    "end": 75.86
+  },
+  {
+    "text": "you",
+    "start": 75.86,
+    "end": 76.05
+  },
+  {
+    "text": "see",
+    "start": 76.05,
+    "end": 76.23
+  },
+  {
+    "text": "an",
+    "start": 76.35,
+    "end": 76.36
+  },
+  {
+    "text": "M,",
+    "start": 76.36,
+    "end": 76.5
+  },
+  {
+    "text": "but",
+    "start": 76.55,
+    "end": 76.73
+  },
+  {
+    "text": "it's",
+    "start": 76.73,
+    "end": 76.97
+  },
+  {
+    "text": "the",
+    "start": 76.97,
+    "end": 77.1
+  },
+  {
+    "text": "high",
+    "start": 77.21,
+    "end": 77.41
+  },
+  {
+    "text": "of",
+    "start": 77.41,
+    "end": 77.53
+  },
+  {
+    "text": "the",
+    "start": 77.53,
+    "end": 77.84
+  },
+  {
+    "text": "day",
+    "start": 77.84,
+    "end": 78.05
+  },
+  {
+    "text": "or",
+    "start": 78.06,
+    "end": 78.2
+  },
+  {
+    "text": "the",
+    "start": 78.2,
+    "end": 78.42
+  },
+  {
+    "text": "high",
+    "start": 78.42,
+    "end": 78.7
+  },
+  {
+    "text": "of",
+    "start": 78.71,
+    "end": 78.85
+  },
+  {
+    "text": "the",
+    "start": 78.85,
+    "end": 79.07
+  },
+  {
+    "text": "week,",
+    "start": 79.07,
+    "end": 79.5
+  },
+  {
+    "text": "that's",
+    "start": 79.5,
+    "end": 79.93
+  },
+  {
+    "text": "still",
+    "start": 79.93,
+    "end": 80.28
+  },
+  {
+    "text": "a",
+    "start": 80.29,
+    "end": 80.36
+  },
+  {
+    "text": "valid",
+    "start": 80.55,
+    "end": 80.74
+  },
+  {
+    "text": "Wor",
+    "start": 80.75,
+    "end": 80.95
+  },
+  {
+    "text": "Mformation",
+    "start": 81.01,
+    "end": 81.68
+  },
+  {
+    "text": "that",
+    "start": 81.68,
+    "end": 81.97
+  },
+  {
+    "text": "can",
+    "start": 81.97,
+    "end": 82.18
+  },
+  {
+    "text": "play",
+    "start": 82.19,
+    "end": 82.48
+  },
+  {
+    "text": "out.",
+    "start": 82.48,
+    "end": 83.04
+  },
+  {
+    "text": "If",
+    "start": 83.04,
+    "end": 83.15
+  },
+  {
+    "text": "you",
+    "start": 83.15,
+    "end": 83.31
+  },
+  {
+    "text": "want",
+    "start": 83.32,
+    "end": 83.53
+  },
+  {
+    "text": "to",
+    "start": 83.55,
+    "end": 83.66
+  },
+  {
+    "text": "trade",
+    "start": 83.66,
+    "end": 83.94
+  },
+  {
+    "text": "them,",
+    "start": 83.94,
+    "end": 84.28
+  },
+  {
+    "text": "you're",
+    "start": 84.28,
+    "end": 84.62
+  },
+  {
+    "text": "going",
+    "start": 84.62,
+    "end": 84.9
+  },
+  {
+    "text": "to",
+    "start": 84.9,
+    "end": 85.01
+  },
+  {
+    "text": "be",
+    "start": 85.01,
+    "end": 85.12
+  },
+  {
+    "text": "looking",
+    "start": 85.12,
+    "end": 85.52
+  },
+  {
+    "text": "for",
+    "start": 85.52,
+    "end": 85.68
+  },
+  {
+    "text": "a",
+    "start": 85.68,
+    "end": 85.75
+  },
+  {
+    "text": "hammer",
+    "start": 85.75,
+    "end": 86.08
+  },
+  {
+    "text": "on",
+    "start": 86.08,
+    "end": 86.15
+  },
+  {
+    "text": "the",
+    "start": 86.21,
+    "end": 86.36
+  },
+  {
+    "text": "15",
+    "start": 86.36,
+    "end": 86.7
+  },
+  {
+    "text": "minute",
+    "start": 86.7,
+    "end": 87.16
+  },
+  {
+    "text": "timeframe",
+    "start": 87.16,
+    "end": 87.96
+  },
+  {
+    "text": "on",
+    "start": 87.96,
+    "end": 88.11
+  },
+  {
+    "text": "the",
+    "start": 88.11,
+    "end": 88.34
+  },
+  {
+    "text": "second",
+    "start": 88.34,
+    "end": 88.8
+  },
+  {
+    "text": "peak",
+    "start": 88.8,
+    "end": 89.11
+  },
+  {
+    "text": "of",
+    "start": 89.11,
+    "end": 89.26
+  },
+  {
+    "text": "the",
+    "start": 89.26,
+    "end": 89.47
+  },
+  {
+    "text": "Wor",
+    "start": 89.49,
+    "end": 89.71
+  },
+  {
+    "text": "an",
+    "start": 89.71,
+    "end": 89.86
+  },
+  {
+    "text": "inverted",
+    "start": 89.86,
+    "end": 90.48
+  },
+  {
+    "text": "hammer",
+    "start": 90.67,
+    "end": 90.92
+  },
+  {
+    "text": "on",
+    "start": 90.94,
+    "end": 91.07
+  },
+  {
+    "text": "the",
+    "start": 91.13,
+    "end": 91.32
+  },
+  {
+    "text": "second",
+    "start": 91.32,
+    "end": 91.78
+  },
+  {
+    "text": "peak",
+    "start": 91.78,
+    "end": 92.09
+  },
+  {
+    "text": "of",
+    "start": 92.09,
+    "end": 92.24
+  },
+  {
+    "text": "the",
+    "start": 92.24,
+    "end": 92.47
+  },
+  {
+    "text": "M.",
+    "start": 92.47,
+    "end": 92.88
+  },
+  {
+    "text": "That's",
+    "start": 92.88,
+    "end": 93.07
+  },
+  {
+    "text": "the",
+    "start": 93.08,
+    "end": 93.34
+  },
+  {
+    "text": "only",
+    "start": 93.34,
+    "end": 93.69
+  },
+  {
+    "text": "time",
+    "start": 93.69,
+    "end": 94.04
+  },
+  {
+    "text": "you",
+    "start": 94.04,
+    "end": 94.3
+  },
+  {
+    "text": "could",
+    "start": 94.3,
+    "end": 94.73
+  },
+  {
+    "text": "say",
+    "start": 94.73,
+    "end": 94.99
+  },
+  {
+    "text": "it's",
+    "start": 94.99,
+    "end": 95.33
+  },
+  {
+    "text": "a",
+    "start": 95.33,
+    "end": 95.41
+  },
+  {
+    "text": "final",
+    "start": 95.45,
+    "end": 95.84
+  },
+  {
+    "text": "damage",
+    "start": 95.84,
+    "end": 96.36
+  },
+  {
+    "text": "Mor",
+    "start": 96.36,
+    "end": 96.54
+  },
+  {
+    "text": "W.",
+    "start": 96.65,
+    "end": 97.02
+  },
+  {
+    "text": "So",
+    "start": 97.07,
+    "end": 97.26
+  },
+  {
+    "text": "this",
+    "start": 97.26,
+    "end": 97.71
+  },
+  {
+    "text": "type",
+    "start": 97.71,
+    "end": 98.16
+  },
+  {
+    "text": "of",
+    "start": 98.16,
+    "end": 98.38
+  },
+  {
+    "text": "Mor",
+    "start": 98.38,
+    "end": 98.71
+  },
+  {
+    "text": "Wis",
+    "start": 98.71,
+    "end": 99.08
+  },
+  {
+    "text": "still",
+    "start": 99.08,
+    "end": 99.32
+  },
+  {
+    "text": "a",
+    "start": 99.32,
+    "end": 99.36
+  },
+  {
+    "text": "valid",
+    "start": 99.36,
+    "end": 99.76
+  },
+  {
+    "text": "Mor",
+    "start": 99.76,
+    "end": 100
+  },
+  {
+    "text": "W,",
+    "start": 100,
+    "end": 100.24
+  },
+  {
+    "text": "but",
+    "start": 100.24,
+    "end": 100.48
+  },
+  {
+    "text": "if",
+    "start": 100.48,
+    "end": 100.64
+  },
+  {
+    "text": "trying",
+    "start": 100.64,
+    "end": 101.11
+  },
+  {
+    "text": "to",
+    "start": 101.12,
+    "end": 101.28
+  },
+  {
+    "text": "trade",
+    "start": 101.28,
+    "end": 101.67
+  },
+  {
+    "text": "it,",
+    "start": 101.67,
+    "end": 101.92
+  },
+  {
+    "text": "your",
+    "start": 102.07,
+    "end": 102.32
+  },
+  {
+    "text": "chance",
+    "start": 102.34,
+    "end": 102.8
+  },
+  {
+    "text": "of",
+    "start": 102.8,
+    "end": 102.96
+  },
+  {
+    "text": "being",
+    "start": 102.96,
+    "end": 103.36
+  },
+  {
+    "text": "wrong",
+    "start": 103.36,
+    "end": 103.76
+  },
+  {
+    "text": "a",
+    "start": 103.76,
+    "end": 103.84
+  },
+  {
+    "text": "higher",
+    "start": 103.84,
+    "end": 104.32
+  },
+  {
+    "text": "because",
+    "start": 104.32,
+    "end": 104.88
+  },
+  {
+    "text": "technically",
+    "start": 104.88,
+    "end": 105.88
+  },
+  {
+    "text": "the",
+    "start": 105.88,
+    "end": 106.07
+  },
+  {
+    "text": "market",
+    "start": 106.07,
+    "end": 106.46
+  },
+  {
+    "text": "structure",
+    "start": 106.46,
+    "end": 107.05
+  },
+  {
+    "text": "hasn't",
+    "start": 107.05,
+    "end": 107.43
+  },
+  {
+    "text": "changed.",
+    "start": 107.44,
+    "end": 108.12
+  },
+  {
+    "text": "So",
+    "start": 108.12,
+    "end": 108.26
+  },
+  {
+    "text": "now",
+    "start": 108.26,
+    "end": 108.47
+  },
+  {
+    "text": "that",
+    "start": 108.47,
+    "end": 108.75
+  },
+  {
+    "text": "you",
+    "start": 108.75,
+    "end": 108.96
+  },
+  {
+    "text": "understand,",
+    "start": 108.96,
+    "end": 109.8
+  },
+  {
+    "text": "if",
+    "start": 109.81,
+    "end": 109.95
+  },
+  {
+    "text": "you",
+    "start": 109.95,
+    "end": 110.16
+  },
+  {
+    "text": "see",
+    "start": 110.16,
+    "end": 110.37
+  },
+  {
+    "text": "a",
+    "start": 110.37,
+    "end": 110.43
+  },
+  {
+    "text": "hammer",
+    "start": 110.44,
+    "end": 110.87
+  },
+  {
+    "text": "and",
+    "start": 110.87,
+    "end": 111.07
+  },
+  {
+    "text": "you",
+    "start": 111.1,
+    "end": 111.23
+  },
+  {
+    "text": "are",
+    "start": 111.29,
+    "end": 111.5
+  },
+  {
+    "text": "happy",
+    "start": 111.5,
+    "end": 111.85
+  },
+  {
+    "text": "to",
+    "start": 111.85,
+    "end": 111.99
+  },
+  {
+    "text": "take",
+    "start": 111.99,
+    "end": 112.27
+  },
+  {
+    "text": "it,",
+    "start": 112.27,
+    "end": 112.55
+  },
+  {
+    "text": "then",
+    "start": 112.55,
+    "end": 112.79
+  },
+  {
+    "text": "just",
+    "start": 112.82,
+    "end": 113.11
+  },
+  {
+    "text": "take",
+    "start": 113.11,
+    "end": 113.52
+  },
+  {
+    "text": "it",
+    "start": 113.52,
+    "end": 113.66
+  },
+  {
+    "text": "because",
+    "start": 113.66,
+    "end": 114.15
+  },
+  {
+    "text": "it",
+    "start": 114.15,
+    "end": 114.29
+  },
+  {
+    "text": "would",
+    "start": 114.29,
+    "end": 114.64
+  },
+  {
+    "text": "likely",
+    "start": 114.64,
+    "end": 115.03
+  },
+  {
+    "text": "be",
+    "start": 115.06,
+    "end": 115.2
+  },
+  {
+    "text": "a",
+    "start": 115.2,
+    "end": 115.27
+  },
+  {
+    "text": "better",
+    "start": 115.27,
+    "end": 115.69
+  },
+  {
+    "text": "risk",
+    "start": 115.69,
+    "end": 115.96
+  },
+  {
+    "text": "to",
+    "start": 115.96,
+    "end": 116.1
+  },
+  {
+    "text": "reward,",
+    "start": 116.23,
+    "end": 116.63
+  },
+  {
+    "text": "but",
+    "start": 116.69,
+    "end": 116.88
+  },
+  {
+    "text": "it's",
+    "start": 116.88,
+    "end": 117.16
+  },
+  {
+    "text": "up",
+    "start": 117.16,
+    "end": 117.3
+  },
+  {
+    "text": "to",
+    "start": 117.3,
+    "end": 117.44
+  },
+  {
+    "text": "you.",
+    "start": 117.44,
+    "end": 117.85
+  },
+  {
+    "text": "Once",
+    "start": 117.92,
+    "end": 118.19
+  },
+  {
+    "text": "you",
+    "start": 118.19,
+    "end": 118.39
+  },
+  {
+    "text": "journal",
+    "start": 118.39,
+    "end": 118.87
+  },
+  {
+    "text": "everything",
+    "start": 118.87,
+    "end": 119.56
+  },
+  {
+    "text": "and",
+    "start": 119.56,
+    "end": 119.76
+  },
+  {
+    "text": "you",
+    "start": 119.76,
+    "end": 119.96
+  },
+  {
+    "text": "see",
+    "start": 119.96,
+    "end": 120.16
+  },
+  {
+    "text": "how",
+    "start": 120.16,
+    "end": 120.35
+  },
+  {
+    "text": "often",
+    "start": 120.45,
+    "end": 120.7
+  },
+  {
+    "text": "those",
+    "start": 120.7,
+    "end": 121.03
+  },
+  {
+    "text": "types",
+    "start": 121.09,
+    "end": 121.38
+  },
+  {
+    "text": "of",
+    "start": 121.38,
+    "end": 121.52
+  },
+  {
+    "text": "trade",
+    "start": 121.52,
+    "end": 121.84
+  },
+  {
+    "text": "setups",
+    "start": 121.91,
+    "end": 122.26
+  },
+  {
+    "text": "play",
+    "start": 122.27,
+    "end": 122.54
+  },
+  {
+    "text": "out",
+    "start": 122.54,
+    "end": 122.88
+  },
+  {
+    "text": "for",
+    "start": 122.88,
+    "end": 123.04
+  },
+  {
+    "text": "you,",
+    "start": 123.04,
+    "end": 123.31
+  },
+  {
+    "text": "then",
+    "start": 123.31,
+    "end": 123.53
+  },
+  {
+    "text": "you'll",
+    "start": 123.53,
+    "end": 123.85
+  },
+  {
+    "text": "know",
+    "start": 123.85,
+    "end": 124.07
+  },
+  {
+    "text": "if",
+    "start": 124.07,
+    "end": 124.18
+  },
+  {
+    "text": "it's",
+    "start": 124.18,
+    "end": 124.39
+  },
+  {
+    "text": "something",
+    "start": 124.43,
+    "end": 124.89
+  },
+  {
+    "text": "you",
+    "start": 124.89,
+    "end": 125.04
+  },
+  {
+    "text": "should",
+    "start": 125.04,
+    "end": 125.38
+  },
+  {
+    "text": "continue",
+    "start": 125.59,
+    "end": 125.82
+  },
+  {
+    "text": "doing",
+    "start": 125.82,
+    "end": 126.09
+  },
+  {
+    "text": "for",
+    "start": 126.09,
+    "end": 126.25
+  },
+  {
+    "text": "yourself",
+    "start": 126.25,
+    "end": 126.69
+  },
+  {
+    "text": "or",
+    "start": 126.69,
+    "end": 126.88
+  },
+  {
+    "text": "not.",
+    "start": 126.88,
+    "end": 127.88
+  },
+  {
+    "text": "Some",
+    "start": 127.88,
+    "end": 128.11
+  },
+  {
+    "text": "people",
+    "start": 128.11,
+    "end": 128.45
+  },
+  {
+    "text": "are",
+    "start": 128.45,
+    "end": 128.62
+  },
+  {
+    "text": "going",
+    "start": 128.62,
+    "end": 128.91
+  },
+  {
+    "text": "to",
+    "start": 128.91,
+    "end": 129.02
+  },
+  {
+    "text": "pick",
+    "start": 129.02,
+    "end": 129.25
+  },
+  {
+    "text": "final",
+    "start": 129.25,
+    "end": 129.54
+  },
+  {
+    "text": "damage",
+    "start": 129.54,
+    "end": 129.88
+  },
+  {
+    "text": "Mor",
+    "start": 129.88,
+    "end": 130.04
+  },
+  {
+    "text": "Ws",
+    "start": 130.04,
+    "end": 130.14
+  },
+  {
+    "text": "beautifully",
+    "start": 130.18,
+    "end": 130.77
+  },
+  {
+    "text": "and",
+    "start": 130.79,
+    "end": 130.94
+  },
+  {
+    "text": "some",
+    "start": 130.94,
+    "end": 131.17
+  },
+  {
+    "text": "people",
+    "start": 131.17,
+    "end": 131.51
+  },
+  {
+    "text": "just",
+    "start": 131.51,
+    "end": 131.74
+  },
+  {
+    "text": "won't.",
+    "start": 131.74,
+    "end": 132.32
+  },
+  {
+    "text": "So",
+    "start": 132.32,
+    "end": 132.46
+  },
+  {
+    "text": "whilst",
+    "start": 132.46,
+    "end": 132.9
+  },
+  {
+    "text": "the",
+    "start": 132.9,
+    "end": 133.11
+  },
+  {
+    "text": "method",
+    "start": 133.12,
+    "end": 133.56
+  },
+  {
+    "text": "is",
+    "start": 133.56,
+    "end": 133.7
+  },
+  {
+    "text": "so",
+    "start": 133.7,
+    "end": 133.83
+  },
+  {
+    "text": "rule-based,",
+    "start": 133.85,
+    "end": 134.71
+  },
+  {
+    "text": "there",
+    "start": 134.71,
+    "end": 135.08
+  },
+  {
+    "text": "are",
+    "start": 135.08,
+    "end": 135.27
+  },
+  {
+    "text": "still",
+    "start": 135.3,
+    "end": 135.67
+  },
+  {
+    "text": "rules",
+    "start": 135.67,
+    "end": 136.04
+  },
+  {
+    "text": "within",
+    "start": 136.04,
+    "end": 136.48
+  },
+  {
+    "text": "the",
+    "start": 136.48,
+    "end": 136.67
+  },
+  {
+    "text": "method",
+    "start": 136.71,
+    "end": 137.11
+  },
+  {
+    "text": "that",
+    "start": 137.15,
+    "end": 137.42
+  },
+  {
+    "text": "you're",
+    "start": 137.43,
+    "end": 137.96
+  },
+  {
+    "text": "going",
+    "start": 137.96,
+    "end": 138.23
+  },
+  {
+    "text": "to",
+    "start": 138.24,
+    "end": 138.35
+  },
+  {
+    "text": "have",
+    "start": 138.35,
+    "end": 138.57
+  },
+  {
+    "text": "to",
+    "start": 138.57,
+    "end": 138.68
+  },
+  {
+    "text": "come",
+    "start": 138.68,
+    "end": 138.89
+  },
+  {
+    "text": "up",
+    "start": 138.9,
+    "end": 139.01
+  },
+  {
+    "text": "with",
+    "start": 139.01,
+    "end": 139.23
+  },
+  {
+    "text": "for",
+    "start": 139.23,
+    "end": 139.4
+  },
+  {
+    "text": "yourself,",
+    "start": 139.4,
+    "end": 139.96
+  },
+  {
+    "text": "for",
+    "start": 139.96,
+    "end": 140.12
+  },
+  {
+    "text": "your",
+    "start": 140.12,
+    "end": 140.35
+  },
+  {
+    "text": "own",
+    "start": 140.35,
+    "end": 140.52
+  },
+  {
+    "text": "trading.",
+    "start": 140.67,
+    "end": 141.16
+  },
+  {
+    "text": "Because",
+    "start": 141.16,
+    "end": 141.6
+  },
+  {
+    "text": "at",
+    "start": 141.61,
+    "end": 141.74
+  },
+  {
+    "text": "the",
+    "start": 141.74,
+    "end": 141.93
+  },
+  {
+    "text": "end",
+    "start": 141.93,
+    "end": 142.12
+  },
+  {
+    "text": "of",
+    "start": 142.12,
+    "end": 142.25
+  },
+  {
+    "text": "the",
+    "start": 142.25,
+    "end": 142.44
+  },
+  {
+    "text": "day,",
+    "start": 142.44,
+    "end": 142.76
+  },
+  {
+    "text": "it's",
+    "start": 142.76,
+    "end": 143.02
+  },
+  {
+    "text": "your",
+    "start": 143.02,
+    "end": 143.28
+  },
+  {
+    "text": "personality",
+    "start": 143.28,
+    "end": 143.99
+  },
+  {
+    "text": "that",
+    "start": 143.99,
+    "end": 144.25
+  },
+  {
+    "text": "adds",
+    "start": 144.25,
+    "end": 144.51
+  },
+  {
+    "text": "to",
+    "start": 144.51,
+    "end": 144.62
+  },
+  {
+    "text": "it",
+    "start": 144.73,
+    "end": 144.77
+  },
+  {
+    "text": "as",
+    "start": 144.77,
+    "end": 144.9
+  },
+  {
+    "text": "well.",
+    "start": 144.9,
+    "end": 145.4
+  },
+  {
+    "text": "So",
+    "start": 145.4,
+    "end": 145.56
+  },
+  {
+    "text": "that's",
+    "start": 145.56,
+    "end": 146.05
+  },
+  {
+    "text": "why",
+    "start": 146.05,
+    "end": 146.28
+  },
+  {
+    "text": "rules",
+    "start": 146.29,
+    "end": 146.7
+  },
+  {
+    "text": "will",
+    "start": 146.7,
+    "end": 147.03
+  },
+  {
+    "text": "differ",
+    "start": 147.03,
+    "end": 147.52
+  },
+  {
+    "text": "person",
+    "start": 147.52,
+    "end": 147.98
+  },
+  {
+    "text": "to",
+    "start": 148.11,
+    "end": 148.17
+  },
+  {
+    "text": "person.",
+    "start": 148.17,
+    "end": 148.72
+  }
+]

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Weekend Play (Combined) — Backtest</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --panel:#ffffff; --ink:#1a1e26; --soft:#5b6472; --line:#e2e6ec;
+    --accent:#0f7d6b; --accent-2:#0a5c4f; --warn:#b4551a; --warnbg:#fff2e6;
+    --qbg:#eef6ff; --qborder:#8fbfe8; --qink:#1f4f74;
+    --chip:#eef2f5; --stop:#e14b4b; --tp:#17a07f;
+    --shadow:0 1px 3px rgba(20,30,45,.08),0 6px 20px rgba(20,30,45,.05);
+    --ride:#3b6fb0; --fade:#c0553b; --good:#17a07f; --bad:#e14b4b;
+    --ansbg:#e7f6ee; --ansborder:#4fb587; --ansink:#12563c;
+    --verdbg:#fbeceb; --verdborder:#d98b7f; --verdink:#8a2f22;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0f1319; --panel:#161c24; --ink:#e7ecf2; --soft:#9aa5b3; --line:#26303c;
+      --accent:#39c9ad; --accent-2:#7fe0cd; --warn:#f0a054; --warnbg:#2a1e12;
+      --qbg:#12222f; --qborder:#2f5b78; --qink:#bfe0f5;
+      --chip:#1d2530; --stop:#ff6b6b; --tp:#3bd6a6;
+      --shadow:0 1px 3px rgba(0,0,0,.4),0 8px 26px rgba(0,0,0,.35);
+      --ride:#5b93d6; --fade:#d76b50; --good:#3bd6a6; --bad:#ff6b6b;
+      --ansbg:#122a1f; --ansborder:#2f8f5b; --ansink:#a5e3c6;
+      --verdbg:#2a1512; --verdborder:#7a3a2f; --verdink:#f2b3a6;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-size:16.5px; line-height:1.6;}
+  .wrap{max-width:1060px; margin:0 auto; padding:0 20px}
+  header.hero{background:linear-gradient(135deg,var(--accent-2),var(--accent));
+    color:#fff; padding:38px 0 30px; border-bottom:4px solid rgba(0,0,0,.12);}
+  header.hero .wrap{max-width:940px}
+  header.hero .eyebrow{text-transform:uppercase; letter-spacing:.15em; font-size:12px; opacity:.9; margin:0 0 8px}
+  header.hero h1{font-size:30px; line-height:1.15; margin:0 0 8px; font-weight:800}
+  header.hero p{margin:0; opacity:.96; font-size:15.5px}
+  main{padding:26px 0 70px}
+  section{background:var(--panel); border:1px solid var(--line); border-radius:15px;
+    padding:22px 26px 26px; margin:0 0 22px; box-shadow:var(--shadow);}
+  section>h2{font-size:22px; margin:0 0 4px; letter-spacing:-.01em}
+  section>.kicker{color:var(--accent); font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:.1em; margin:0 0 12px}
+  h3{font-size:18px; margin:22px 0 6px}
+  p{margin:9px 0}
+  ul,ol{margin:9px 0; padding-left:22px} li{margin:5px 0}
+  .soft{color:var(--soft)} strong{font-weight:700}
+  code{background:var(--chip); padding:1px 5px; border-radius:5px; font-size:13.5px}
+  /* verdict banner */
+  .verdict{background:var(--verdbg); border:1.5px solid var(--verdborder); color:var(--verdink);
+    border-radius:15px; padding:20px 24px; margin:0 0 22px; box-shadow:var(--shadow);}
+  .verdict .tag{display:inline-block; font-weight:800; letter-spacing:.04em; font-size:13px;
+    text-transform:uppercase; background:var(--verdink); color:var(--verdbg); padding:3px 10px; border-radius:6px; margin-bottom:8px}
+  .verdict h2{margin:2px 0 8px; font-size:23px; color:var(--verdink)}
+  .verdict p{margin:7px 0; font-size:15.5px}
+  /* boxes */
+  .box{border-radius:12px; padding:14px 16px; margin:15px 0; font-size:15px}
+  .box.rule{background:var(--chip); border:1px solid var(--line)}
+  .box.honesty{background:var(--warnbg); border:1px solid var(--warn)}
+  .box.ans{background:var(--ansbg); border:1px solid var(--ansborder); color:var(--ansink)}
+  .box h4{margin:0 0 6px; font-size:15px; text-transform:uppercase; letter-spacing:.05em}
+  /* tables */
+  .tw{overflow-x:auto; margin:14px 0}
+  table{border-collapse:collapse; width:100%; font-size:14px; min-width:640px}
+  th,td{padding:7px 9px; text-align:right; border-bottom:1px solid var(--line); white-space:nowrap}
+  th:first-child,td:first-child{text-align:left; white-space:normal; min-width:200px}
+  thead th{background:var(--chip); font-size:12px; text-transform:uppercase; letter-spacing:.03em; color:var(--soft)}
+  tbody tr:hover{background:var(--chip)}
+  .pos{color:var(--good); font-weight:700} .neg{color:var(--bad); font-weight:700}
+  .rowhi{background:rgba(23,160,127,.08)}
+  .rowdim td{opacity:.72}
+  .pill{display:inline-block; font-size:11px; font-weight:700; padding:1px 7px; border-radius:20px; margin-right:5px}
+  .pill.ride{background:rgba(59,111,176,.15); color:var(--ride)}
+  .pill.fade{background:rgba(192,85,59,.15); color:var(--fade)}
+  figure{margin:16px 0; background:var(--chip); border:1px solid var(--line); border-radius:12px; padding:14px}
+  figcaption{font-size:13px; color:var(--soft); margin-top:8px}
+  .legend span{display:inline-block; margin-right:16px; font-size:13px}
+  .sw{display:inline-block; width:12px; height:12px; border-radius:3px; vertical-align:middle; margin-right:5px}
+</style>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+  <div class="eyebrow">Weekend SD · Phase 4c · In-sample 2019-09 → 2024-12 · BTC-USDT perp</div>
+  <h1>The Combined Weekend Play — Backtest</h1>
+  <p>Ride the weekend long, then flip into a Monday counter-trade at a declared trigger. Does the two-leg <em>structure</em> beat each piece alone and the validated Monday fade?</p>
+</div></header>
+
+<main><div class="wrap">
+
+  <!-- ===================== VERDICT BANNER (FIRST LINE) ===================== -->
+  <div class="verdict">
+    <span class="tag">Verdict</span>
+    <h2>❌ No robust value added — keep the simple validated Monday fade.</h2>
+    <p><strong>Three of the four flip triggers fail outright.</strong> Bolting an SD-level fade (F1) or an HPDR-band fade (F4) onto the weekend ride makes it <em>worse</em> than just riding — both fade legs lose or wash, and cutting the long short at the tag throws away drift. F3 is just "ride to Monday open," no flip.</p>
+    <p><strong>Only F2 (the validated M/W fade) clears the mechanical t ≥ 2 bar (+198.8R, t = 2.43) — but it fails the spirit of the test.</strong> Its extra return over the fade is unhedged weekend <em>bull-market beta</em>: the always-long leg alone is +104R but only t = 1.22 (not established), lost −51R in 2022, and carries a 62%-of-account drawdown. Stapling the fade on top <em>raises</em> total R yet <em>lowers</em> the risk-adjusted quality (t drops 2.98 → 2.43) and multiplies drawdown ~10×. The one clean, regime-robust edge in this whole study remains the standalone validated fade: <strong>+0.382R, 91 trades, t = 2.98, max-DD 4.6R.</strong></p>
+    <p class="soft" style="font-size:13.5px">Weekend leg = <strong>ALWAYS-LONG</strong>, entered Fri 17:00 New York (Phase 4b found no credible weekend direction rule — the long is a decree, not a signal). 9 rows tested → treat any single t with multiple-testing caution.</p>
+  </div>
+
+  <!-- ===================== STRUCTURE DIAGRAM ===================== -->
+  <section id="structure">
+    <div class="kicker">The structure</div>
+    <h2>What the combined play actually does</h2>
+    <p>Every weekend you buy at the Friday close and hold long through the weekend (<span class="pill ride">LEG 1 · RIDE</span>). On Monday a trigger fires "breakout complete": you close the long and flip into a fade back toward the weekend base (<span class="pill fade">LEG 2 · FADE</span>). If nothing triggers, the long simply runs to the Monday-window close.</p>
+
+    <figure>
+      <svg viewBox="0 0 980 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Timeline of the two-leg weekend play" style="width:100%;height:auto;font-family:inherit">
+        <defs>
+          <marker id="ah" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="var(--ink)"/></marker>
+        </defs>
+        <!-- baseline -->
+        <line x1="40" y1="150" x2="945" y2="150" stroke="var(--line)" stroke-width="2"/>
+        <!-- time ticks -->
+        <g fill="var(--soft)" font-size="12" text-anchor="middle">
+          <line x1="90" y1="144" x2="90" y2="156" stroke="var(--soft)"/><text x="90" y="176">Fri 17:00 NY</text>
+          <line x1="470" y1="144" x2="470" y2="156" stroke="var(--soft)"/><text x="470" y="176">Mon 02:00 Dubai</text><text x="470" y="192" font-size="10.5">(base latch)</text>
+          <line x1="720" y1="144" x2="720" y2="156" stroke="var(--soft)"/><text x="720" y="176">flip trigger</text><text x="720" y="192" font-size="10.5">(Mon "breakout complete")</text>
+          <line x1="910" y1="144" x2="910" y2="156" stroke="var(--soft)"/><text x="910" y="176">Tue 00:00 Dubai</text>
+        </g>
+        <!-- weekend shading -->
+        <rect x="90" y="60" width="380" height="90" fill="var(--ride)" opacity="0.06"/>
+        <text x="280" y="52" text-anchor="middle" fill="var(--soft)" font-size="11.5">weekend</text>
+        <rect x="470" y="60" width="440" height="90" fill="var(--fade)" opacity="0.05"/>
+        <text x="690" y="52" text-anchor="middle" fill="var(--soft)" font-size="11.5">Monday window</text>
+        <!-- leg 1 ride -->
+        <path d="M90,150 L720,95" stroke="var(--ride)" stroke-width="3.5" fill="none" marker-end="url(#ah)"/>
+        <circle cx="90" cy="150" r="5" fill="var(--ride)"/>
+        <text x="360" y="118" fill="var(--ride)" font-size="13" font-weight="700">LEG 1 · LONG the weekend ride ($10k notional, always long)</text>
+        <!-- leg 2 fade -->
+        <path d="M720,95 L905,150" stroke="var(--fade)" stroke-width="3.5" fill="none" marker-end="url(#ah)"/>
+        <circle cx="720" cy="95" r="5" fill="var(--fade)"/>
+        <text x="812" y="112" fill="var(--fade)" font-size="13" font-weight="700" text-anchor="middle">LEG 2 · FADE</text>
+        <text x="812" y="128" fill="var(--fade)" font-size="11" text-anchor="middle">(toward base)</text>
+        <!-- no-trigger dashed continuation -->
+        <path d="M720,95 L905,80" stroke="var(--ride)" stroke-width="2" stroke-dasharray="5 4" fill="none"/>
+        <text x="820" y="72" fill="var(--soft)" font-size="10.5" text-anchor="middle">no trigger → long runs to Tue 00:00</text>
+      </svg>
+      <figcaption><b>The two legs.</b> Leg 1 is a fixed-notional long from Friday 17:00 NY; leg 2 is the fade that starts the instant the flip trigger fires. Both legs pay taker fee 0.05%/side + 0.02% slip on every fill; each expresses P&L as net dollars ÷ $100 = R, so the two R's simply add.</figcaption>
+    </figure>
+
+    <h3>The four flip triggers (each is one declared, frozen rule)</h3>
+    <div class="tw"><table>
+      <thead><tr><th>Code · plain name</th><th>When leg 1 closes / leg 2 starts</th><th>Leg-2 fade</th></tr></thead>
+      <tbody>
+        <tr><td><strong>F1 · SD-level tag</strong></td><td style="text-align:left">first tag of the confluence mean level (k=0, ≥2 of 3 stat windows agree within 0.25 pts)</td><td style="text-align:left">up-tag → short / down-tag → long; target halfway to base; stop 1× confluence-SD; time-stop Tue 00:00</td></tr>
+        <tr><td><strong>F2 · M/W confirmation</strong> <span class="soft">(validated)</span></td><td style="text-align:left">at the Annie FMWB retest entry (Monday-spike signals only)</td><td style="text-align:left">the validated Monday fade, exactly — TP 1.9R fixed, stop beyond formation extreme, refund exit, Friday hard close</td></tr>
+        <tr><td><strong>F3 · fixed-time</strong></td><td style="text-align:left">at the base latch (Mon 02:00 Dubai)</td><td style="text-align:left"><em>none</em> — a bare time gives no level or direction. Measures "ride, exit at Monday open."</td></tr>
+        <tr><td><strong>F4 · HPDR band tag</strong></td><td style="text-align:left">first tag of the HPDR 95%-coverage band (Range 4) in the Monday window</td><td style="text-align:left">upper band → short / lower band → long; exits same as F1 (halfway to base, 1× confluence-SD stop, time-stop)</td></tr>
+      </tbody>
+    </table></div>
+    <p class="soft" style="font-size:13.5px">F1 reuses the exact CONF/k0/half/sd cell from the naked-fade study (Phase 3's least-bad cell). F4's "extreme band" is <em>declared</em> as HPDR Range 4 (95% coverage ≈ price beyond the 95th-percentile historical 3.5-hour move): a genuine statistical stretch that still tags a testable number of Mondays — Range 5 (99%) sits ~5% out and is essentially never tagged intraday; Range 8 (100%) ~33% out, never.</p>
+  </section>
+
+  <!-- ===================== SANITY ANCHOR ===================== -->
+  <section id="anchor">
+    <div class="kicker">Sanity anchor — checked before trusting anything</div>
+    <h2>F2 leg-2 standalone reproduces the validated Monday fade</h2>
+    <p>The F2 fade leg is the previously-validated Annie Monday fade. Run in isolation it <strong>must</strong> return ≈ +0.382R over ~91 trades, t ≈ 2.98. It does, to the digit:</p>
+    <div class="box ans">
+      <h4>✅ Anchor reproduced exactly</h4>
+      <p style="margin:4px 0"><strong>N = 91 · avg = +0.3820R · total = +34.76R · win-rate = 55.0% · t = 2.977</strong> &nbsp;(target: +0.382R, 91 trades, t = 2.98).</p>
+      <p style="margin:4px 0" class="soft">The F1 fade leg likewise reproduces its source cell exactly: N = 81, avg = −0.0239R, total = −1.93R (the Phase-3 CONF/k0/half/sd result). The machinery is faithful; the combined numbers below can be trusted.</p>
+    </div>
+  </section>
+
+  <!-- ===================== 9-ROW RESULTS ===================== -->
+  <section id="results">
+    <div class="kicker">Results · all 9 declared rows</div>
+    <h2>The nine rows</h2>
+    <p class="legend">
+      <span><span class="sw" style="background:var(--ride)"></span>ride = weekend long leg</span>
+      <span><span class="sw" style="background:var(--fade)"></span>fade = Monday counter-trade leg</span>
+      <span>1R = $100 = a 1% move on a $10k account · max-DD in R ≈ % of account</span>
+    </p>
+    <div class="tw"><table>
+      <thead><tr>
+        <th>#&nbsp; Row (plain name)</th><th>N</th><th>Win %</th><th>Avg R</th><th>Med R</th><th>t</th><th>PF</th><th>Total R</th><th>Max-DD R</th><th>Leg-2 exits</th>
+      </tr></thead>
+      <tbody>
+        <tr><td><strong>1</strong> Combined <span class="pill ride">ride</span>+<span class="pill fade">fade</span> · <strong>F1 SD-level tag</strong></td><td>277</td><td>49.1</td><td class="pos">+0.253</td><td>−0.058</td><td>0.86</td><td>1.16</td><td class="pos">+69.95</td><td>68.2</td><td class="soft">tp46 stop17 time18 · 196 ride-only</td></tr>
+        <tr class="rowhi"><td><strong>2</strong> Combined <span class="pill ride">ride</span>+<span class="pill fade">fade</span> · <strong>F2 M/W confirmation</strong></td><td>277</td><td>52.0</td><td class="pos">+0.718</td><td>+0.128</td><td><strong>2.43</strong></td><td>1.53</td><td class="pos">+198.83</td><td>45.6</td><td class="soft">tp32 stop29 fri30 · 186 ride-only</td></tr>
+        <tr><td><strong>3</strong> Combined · <strong>F3 fixed-time (ride only)</strong></td><td>277</td><td>53.8</td><td class="pos">+0.181</td><td>+0.171</td><td>0.99</td><td>1.21</td><td class="pos">+50.09</td><td>28.9</td><td class="soft">no leg 2</td></tr>
+        <tr><td><strong>4</strong> Combined <span class="pill ride">ride</span>+<span class="pill fade">fade</span> · <strong>F4 HPDR 95% band</strong></td><td>277</td><td>49.5</td><td class="pos">+0.293</td><td>−0.030</td><td>0.99</td><td>1.18</td><td class="pos">+81.27</td><td>63.3</td><td class="soft">tp26 stop10 time10 · 231 ride-only</td></tr>
+        <tr class="rowdim"><td><strong>5</strong> Leg-2 alone <span class="pill fade">fade</span> · <strong>F1 naked SD fade</strong></td><td>81</td><td>64.2</td><td class="neg">−0.024</td><td>+0.376</td><td>−0.33</td><td>0.92</td><td class="neg">−1.93</td><td>11.1</td><td class="soft">tp46 stop17 time18</td></tr>
+        <tr class="rowhi"><td><strong>6</strong> Leg-2 alone <span class="pill fade">fade</span> · <strong>F2 validated Monday fade</strong> ★</td><td>91</td><td>55.0</td><td class="pos">+0.382</td><td>+0.164</td><td><strong>2.98</strong></td><td>2.05</td><td class="pos">+34.76</td><td><strong>4.6</strong></td><td class="soft">tp32 stop29 fri30</td></tr>
+        <tr class="rowdim"><td><strong>7</strong> Leg-2 alone <span class="pill fade">fade</span> · <strong>F4 HPDR-triggered fade</strong></td><td>46</td><td>67.4</td><td class="pos">+0.007</td><td>+0.302</td><td>0.07</td><td>1.02</td><td class="pos">+0.31</td><td>4.9</td><td class="soft">tp26 stop10 time10</td></tr>
+        <tr><td><strong>8</strong> Leg-1 alone <span class="pill ride">ride</span> · always-long Fri17→Tue00</td><td>277</td><td>49.5</td><td class="pos">+0.376</td><td>−0.030</td><td>1.22</td><td>1.24</td><td class="pos">+104.27</td><td>62.2</td><td class="soft">held to time</td></tr>
+        <tr><td><strong>9</strong> Leg-1 to base latch only (= F3)</td><td>277</td><td>53.8</td><td class="pos">+0.181</td><td>+0.171</td><td>0.99</td><td>1.21</td><td class="pos">+50.09</td><td>28.9</td><td class="soft">held to Mon 02:00</td></tr>
+      </tbody>
+    </table></div>
+    <p class="soft" style="font-size:13.5px">★ = the one clean, regime-robust edge. Combined rows (1–4) trade <em>every</em> weekend — leg 1 is always on — so N = 277; the "ride-only" count is weekends where no flip triggered. Leg-2-alone rows (5–7) count only the weekends where the fade actually fires.</p>
+  </section>
+
+  <!-- ===================== BENCHMARK ===================== -->
+  <section id="benchmark">
+    <div class="kicker">Does the structure add value?</div>
+    <h2>Combined vs its own legs vs the validated fade</h2>
+    <p>The verdict standard: a combined trigger adds value only if it beats <strong>both</strong> its legs alone <strong>and</strong> the validated fade, with a paired or comparable <strong>t ≥ 2</strong>.</p>
+    <div class="tw"><table>
+      <thead><tr>
+        <th>Combined trigger</th><th>Combined total R</th><th>Combined t</th>
+        <th>vs Leg-1 alone (+104.3R)</th><th>vs Leg-2 fade alone</th><th>vs validated fade (+34.8R, t 2.98)</th><th>Beats both @ t≥2?</th>
+      </tr></thead>
+      <tbody>
+        <tr><td><strong>F1 · SD-level tag</strong></td><td class="pos">+69.95</td><td>0.86</td><td class="neg">worse · paired t −1.22</td><td class="pos">beats −1.93R (paired t +1.48)</td><td class="neg">lower total &amp; t</td><td class="neg">No</td></tr>
+        <tr class="rowhi"><td><strong>F2 · M/W confirmation</strong></td><td class="pos">+198.83</td><td><strong>2.43</strong></td><td class="pos">beats · paired t +3.78</td><td class="pos">beats +34.8R (paired t +0.82)</td><td class="neg">higher total, <strong>lower t</strong> (2.43&lt;2.98)</td><td class="warn" style="color:var(--warn);font-weight:700">Letter yes / spirit no</td></tr>
+        <tr><td><strong>F4 · HPDR 95% band</strong></td><td class="pos">+81.27</td><td>0.99</td><td class="neg">worse · paired t −1.03</td><td class="pos">beats +0.31R (paired t +1.47)</td><td class="neg">lower total &amp; t</td><td class="neg">No</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>F1 and F4 fail cleanly.</strong> Both combined totals (+70R, +81R) are <em>below</em> leg-1-alone (+104R): the fade legs lose or wash (F1 fade −1.9R; F4 fade +0.3R over just 46 tags) and, worse, closing the long at the tag surrenders weekend drift. The paired test confirms it — adding the fade to the ride is significantly <em>negative</em> (F1 t −1.22, F4 t −1.03).</p>
+    <p><strong>F2 is the only interesting case — and the honest read is "no."</strong> Yes, +198.8R clears t = 2.43. But dissect it:</p>
+    <ul>
+      <li><strong>+104R of it is just the weekend long</strong> (leg 1) — an unvalidated, undirected bull-market bet (t = 1.22, not established).</li>
+      <li><strong>+34.8R is the validated fade</strong> — the real edge, already available standalone at a <em>higher</em> t (2.98) and one-tenth the drawdown.</li>
+      <li><strong>The remaining ~+60R of "synergy"</strong> is a timing artifact: on <em>spike-up</em> Mondays the long exits near the spike top (before the fade-back) and <em>then</em> shorts the drop — a genuine double-win, but it only exists in one direction.</li>
+    </ul>
+    <div class="box rule">
+      <h4>The synergy is one-sided (F2 fired weekends, by fade direction)</h4>
+      <div class="tw"><table style="min-width:520px">
+        <thead><tr><th>Monday spike</th><th>N</th><th>Leg-1 ride avg R</th><th>Leg-2 fade avg R</th><th>Read</th></tr></thead>
+        <tbody>
+          <tr><td>UP → short fade</td><td>37</td><td class="pos">+2.78</td><td class="pos">+0.48</td><td class="soft">ride the rally to the top, then short the drop — both win</td></tr>
+          <tr><td>DOWN → long fade</td><td>54</td><td class="neg">−1.37</td><td class="pos">+0.31</td><td class="soft">the long ride gets crushed into the low; the fade only partly repairs it</td></tr>
+        </tbody>
+      </table></div>
+      <p style="margin:8px 0 0" class="soft">The fade itself is balanced and healthy in both directions (+0.48 / +0.31). The <em>ride</em> is what's lopsided — it only pays when the Monday spike happens to be up. That is a directional bet on the weekend, exactly what Phase 4b said we have no rule for.</p>
+    </div>
+  </section>
+
+  <!-- ===================== HONESTY ===================== -->
+  <section id="honesty">
+    <div class="kicker">Honesty box</div>
+    <h2>What could make these numbers lie — and what we did about it</h2>
+    <div class="box honesty">
+      <ul style="margin:4px 0">
+        <li><strong>Leg-1 R is not risk-based, it's notional-based.</strong> The weekend long has no natural stop, so we size it at a fixed $10k notional (1×) and define 1R = a 1% move. That makes leg-1 and leg-2 R's summable in dollars, but leg-1 R is far higher-variance — a single weekend can swing several R. The 62%-of-account max-DD on leg-1 alone is the honest cost of that.</li>
+        <li><strong>The weekend edge is bull-market beta, not alpha.</strong> Leg-1 by year: 2020 +37R, 2021 +38R, 2024 +54R — but <strong>2022 −51R</strong>. It is long-BTC-in-an-uptrend. Out of a bull regime it can flip negative; its t = 1.22 says we cannot even establish it in-sample.</li>
+        <li><strong>F2's high total R buys <em>lower</em> statistical quality.</strong> Combined t (2.43) is below the fade-alone t (2.98) and drawdown is ~10× larger (45.6R vs 4.6R). More money, worse risk-adjusted — the opposite of what "adds value" should mean.</li>
+        <li><strong>Multiple testing.</strong> Nine rows / four triggers were examined. A lone t = 2.43 that is itself driven by regime beta is not a bankable discovery — the pre-registered, independently-validated fade (t = 2.98) is.</li>
+        <li><strong>Costs applied everywhere, ambiguity penalised.</strong> Taker 0.05%/side + 0.02% slip on every fill including the flip (both legs charged, mildly conservative); same-minute stop-and-target counts as a loss; all triggers and HPDR bands are strictly causal (HPDR uses only the previous completed 15-minute bar). F1/F4 fades reuse the frozen Phase-3 cell; F2 fade is read verbatim from the validated weekly-trades file.</li>
+        <li><strong>In-sample only.</strong> Everything here is 2019-09 → 2024-12. Nothing was run on the locked 2025-26 block.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===================== FOR IGOR ===================== -->
+  <section id="forigor">
+    <div class="kicker">What this means for you</div>
+    <h2>Bottom line, in plain English</h2>
+    <ul>
+      <li><strong>Don't trade the two-leg combined play.</strong> The "ride then flip" structure does not create a robust new edge. On three of four triggers it is worse than doing nothing clever; on the fourth it only looks good because it smuggles in an unhedged long-BTC bet.</li>
+      <li><strong>Keep trading the standalone Monday fade.</strong> That is the single clean, pre-registered, regime-robust edge in this whole line of work: <strong>+0.38R per trade, ~91 setups over six years, t ≈ 3.0, and only a 4.6R drawdown.</strong> It does not need the weekend ride bolted on.</li>
+      <li><strong>If you want the weekend-ride return, know what you're buying.</strong> The +104R from holding long over weekends is real but it is <em>market beta</em> in a bull run, not a skill edge — it lost 51R in 2022 and can draw down 60%+ of the account. That is a position-sizing / regime decision, entirely separate from the fade, and should never be dressed up as part of a "strategy" t-stat.</li>
+      <li><strong>The SD levels and the HPDR band are not useful flip triggers.</strong> The SD-level fade loses (Phase 3 already showed this); the HPDR 95% band tags too rarely and washes to zero. Neither improves on the fade.</li>
+    </ul>
+    <p class="soft" style="font-size:13.5px">Method note: script <code>bt_weekend_play_combined.py</code> · outputs <code>combined_rows.csv</code> + <code>combined_trades.csv</code> · deterministic (two runs md5-identical) · in-sample 2019-09→2024-12 · costs, causality and ambiguity conventions as in the honesty box.</p>
+  </section>
+
+</div></main>
+</body>
+</html>

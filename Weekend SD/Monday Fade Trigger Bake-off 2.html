@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Monday Fade — Trigger Bake-off 2</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --panel:#ffffff; --ink:#1a1e26; --soft:#5b6472; --line:#e2e6ec;
+    --accent:#0f7d6b; --accent-2:#0a5c4f; --warn:#b4551a; --warnbg:#fff2e6;
+    --qbg:#eef6ff; --qborder:#8fbfe8; --qink:#1f4f74;
+    --chip:#eef2f5; --stop:#e14b4b; --tp:#17a07f;
+    --shadow:0 1px 3px rgba(20,30,45,.08),0 6px 20px rgba(20,30,45,.05);
+    --good:#17a07f; --bad:#e14b4b; --mid:#8a8f98;
+    --ansbg:#e7f6ee; --ansborder:#4fb587; --ansink:#12563c;
+    --verdbg:#fbeceb; --verdborder:#d98b7f; --verdink:#8a2f22;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0f1319; --panel:#161c24; --ink:#e7ecf2; --soft:#9aa5b3; --line:#26303c;
+      --accent:#39c9ad; --accent-2:#7fe0cd; --warn:#f0a054; --warnbg:#2a1e12;
+      --qbg:#12222f; --qborder:#2f5b78; --qink:#bfe0f5;
+      --chip:#1d2530; --stop:#ff6b6b; --tp:#3bd6a6;
+      --shadow:0 1px 3px rgba(0,0,0,.4),0 8px 26px rgba(0,0,0,.35);
+      --good:#3bd6a6; --bad:#ff6b6b; --mid:#9aa5b3;
+      --ansbg:#122a1f; --ansborder:#2f8f5b; --ansink:#a5e3c6;
+      --verdbg:#2a1512; --verdborder:#7a3a2f; --verdink:#f2b3a6;
+    }
+  }
+  html[data-theme="dark"]{
+    --bg:#0f1319; --panel:#161c24; --ink:#e7ecf2; --soft:#9aa5b3; --line:#26303c;
+    --accent:#39c9ad; --accent-2:#7fe0cd; --warn:#f0a054; --warnbg:#2a1e12;
+    --qbg:#12222f; --qborder:#2f5b78; --qink:#bfe0f5;
+    --chip:#1d2530; --stop:#ff6b6b; --tp:#3bd6a6;
+    --shadow:0 1px 3px rgba(0,0,0,.4),0 8px 26px rgba(0,0,0,.35);
+    --good:#3bd6a6; --bad:#ff6b6b; --mid:#9aa5b3;
+    --ansbg:#122a1f; --ansborder:#2f8f5b; --ansink:#a5e3c6;
+    --verdbg:#2a1512; --verdborder:#7a3a2f; --verdink:#f2b3a6;
+  }
+  html[data-theme="light"]{
+    --bg:#f6f7f9; --panel:#ffffff; --ink:#1a1e26; --soft:#5b6472; --line:#e2e6ec;
+    --accent:#0f7d6b; --accent-2:#0a5c4f; --warn:#b4551a; --warnbg:#fff2e6;
+    --qbg:#eef6ff; --qborder:#8fbfe8; --qink:#1f4f74;
+    --chip:#eef2f5; --stop:#e14b4b; --tp:#17a07f;
+    --shadow:0 1px 3px rgba(20,30,45,.08),0 6px 20px rgba(20,30,45,.05);
+    --good:#17a07f; --bad:#e14b4b; --mid:#8a8f98;
+    --ansbg:#e7f6ee; --ansborder:#4fb587; --ansink:#12563c;
+    --verdbg:#fbeceb; --verdborder:#d98b7f; --verdink:#8a2f22;
+  }
+  #themeBtn{position:fixed; top:14px; right:16px; z-index:50; background:var(--panel); color:var(--ink);
+    border:1px solid var(--line); border-radius:20px; padding:6px 14px; font-size:13px; font-weight:700;
+    cursor:pointer; box-shadow:var(--shadow);}
+  #themeBtn:hover{border-color:var(--accent); color:var(--accent)}
+  *{box-sizing:border-box}
+  body{margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-size:16.5px; line-height:1.6;}
+  .wrap{max-width:1060px; margin:0 auto; padding:0 20px}
+  header.hero{background:linear-gradient(135deg,var(--accent-2),var(--accent));
+    color:#fff; padding:38px 0 30px; border-bottom:4px solid rgba(0,0,0,.12);}
+  header.hero .wrap{max-width:940px}
+  header.hero .eyebrow{text-transform:uppercase; letter-spacing:.15em; font-size:12px; opacity:.9; margin:0 0 8px}
+  header.hero h1{font-size:30px; line-height:1.15; margin:0 0 8px; font-weight:800}
+  header.hero p{margin:0; opacity:.96; font-size:15.5px}
+  main{padding:26px 0 70px}
+  section{background:var(--panel); border:1px solid var(--line); border-radius:15px;
+    padding:22px 26px 26px; margin:0 0 22px; box-shadow:var(--shadow);}
+  section>h2{font-size:22px; margin:0 0 4px; letter-spacing:-.01em}
+  section>.kicker{color:var(--accent); font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:.1em; margin:0 0 12px}
+  h3{font-size:18px; margin:22px 0 6px}
+  p{margin:9px 0}
+  ul,ol{margin:9px 0; padding-left:22px} li{margin:5px 0}
+  .soft{color:var(--soft)} strong{font-weight:700}
+  code{background:var(--chip); padding:1px 5px; border-radius:5px; font-size:13.5px}
+  a{color:var(--accent); word-break:break-word}
+  .verdict{background:var(--verdbg); border:1.5px solid var(--verdborder); color:var(--verdink);
+    border-radius:15px; padding:20px 24px; margin:0 0 22px; box-shadow:var(--shadow);}
+  .verdict .tag{display:inline-block; font-weight:800; letter-spacing:.04em; font-size:13px;
+    text-transform:uppercase; background:var(--verdink); color:var(--verdbg); padding:3px 10px; border-radius:6px; margin-bottom:8px}
+  .verdict h2{margin:2px 0 8px; font-size:23px; color:var(--verdink)}
+  .verdict p{margin:7px 0; font-size:15.5px}
+  .box{border-radius:12px; padding:14px 16px; margin:15px 0; font-size:15px}
+  .box.rule{background:var(--chip); border:1px solid var(--line)}
+  .box.honesty{background:var(--warnbg); border:1px solid var(--warn)}
+  .box.ans{background:var(--ansbg); border:1px solid var(--ansborder); color:var(--ansink)}
+  .box h4{margin:0 0 6px; font-size:15px; text-transform:uppercase; letter-spacing:.05em}
+  .tw{overflow-x:auto; margin:14px 0}
+  table{border-collapse:collapse; width:100%; font-size:13.5px; min-width:680px}
+  th,td{padding:6px 8px; text-align:right; border-bottom:1px solid var(--line); white-space:nowrap}
+  th:first-child,td:first-child{text-align:left; white-space:normal; min-width:150px}
+  thead th{background:var(--chip); font-size:11.5px; text-transform:uppercase; letter-spacing:.03em; color:var(--soft)}
+  tbody tr:hover{background:var(--chip)}
+  .pos{color:var(--good); font-weight:700} .neg{color:var(--bad); font-weight:700}
+  .mut{color:var(--mid)}
+  .rowbase{background:rgba(23,160,127,.10); font-weight:600}
+  .rowdim td{opacity:.62}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12.5px}
+  .pill{display:inline-block; font-size:11px; font-weight:700; padding:1px 7px; border-radius:20px; margin-right:4px}
+  .pill.flt{background:rgba(59,111,176,.16); color:#3b6fb0}
+  .pill.rep{background:rgba(192,85,59,.16); color:#c0553b}
+  .pill.blk{background:rgba(138,143,152,.18); color:var(--mid)}
+  figure{margin:16px 0; background:var(--chip); border:1px solid var(--line); border-radius:12px; padding:14px}
+  figcaption{font-size:13px; color:var(--soft); margin-top:8px}
+  svg{max-width:100%; height:auto; display:block}
+  .src{font-size:12.5px; color:var(--soft)}
+</style>
+<script>(function(){var t=localStorage.getItem('wsd-theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}})();</script>
+</head>
+<body>
+<button id="themeBtn" title="Switch light/dark theme" onclick="(function(){var h=document.documentElement;var cur=h.getAttribute('data-theme');var next;if(cur==='dark'){next='light';}else if(cur==='light'){next='dark';}else{next=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'light':'dark';}h.setAttribute('data-theme',next);try{localStorage.setItem('wsd-theme',next);}catch(e){}})()">◐ Light / Dark</button>
+<header class="hero"><div class="wrap">
+  <div class="eyebrow">Weekend SD · R2 · In-sample 2019-09 → 2024-12-31 · BTC-USDT perp · 15m native</div>
+  <h1>Monday Fade — Trigger Bake-off 2</h1>
+  <p>Can <em>other</em> indicators sharpen the validated Monday fade's entry — as extra filters, or as replacement confirmations? Fifteen published exhaustion / mean-reversion tools were declared from source, frozen, then run once against the 91 validated fades.</p>
+</div></header>
+
+<main><div class="wrap">
+
+<!-- ============== VERDICT ============== -->
+<div class="verdict">
+  <span class="tag">Verdict</span>
+  <h2>❌ No indicator improves the fade. The PVSRA failed-breakout confirmation stands alone.</h2>
+  <p>Of 18 declared comparisons (15 filters + 3 replacements), <strong>not one filter's kept-vs-dropped Welch t reaches ±2</strong> — no tool separates the fade's winners from its losers. The filters that meaningfully thin the sample mostly keep the <em>worse</em> trades (negative Welch t); the two that nudge average-R up (RSI-divergence, PMARP) do so only by shrinking N, are statistically indistinguishable from the trades they drop, and are exactly what you expect from luck. Every <strong>replacement</strong> (indicator band-cross swapped in for the PVSRA retest) is decisively worse (avg −0.12R to −0.66R, t as low as −5.4).</p>
+  <p>The signal underneath the null: the edge lives in the <strong>retest / pullback mechanics</strong> (wait for the failed breakout to confirm and pull back), <em>not</em> in which oscillator flags the overshoot. A weekend spike-out is, by construction, already an extreme on every short-lookback indicator — so they add no selectivity. <strong>Keep the fade exactly as validated: +0.382R, 91 trades, t = 2.98.</strong></p>
+</div>
+
+<!-- ============== WHAT WE TESTED ============== -->
+<section>
+  <div class="kicker">The question</div>
+  <h2>What this tested</h2>
+  <p><strong>Baseline to beat</strong> — the validated Annie Monday fade: weekend-box spike-out → M/W peak-2 → a 200% PVSRA vector body-closes through the 50-EMA → 2-of-3 retest → fade, TP 1.9R, stop beyond the extreme, Friday close. On the Monday subset that is <strong>+0.382R over 91 trades, t = 2.98</strong> (in-sample 2019-09 → 2024-12-31). The mechanism established in R1: the edge is the <em>failed-breakout confirmation after a thin-weekend overshoot</em> — the weekend base acts as a magnet.</p>
+  <p>Two ways an indicator could help, both declared up front:</p>
+  <ul>
+    <li><span class="pill flt">Filter</span> Keep only the fades where indicator X <em>also</em> printed its published extreme, on the fade side, during the Monday overshoot we are fading. Does the sub-sample beat the whole?</li>
+    <li><span class="pill rep">Replacement</span> For the three band-type tools that define a price trigger, let the indicator's band-cross <em>replace</em> the PVSRA confirmation as the entry — same weekends, same direction, same exits (TP 1.9R, stop beyond the running extreme, Friday close).</li>
+  </ul>
+  <div class="box rule">
+    <h4>One strict causality rule for every candidate</h4>
+    <p>All indicators are computed on the 15-minute series (the fade's native timeframe). For each fade, a filter may only use bars <strong>at or before the entry</strong>. Because the fade enters on a <em>retest</em> — after the spike has already retraced — momentum has normalised by the entry bar itself. So each exhaustion filter asks the mechanically correct question: <em>"did indicator X reach its published extreme, on the fade side, at some completed 15m bar during the Monday overshoot, up to (not including) the entry bar?"</em> The window is the Monday session, causally truncated at entry. This window is dictated by the fade's retest mechanism, <strong>not</strong> chosen to favour any candidate; thresholds are unchanged and taken from source. (A first pass that read each indicator only at the single entry-retest bar left almost every cell empty — 0–2 trades — precisely because the extreme is gone by the retest. That near-vacuous result is itself confirmation that the entry sits well past the exhaustion point.)</p>
+  </div>
+</section>
+
+<!-- ============== DECLARED LIST ============== -->
+<section>
+  <div class="kicker">Phase 1 · frozen before any result was seen</div>
+  <h2>The declared list — formulas &amp; sources</h2>
+  <p>Every parameter below is the <strong>published default from the cited source</strong>, never tuned on our data. Fade-side mapping: a <em>short</em> fade (fading an up-overshoot) requires the overbought extreme; a <em>long</em> fade requires the oversold extreme. Nothing was added after results were seen.</p>
+  <div class="tw">
+  <table>
+    <thead><tr>
+      <th>#  ·  indicator</th><th>what it measures</th><th>causal rule / threshold (from source)</th><th>mode</th>
+    </tr></thead>
+    <tbody>
+      <tr><td><strong>C1 · RSI(2)</strong> — Connors</td><td>2-period Wilder RSI; deep short-term momentum extreme</td><td>short: RSI2 ≥ 90 · long: ≤ 10</td><td><span class="pill flt">filter</span></td></tr>
+      <tr><td><strong>C2 · Williams %R(14)</strong></td><td>where close sits in the 14-bar high-low range (0…−100)</td><td>short: %R ≥ −20 · long: ≤ −80</td><td><span class="pill flt">filter</span></td></tr>
+      <tr><td><strong>C3 · Bollinger %B(20,2)</strong></td><td>close vs the 20/2 bands; &gt;1 above upper, &lt;0 below lower</td><td>short: %B ≥ 1.0 · long: ≤ 0.0</td><td><span class="pill flt">filter</span> <span class="pill rep">repl</span></td></tr>
+      <tr><td><strong>C4 · CCI(20)</strong> — Lambert</td><td>typical-price deviation from its 20-SMA in mean-deviation units</td><td>short: CCI ≥ +100 · long: ≤ −100 (const 0.015)</td><td><span class="pill flt">filter</span></td></tr>
+      <tr><td><strong>C5 · MFI(14)</strong></td><td>volume-weighted RSI (money flow); we <em>have</em> volume</td><td>short: MFI ≥ 80 · long: ≤ 20</td><td><span class="pill flt">filter</span></td></tr>
+      <tr><td><strong>C6 · Stochastic %D(14,3,3)</strong> — Lane</td><td>full-stochastic slow line; stands in for the un-recoverable Krown Stoch</td><td>short: %D ≥ 80 · long: ≤ 20</td><td><span class="pill flt">filter</span></td></tr>
+      <tr><td><strong>C7 · Keltner reject (20, 2×ATR10)</strong></td><td>price beyond the EMA20 ± 2×ATR(10) channel</td><td>short: high ≥ upper · long: low ≤ lower</td><td><span class="pill flt">filter</span></td></tr>
+      <tr><td><strong>C8 · Fisher Transform(10)</strong> — Ehlers</td><td>Gaussian-ised price extreme; ±2 reference lines</td><td>short: Fisher ≥ +2 · long: ≤ −2</td><td><span class="pill flt">filter</span></td></tr>
+      <tr><td><strong>C9 · TD Setup 9</strong> — DeMark</td><td>9 consecutive closes vs the close 4 bars earlier = exhaustion count</td><td>short: sell-setup 9 · long: buy-setup 9 (in window)</td><td><span class="pill flt">filter</span></td></tr>
+      <tr><td><strong>C10 · Anchored VWAP ±2σ</strong> — Shannon</td><td>volume-weighted VWAP bands anchored at the weekend start</td><td>short: price ≥ VWAP+2σ · long: ≤ VWAP−2σ</td><td><span class="pill flt">filter</span> <span class="pill rep">repl</span></td></tr>
+      <tr><td><strong>C11 · OBV divergence (proxy)</strong></td><td>14-bar price up while OBV down (bearish) / mirror (bullish)</td><td>short: price↑ &amp; OBV↓ · long: price↓ &amp; OBV↑</td><td><span class="pill flt">filter</span></td></tr>
+      <tr><td><strong>C12 · ATR stretch ≥ 2</strong> (vs 50-EMA)</td><td>entry distance from the 50-EMA in ATR(14) units</td><td>short: (high−EMA50)/ATR ≥ 2 · long: ≤ −2</td><td><span class="pill flt">filter</span></td></tr>
+      <tr><td><strong>C13 · PMARP custom</strong> (EMA55, lb100)</td><td>percentile of price/MA ratio; validated <em>bit-exact</em> Krown replica</td><td>short: PMARP ≥ 95 · long: ≤ 5</td><td><span class="pill flt">filter</span></td></tr>
+      <tr><td><strong>C14 · HPDR 95% band (Range 4)</strong></td><td>price beyond the 95th-pct 14-bar historical move; <em>bar-exact</em> replica</td><td>short: high ≥ up-band · long: low ≤ dn-band</td><td><span class="pill flt">filter</span> <span class="pill rep">repl</span></td></tr>
+      <tr><td><strong>C15 · CT RSI Div (14/5/5)</strong></td><td>regular RSI divergence on the fade side; Igor-validated replica</td><td>short: regular bearish div · long: regular bullish div</td><td><span class="pill flt">filter</span></td></tr>
+      <tr class="rowdim"><td><strong>C16 · Krown "Advanced Stochastic" Dark-Zone</strong></td><td>proprietary oscillator; 80/20 dark-zone rule is validated</td><td class="mut">construction is a MISMATCH — <strong>not recoverable from OHLC</strong>, so it cannot run as a causal filter. C6 (standard Lane stochastic) is the honest stand-in.</td><td><span class="pill blk">blocked</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="src">Sources (plain-text): C1 <a href="https://www.quantifiedstrategies.com/rsi-2-strategy/">quantifiedstrategies.com/rsi-2-strategy</a> &amp; Connors/Alvarez, <em>Short Term Trading Strategies That Work</em> (2008); C1/C2/C3/C4/C5/C6/C7 StockCharts ChartSchool — RSI(2) <a href="https://chartschool.stockcharts.com/table-of-contents/trading-strategies-and-models/trading-strategies/rsi-2">rsi-2</a>, Williams %R <a href="https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/williams-r">williams-r</a>, %B <a href="https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/b-indicator">b-indicator</a>, MFI <a href="https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/money-flow-index-mfi">mfi</a>, Stochastic <a href="https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/stochastic-oscillator-fast-slow-and-full">stochastic-oscillator</a>, Keltner <a href="https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/keltner-channels">keltner-channels</a>; C4 <a href="https://en.wikipedia.org/wiki/Commodity_channel_index">en.wikipedia.org/wiki/Commodity_channel_index</a>; C8 <a href="https://www.tradingview.com/scripts/fishertransform/">tradingview.com/scripts/fishertransform</a> &amp; Ehlers, <em>Cybernetic Analysis</em>; C9 <a href="https://demark.com/sequential-indicator/">demark.com/sequential-indicator</a>; C10 <a href="https://www.litefinance.org/blog/for-beginners/best-technical-indicators/anchored-vwap/">litefinance.org/…/anchored-vwap</a> &amp; Shannon, <em>Maximum Trading Gains With Anchored VWAP</em>; C13/C14/C15/C16 validated Krown replicas in <code>detectors/krown/</code>.</p>
+</section>
+
+<!-- ============== ANCHOR REPRODUCTION ============== -->
+<section>
+  <div class="kicker">Proof · the baseline is intact before we compare anything to it</div>
+  <h2>Anchor reproduction</h2>
+  <p>The bake-off reads the 91 validated Monday fades <strong>exactly as produced</strong> (the same <code>weekly_trades_a.csv</code> the R1 F2-standalone machinery reads). Two independent reproductions agree to the fourth decimal:</p>
+  <div class="tw">
+  <table>
+    <thead><tr><th>source</th><th>N</th><th>avg R</th><th>total R</th><th>win %</th><th>t</th><th>status</th></tr></thead>
+    <tbody>
+      <tr><td>Row 6 · <code>bt_weekend_play_combined.py</code> (F2 leg-2 standalone)</td><td>91</td><td>0.3820</td><td>34.761</td><td>55.0</td><td>2.977</td><td class="pos">PASS</td></tr>
+      <tr><td>Baseline · <code>bt_trigger_bakeoff2.py</code></td><td>91</td><td>0.3820</td><td>34.761</td><td>54.9</td><td>2.977</td><td class="pos">PASS</td></tr>
+      <tr><td class="soft">Target (validated)</td><td class="soft">91</td><td class="soft">≈0.382</td><td class="soft">—</td><td class="soft">—</td><td class="soft">≈2.98</td><td class="soft">—</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- ============== FILTER RESULTS ============== -->
+<section>
+  <div class="kicker">Test A · does keeping only the "confirmed" fades help?</div>
+  <h2>Filter results — the 91 fades, sub-sampled by each indicator</h2>
+  <p>Read the <strong>Welch t</strong> column, not the kept-t. Welch t asks the only question that matters: <em>is the kept subset statistically different from the trades the filter threw away?</em> Positive = the filter kept better trades; negative = it kept the <em>worse</em> ones. <strong>Every value sits between −1.6 and +1.0</strong> — none is significant. Rows where the filter keeps ~all 91 trades are non-selective by nature (a weekend overshoot is always an extreme on those tools) and simply echo the baseline; their kept-t of ≈2.98 is <em>not</em> independent evidence.</p>
+  <div class="tw">
+  <table>
+    <thead><tr>
+      <th>#  ·  filter</th><th>kept N</th><th>kept win %</th><th>kept avg R</th><th>kept t</th><th>kept PF</th><th>dropped N</th><th>dropped avg R</th><th>Welch t (kept vs dropped)</th>
+    </tr></thead>
+    <tbody>
+      <tr class="rowbase"><td>Baseline (all 91)</td><td>91</td><td>54.9</td><td>0.3820</td><td>2.98</td><td>2.05</td><td>0</td><td>—</td><td>—</td></tr>
+      <tr><td>C1 · RSI(2) Connors</td><td>91</td><td>54.9</td><td>0.3820</td><td>2.98</td><td>2.05</td><td>0</td><td class="mut">— non-selective</td><td>—</td></tr>
+      <tr><td>C2 · Williams %R(14)</td><td>90</td><td>54.4</td><td>0.3668</td><td>2.85</td><td>2.00</td><td>1</td><td>1.75</td><td class="mut">n/a (drop&lt;2)</td></tr>
+      <tr><td>C3 · Bollinger %B(20,2)</td><td>90</td><td>54.4</td><td>0.3760</td><td>2.90</td><td>2.02</td><td>1</td><td>0.92</td><td class="mut">n/a (drop&lt;2)</td></tr>
+      <tr><td>C4 · CCI(20)</td><td>91</td><td>54.9</td><td>0.3820</td><td>2.98</td><td>2.05</td><td>0</td><td class="mut">— non-selective</td><td>—</td></tr>
+      <tr><td>C5 · MFI(14)</td><td>76</td><td>52.6</td><td>0.3259</td><td>2.33</td><td>1.86</td><td>15</td><td>0.666</td><td class="neg">−0.96</td></tr>
+      <tr><td>C6 · Stochastic %D(14,3,3)</td><td>84</td><td>54.8</td><td>0.3549</td><td>2.67</td><td>1.96</td><td>7</td><td>0.708</td><td class="neg">−0.66</td></tr>
+      <tr><td>C7 · Keltner reject (20, 2×ATR10)</td><td>91</td><td>54.9</td><td>0.3820</td><td>2.98</td><td>2.05</td><td>0</td><td class="mut">— non-selective</td><td>—</td></tr>
+      <tr><td>C8 · Fisher Transform(10)</td><td>84</td><td>54.8</td><td>0.3546</td><td>2.68</td><td>1.96</td><td>7</td><td>0.711</td><td class="neg">−0.66</td></tr>
+      <tr><td>C9 · TD Setup 9 (DeMark)</td><td>69</td><td>56.5</td><td>0.3634</td><td>2.54</td><td>2.05</td><td>22</td><td>0.440</td><td class="neg">−0.24</td></tr>
+      <tr><td>C10 · Anchored VWAP ±2σ</td><td>87</td><td>56.3</td><td>0.4015</td><td>3.02</td><td>2.09</td><td>4</td><td>−0.042</td><td class="pos">+1.02</td></tr>
+      <tr><td>C11 · OBV divergence (proxy)</td><td>82</td><td>52.4</td><td>0.3121</td><td>2.34</td><td>1.82</td><td>9</td><td>1.019</td><td class="neg">−1.60</td></tr>
+      <tr><td>C12 · ATR stretch ≥ 2 (vs 50-EMA)</td><td>91</td><td>54.9</td><td>0.3820</td><td>2.98</td><td>2.05</td><td>0</td><td class="mut">— non-selective</td><td>—</td></tr>
+      <tr><td>C13 · PMARP custom (EMA55, lb100)</td><td>84</td><td>56.0</td><td>0.3986</td><td>2.99</td><td>2.12</td><td>7</td><td>0.183</td><td class="pos">+0.42</td></tr>
+      <tr><td>C14 · HPDR 95% band (Range 4)</td><td>39</td><td>51.3</td><td>0.2659</td><td>1.55</td><td>1.87</td><td>52</td><td>0.469</td><td class="neg">−0.81</td></tr>
+      <tr><td>C15 · CT RSI Div (14/5/5)</td><td>50</td><td>60.0</td><td>0.4325</td><td>2.60</td><td>2.38</td><td>41</td><td>0.320</td><td class="pos">+0.43</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="soft">Non-selective (keep ≈ all 91): C1, C4, C7, C12 — and near-so C2, C3. A thin-weekend spike-out is by definition already at an RSI(2), CCI, Keltner and 2-ATR extreme, so these filters keep everything and add zero selectivity. The genuinely discriminating filters (drop ≥ 10: C5, C9, C11, C14, C15) do <em>not</em> reliably lift performance — three of the five kept the <em>worse</em> half.</p>
+
+  <figure>
+    <svg viewBox="0 0 720 360" role="img" aria-label="Welch t of each discriminating filter; none reaches plus or minus 2">
+      <!-- significance guides -->
+      <line x1="360" y1="26" x2="360" y2="316" stroke="var(--line)" stroke-width="2"/>
+      <line x1="87" y1="26" x2="87" y2="316" stroke="var(--bad)" stroke-width="1" stroke-dasharray="4 4" opacity="0.6"/>
+      <line x1="633" y1="26" x2="633" y2="316" stroke="var(--good)" stroke-width="1" stroke-dasharray="4 4" opacity="0.6"/>
+      <text x="87" y="20" fill="var(--bad)" font-size="11" text-anchor="middle">t = −2 (sig.)</text>
+      <text x="633" y="20" fill="var(--good)" font-size="11" text-anchor="middle">t = +2 (sig.)</text>
+      <text x="360" y="20" fill="var(--soft)" font-size="11" text-anchor="middle">0</text>
+      <!-- bars: x0=360, scale=136.36 px per t-unit -->
+      <!-- C5 -0.96 -->
+      <rect x="229" y="34"  width="131" height="18" fill="var(--bad)" opacity="0.85"/><text x="222" y="47" fill="var(--ink)" font-size="12" text-anchor="end">C5 MFI</text><text x="368" y="47" fill="var(--soft)" font-size="11">−0.96</text>
+      <!-- C6 -0.66 -->
+      <rect x="270" y="64"  width="90"  height="18" fill="var(--bad)" opacity="0.85"/><text x="263" y="77" fill="var(--ink)" font-size="12" text-anchor="end">C6 Stoch %D</text><text x="368" y="77" fill="var(--soft)" font-size="11">−0.66</text>
+      <!-- C8 -0.66 -->
+      <rect x="271" y="94"  width="89"  height="18" fill="var(--bad)" opacity="0.85"/><text x="264" y="107" fill="var(--ink)" font-size="12" text-anchor="end">C8 Fisher</text><text x="368" y="107" fill="var(--soft)" font-size="11">−0.66</text>
+      <!-- C9 -0.24 -->
+      <rect x="328" y="124" width="32"  height="18" fill="var(--bad)" opacity="0.85"/><text x="321" y="137" fill="var(--ink)" font-size="12" text-anchor="end">C9 TD9</text><text x="368" y="137" fill="var(--soft)" font-size="11">−0.24</text>
+      <!-- C10 +1.02 -->
+      <rect x="360" y="154" width="139" height="18" fill="var(--good)" opacity="0.85"/><text x="352" y="167" fill="var(--ink)" font-size="12" text-anchor="end">C10 AVWAP</text><text x="504" y="167" fill="var(--soft)" font-size="11">+1.02</text>
+      <!-- C11 -1.60 -->
+      <rect x="142" y="184" width="218" height="18" fill="var(--bad)" opacity="0.85"/><text x="135" y="197" fill="var(--ink)" font-size="12" text-anchor="end">C11 OBV div</text><text x="368" y="197" fill="var(--soft)" font-size="11">−1.60</text>
+      <!-- C13 +0.42 -->
+      <rect x="360" y="214" width="57"  height="18" fill="var(--good)" opacity="0.85"/><text x="352" y="227" fill="var(--ink)" font-size="12" text-anchor="end">C13 PMARP</text><text x="422" y="227" fill="var(--soft)" font-size="11">+0.42</text>
+      <!-- C14 -0.81 -->
+      <rect x="250" y="244" width="110" height="18" fill="var(--bad)" opacity="0.85"/><text x="243" y="257" fill="var(--ink)" font-size="12" text-anchor="end">C14 HPDR</text><text x="368" y="257" fill="var(--soft)" font-size="11">−0.81</text>
+      <!-- C15 +0.43 -->
+      <rect x="360" y="274" width="58"  height="18" fill="var(--good)" opacity="0.85"/><text x="352" y="287" fill="var(--ink)" font-size="12" text-anchor="end">C15 RSI Div</text><text x="423" y="287" fill="var(--soft)" font-size="11">+0.43</text>
+      <text x="360" y="336" fill="var(--soft)" font-size="12" text-anchor="middle">Welch t of "kept vs dropped" — the whole field lives inside the noise band, far from ±2.</text>
+    </svg>
+    <figcaption>Every discriminating filter's separation statistic is statistically insignificant. Red bars = the filter kept the worse trades; green = kept slightly better, but nowhere near significance.</figcaption>
+  </figure>
+</section>
+
+<!-- ============== REPLACEMENT RESULTS ============== -->
+<section>
+  <div class="kicker">Test B · swap the indicator's band-cross in for the PVSRA retest</div>
+  <h2>Replacement results</h2>
+  <p>Same 91 weekends, same fade direction, same exits (TP 1.9R, stop beyond the running weekend→trigger extreme, Friday close). The indicator's band-cross is the entry instead of the PVSRA 2-of-3 retest. All three are <strong>far worse than the baseline</strong>:</p>
+  <div class="tw">
+  <table>
+    <thead><tr><th>replacement trigger</th><th>N</th><th>win %</th><th>avg R</th><th>t</th><th>PF</th><th>vs baseline (+0.382R, t 2.98)</th></tr></thead>
+    <tbody>
+      <tr class="rowbase"><td>Baseline (PVSRA retest)</td><td>91</td><td>54.9</td><td>0.3820</td><td>2.98</td><td>2.05</td><td>—</td></tr>
+      <tr><td>C3 · Bollinger %B band-cross</td><td>77</td><td>19.5</td><td class="neg">−0.6580</td><td class="neg">−5.39</td><td>0.30</td><td class="neg">collapses</td></tr>
+      <tr><td>C10 · Anchored VWAP ±2σ touch</td><td>79</td><td>21.5</td><td class="neg">−0.6228</td><td class="neg">−4.55</td><td>0.37</td><td class="neg">collapses</td></tr>
+      <tr><td>C14 · HPDR 95% band tag</td><td>60</td><td>36.7</td><td class="neg">−0.1205</td><td class="neg">−0.69</td><td>0.83</td><td class="neg">loses money</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>Entering at the raw overshoot extreme — the moment price pokes the band — with a stop just beyond that extreme is the opposite of what the fade does. The validated fade waits for the <em>failed</em> breakout to confirm and price to pull back to the level before entering. Replacing that patience with an eager band-touch turns a +0.38R edge into a −0.1R to −0.66R loser. This is the clearest signal in the whole study of <em>where</em> the edge actually is.</p>
+</section>
+
+<!-- ============== HONESTY BOX ============== -->
+<section>
+  <div class="box honesty">
+    <h4>Honesty box — comparison count &amp; luck math</h4>
+    <p><strong>Declared comparisons:</strong> 15 filters + 3 replacements = <strong>18</strong>, all frozen before results, run in a single pass, no post-hoc additions, no threshold tuning.</p>
+    <p><strong>Expected false positives:</strong> at two-sided |t| ≥ 2 (p ≈ 0.046), pure luck yields ≈ 18 × 0.046 ≈ <strong>0.8 comparisons</strong> (about one). Several filter <em>kept-t</em> values exceed 2 — but that is <em>not</em> independent evidence: those filters keep ~all 91 trades and therefore inherit the baseline's t ≈ 2.98. The decision statistic is the <strong>kept-vs-dropped Welch t</strong> (does the filter actually separate winners from losers?), and its maximum across all 15 filters is <strong>+1.02</strong> — below the ≈1 false positive luck would hand us, and nowhere near the ±2 significance line.</p>
+    <p><strong>Winner bar (declared):</strong> t ≥ 3 with N ≥ 40 from a genuinely discriminating filter, OR ≥ 2 <em>unrelated</em> indicators agreeing significantly on the same filtered subset. <strong>Not met.</strong> C10's nominal kept-t of 3.02 is an artefact — it drops only 4 of 91 trades (a −0.04R tail), so it is the baseline in disguise, not a discriminating filter. No two indicators agree with significance.</p>
+    <p><strong>Thin cells (N &lt; 20):</strong> none — after the overshoot-window design the smallest kept sample is N = 39 (C14). No row was headlined on a thin cell.</p>
+  </div>
+</section>
+
+<!-- ============== WHAT IT MEANS ============== -->
+<section>
+  <div class="kicker">So what</div>
+  <h2>What this means for the trade</h2>
+  <div class="box ans">
+    <p><strong>Trade the fade exactly as validated. Add nothing.</strong> No published exhaustion or mean-reversion indicator — nor any of our four validated Krown replicas — improves the entry as a filter, and every one tested as a replacement makes it worse.</p>
+  </div>
+  <ul>
+    <li><strong>Why no filter helps.</strong> The setup <em>is</em> the extreme. A thin-weekend spike-out already registers as overbought/oversold on essentially every short-lookback tool, so requiring a second extreme adds no information — it either keeps everything (RSI2, CCI, Keltner, ATR-stretch) or, when it does thin the sample, thins it at random (Welch t inside ±1.6, mostly negative).</li>
+    <li><strong>Where the edge really lives.</strong> The replacement test is decisive: swapping the PVSRA <em>retest</em> for an indicator band-touch collapses the edge. The value is in the <em>failed-breakout-then-pullback</em> mechanics — waiting for the overshoot to fail and price to return to the level — not in which oscillator lit up. That matches the R1 mechanism (the weekend base is a magnet; the fade profits from the return, not from calling the top).</li>
+    <li><strong>The two "nice-looking" filters are traps.</strong> CT RSI-divergence (60% win, 0.43R) and PMARP look better only because they shrink N; their kept-vs-dropped separation is insignificant (+0.43, +0.42) and their kept-t falls <em>below</em> the baseline. Adopting either would be curve-fitting to noise and would cost roughly half the trades.</li>
+    <li><strong>Housekeeping.</strong> The Krown "Advanced Stochastic" (C16) could not be tested honestly — its oscillator construction is a proprietary MISMATCH, not recoverable from OHLC — so the standard Lane stochastic (C6) stood in; it, too, added nothing. True order-flow / volume-delta divergence is <em>not</em> proxyable from OHLCV (no aggressor side), so C11 used an OBV-slope proxy, which was the worst-separating filter of all (−1.60).</li>
+  </ul>
+  <p class="soft">Scope: single in-sample pass (2019-09 → 2024-12-31), BTC-USDT perp, 15m native, causal-only, fees 5 bps/side + 2 bps slip/fill. Deterministic: both output CSVs are md5-identical across two runs. This is an <em>expected and clean</em> null — the validated fade needs no confirmation crutch.</p>
+</section>
+
+</div></main>
+</body>
+</html>

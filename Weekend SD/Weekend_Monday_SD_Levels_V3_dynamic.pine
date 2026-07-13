@@ -1,0 +1,572 @@
+//@version=6
+// ============================================================================
+// Weekend + Monday Mean + SD Levels — V3 DYNAMIC
+// ============================================================================
+// WHAT CHANGED vs V2 (Weekend_Monday_SD_Levels_V2.pine — DO NOT DELETE THAT FILE):
+//   - V2 drew ONE set of Monday levels from FROZEN input constants that were
+//     computed once, months ago, and turned out to be WRONG + non-stationary
+//     (Phase 1 showed the rolling 3-month mean swings 1.5% -> 6%+ over time).
+//   - V3 draws THREE line-sets side by side, each mean / mean+1SD / mean+2SD /
+//     p95 above the base (UP) and below it (DOWN):
+//         * ALL-HISTORY  — corrected constants computed offline (see provenance
+//                          below), wired as input defaults. Third, slow anchor.
+//         * 3-MONTH      — trailing 13 completed weekends, computed LIVE on chart.
+//         * 1-MONTH      — trailing 4 completed weekends, computed LIVE on chart.
+//   - V3 adds CONFLUENCE ZONES: where >=2 of the 3 sets agree on the same-rank
+//     level (within a % tolerance) a shaded box marks the agreement band.
+//   - V3 tracks the Monday window High/Low AFTER the base latch so it can build
+//     each weekend's UP/DOWN observation. That observation is pushed to the
+//     stats arrays ONLY after the Monday window closes (Tue 00:00 Dubai), so the
+//     stats shown on any Monday use ONLY prior weekends. ZERO look-ahead.
+//
+// PHASE-1 CONSTANTS PROVENANCE (all %, wired as the ALL-HISTORY defaults below):
+//   Computed offline from 277 clean weekends, 2019-09 -> 2024-12-31, from 3.59M
+//   1m BTCUSDT-perp candles. Sample SD (ddof=1). p95 = numpy linear interpolation.
+//   See "Weekend SD Truth Report.html" + weekend_sd_stats.csv (row full_is_history).
+//     UP   mean 2.8076  SD 3.5904  p95 8.5684
+//     DOWN mean 2.7809  SD 3.2868  p95 7.5895
+//
+// TRADINGVIEW LIMITATION (why ALL-HISTORY stays a constant, not live):
+//   TradingView cannot load 5+ years of 1m bars into one chart (bar-count caps
+//   ~10k free / ~20k paid), so the all-history stats MUST be precomputed offline
+//   and pasted as constants. The LIVE 1M/3M sets only need ~14 completed weekends
+//   of intraday history (~13 weeks ~= 91 days). Bars needed for 13 weekends:
+//     1H  ~2.2k bars  -> fine on any plan
+//     30m ~4.4k bars  -> fine on any plan
+//     15m ~8.7k bars  -> fine on most plans
+//     5m  ~26k bars   -> exceeds free, tight on paid
+//     1m  ~131k bars  -> impossible; you get 1-2 weekends -> live sets stay blank
+//   RECOMMENDED chart timeframe: 30m or 1H (also keeps the close[1] base proxy
+//   reasonably tight to Monday 02:00 Dubai). See the Install Guide for details.
+//
+// DESIGN CHOICES (documented because this cannot be run/verified inside TV here):
+//   - Distance mode: PERCENT ONLY. V2's "Dollars" mode is incoherent with live
+//     stats — a fixed $ move meant everything at $10k BTC and nothing at $60k;
+//     the whole rebuild is about % non-stationarity, so $ mode is dropped.
+//   - Percentile: p95 via linear interpolation implemented by hand (f_p95) to
+//     EXACTLY match numpy np.percentile(a,95) default (R-7). For n=4, rank =
+//     0.95*(n-1)=2.85 -> interpolates 85% of the way from the 3rd to the 4th
+//     sorted value = an interpolated near-max. (v6 also ships
+//     array.percentile_linear_interpolation(); we roll our own so the convention
+//     is provably identical to Phase-1 and readable in source.)
+//   - Sample SD (ddof=1) by hand (f_sd); na when n<2. Small-sample caveat: the
+//     1-MONTH window (n=4) SD is very noisy — treat 1M as a fast, jumpy signal.
+//   - Object strategy: LINES are plot() series (style_linebr, editable in Style
+//     tab, no line objects) = 26 plots. Confluence ZONES are box objects capped
+//     at weeks_to_keep*8. Right-edge tags are label objects, cleared and redrawn
+//     for the newest weekend only. max_boxes_count / max_labels_count declared.
+// ============================================================================
+
+indicator("Weekend + Monday SD Levels V3 (dynamic)", shorttitle="Wknd SD V3", overlay=true, format=format.price, scale=scale.right, max_boxes_count=500, max_labels_count=500)
+
+// =====================
+// Inputs
+// =====================
+weeks_to_keep = input.int(4, "How many weekends of lines/zones to keep", minval=1, maxval=12, group="Display")
+show_weekend_lines = input.bool(true, "Show weekend high/low lines", group="Display")
+show_labels        = input.bool(true, "Show right-edge level labels (newest weekend)", group="Display")
+
+// Per-set show/hide
+show_all = input.bool(true, "Show ALL-HISTORY set (constants)", group="Line sets")
+show_3m  = input.bool(true, "Show 3-MONTH set (trailing 13 wk, live)", group="Line sets")
+show_1m  = input.bool(true, "Show 1-MONTH set (trailing 4 wk, live)",  group="Line sets")
+
+// Live window sizes (in completed weekends)
+win_3m = input.int(13, "3-MONTH window (weekends)", minval=2, maxval=52, group="Line sets", tooltip="Trailing completed weekends for the 3-month set. 13 weekends ~= 3 months.")
+win_1m = input.int(4,  "1-MONTH window (weekends)", minval=2, maxval=52, group="Line sets", tooltip="Trailing completed weekends for the 1-month set. 4 weekends ~= 1 month. SMALL SAMPLE: n=4 SD is very noisy; p95 is an interpolated near-max.")
+
+// Confluence
+show_confluence = input.bool(true, "Show confluence zones (>=2 sets agree)", group="Confluence")
+tolerance_pct   = input.float(0.25, "Confluence tolerance (% points)", minval=0.0, step=0.05, group="Confluence", tooltip="Two same-rank levels 'agree' when their move %s are within this many percentage points of each other.")
+
+// Timezones (kept from V2)
+tz_start = input.string("America/New_York", "Weekend START timezone (NY)", group="Weekend window")
+tz_end   = input.string("Asia/Dubai",       "Weekend END timezone (Dubai)", group="Weekend window")
+
+// Weekend window (kept from V2)
+start_hour = input.int(17, "Weekend START hour (NY session close)", minval=0, maxval=23, group="Weekend window")
+start_min  = input.int(0,  "Weekend START minute",                  minval=0, maxval=59, group="Weekend window")
+end_hour   = input.int(2,  "Weekend END hour (Dead Gap END, Dubai)", minval=0, maxval=23, group="Weekend window")
+end_min    = input.int(0,  "Weekend END minute",                     minval=0, maxval=59, group="Weekend window")
+
+// ALL-HISTORY stats constants (Phase-1 corrected, all %)  <-- see provenance above
+up_mean_pct = input.float(2.8076, "All-history UP mean %",  group="All-history constants")
+up_sd_pct   = input.float(3.5904, "All-history UP SD %",    group="All-history constants")
+up_p95_pct  = input.float(8.5684, "All-history UP p95 %",   group="All-history constants")
+dn_mean_pct = input.float(2.7809, "All-history DOWN mean %", group="All-history constants")
+dn_sd_pct   = input.float(3.2868, "All-history DOWN SD %",   group="All-history constants")
+dn_p95_pct  = input.float(7.5895, "All-history DOWN p95 %",  group="All-history constants")
+
+// Colors (defaults; editable in Style tab)
+col_all = input.color(color.new(#9598a1, 0), "ALL-HISTORY color", group="Colors")
+col_3m  = input.color(color.new(#26a69a, 0), "3-MONTH color",     group="Colors")
+col_1m  = input.color(color.new(#ff9800, 0), "1-MONTH color",     group="Colors")
+col_wk  = input.color(color.new(#787b86, 0), "Weekend hi/lo color", group="Colors")
+
+// =====================
+// Helpers
+// =====================
+dayMs = 24 * 60 * 60 * 1000
+
+// "Crosses" a timestamp even if the bar starts exactly at it, or straddles it
+f_cross(int ts) =>
+    (time <= ts) and (time_close >= ts)
+
+// Tail: new float array = the last `count` elements of src (fewer if src smaller)
+f_tail(float[] src, int count) =>
+    int szf = array.size(src)
+    int take = math.min(count, szf)
+    float[] outp = array.new_float()
+    if take > 0
+        for j = szf - take to szf - 1
+            array.push(outp, array.get(src, j))
+    outp
+
+// Mean of an array (na if empty). Guarded so array.sum is never called on empty
+// (Pine ternaries evaluate BOTH branches, so an "n==0 ? na : ..." form is unsafe).
+f_mean(float[] a) =>
+    int n = array.size(a)
+    float res = na
+    if n > 0
+        res := array.sum(a) / n
+    res
+
+// Sample standard deviation, ddof = 1 (na if n < 2) — matches Phase-1 numpy std(ddof=1)
+f_sd(float[] a) =>
+    int n = array.size(a)
+    float res = na
+    if n > 1
+        float m = array.sum(a) / n
+        float ss = 0.0
+        for j = 0 to n - 1
+            float d = array.get(a, j) - m
+            ss += d * d
+        res := math.sqrt(ss / (n - 1))
+    res
+
+// p95 via linear interpolation — EXACTLY numpy np.percentile(a, 95) default (R-7)
+f_p95(float[] a) =>
+    int n = array.size(a)
+    float res = na
+    if n == 1
+        res := array.get(a, 0)
+    else if n > 1
+        float[] s = array.copy(a)
+        array.sort(s, order.ascending)
+        float rank = 0.95 * (n - 1)
+        int lo = int(math.floor(rank))
+        int hi = int(math.ceil(rank))
+        float frac = rank - lo
+        float vlo = array.get(s, lo)
+        float vhi = array.get(s, hi)
+        res := vlo + frac * (vhi - vlo)
+    res
+
+// Confluence over up to 3 same-rank move %s. Returns [ok, min_move, max_move]
+// over the members that belong to at least one agreeing pair.
+f_confluence(float a, bool pa, float b, bool pb, float c, bool pc, float tol) =>
+    bool ab = pa and pb and not na(a) and not na(b) and math.abs(a - b) <= tol
+    bool ac = pa and pc and not na(a) and not na(c) and math.abs(a - c) <= tol
+    bool bc = pb and pc and not na(b) and not na(c) and math.abs(b - c) <= tol
+    bool inA = ab or ac
+    bool inB = ab or bc
+    bool inC = ac or bc
+    bool ok  = ab or ac or bc
+    float mn = na
+    float mx = na
+    if inA
+        mn := na(mn) ? a : math.min(mn, a)
+        mx := na(mx) ? a : math.max(mx, a)
+    if inB
+        mn := na(mn) ? b : math.min(mn, b)
+        mx := na(mx) ? b : math.max(mx, b)
+    if inC
+        mn := na(mn) ? c : math.min(mn, c)
+        mx := na(mx) ? c : math.max(mx, c)
+    [ok, mn, mx]
+
+// =====================
+// Storage — completed weekend records (for line/zone drawing, last N)
+// =====================
+var int[]   wk_start_ts_arr = array.new_int()
+var int[]   wk_end_ts_arr   = array.new_int()   // dead gap END (Mon 02:00 Dubai)
+var int[]   mon_end_ts_arr  = array.new_int()   // Monday end (Tue 00:00 Dubai)
+var float[] wk_high_arr     = array.new_float()
+var float[] wk_low_arr      = array.new_float()
+var float[] base_close_arr  = array.new_float()
+// frozen 3-MONTH stats per weekend
+var float[] u_mean3_arr = array.new_float()
+var float[] u_sd3_arr   = array.new_float()
+var float[] u_p953_arr  = array.new_float()
+var float[] d_mean3_arr = array.new_float()
+var float[] d_sd3_arr   = array.new_float()
+var float[] d_p953_arr  = array.new_float()
+// frozen 1-MONTH stats per weekend
+var float[] u_mean1_arr = array.new_float()
+var float[] u_sd1_arr   = array.new_float()
+var float[] u_p951_arr  = array.new_float()
+var float[] d_mean1_arr = array.new_float()
+var float[] d_sd1_arr   = array.new_float()
+var float[] d_p951_arr  = array.new_float()
+
+// Storage — rolling completed UP/DOWN observations (%) for LIVE stats
+var float[] up_obs_arr = array.new_float()
+var float[] dn_obs_arr = array.new_float()
+
+// Drawing object registries
+var box[]   conf_boxes  = array.new_box()
+var label[] line_labels = array.new_label()
+
+// Rank labels (ASCII to render everywhere)
+var string[] rankTxt = array.from("mean", "+1SD", "+2SD", "p95")
+
+// Trim helpers
+f_trim_hist(int keep) =>
+    while array.size(wk_start_ts_arr) > keep
+        array.shift(wk_start_ts_arr)
+        array.shift(wk_end_ts_arr)
+        array.shift(mon_end_ts_arr)
+        array.shift(wk_high_arr)
+        array.shift(wk_low_arr)
+        array.shift(base_close_arr)
+        array.shift(u_mean3_arr)
+        array.shift(u_sd3_arr)
+        array.shift(u_p953_arr)
+        array.shift(d_mean3_arr)
+        array.shift(d_sd3_arr)
+        array.shift(d_p953_arr)
+        array.shift(u_mean1_arr)
+        array.shift(u_sd1_arr)
+        array.shift(u_p951_arr)
+        array.shift(d_mean1_arr)
+        array.shift(d_sd1_arr)
+        array.shift(d_p951_arr)
+
+f_trim_obs(int keep) =>
+    while array.size(up_obs_arr) > keep
+        array.shift(up_obs_arr)
+        array.shift(dn_obs_arr)
+
+// Build the right-edge tags for one set (side-effect helper; pushes to line_labels)
+f_set_labels(string tag, bool shown, float[] upMoves, float[] dnMoves, float base, int x, color col) =>
+    if shown and not na(base)
+        for r = 0 to 3
+            float um = array.get(upMoves, r)
+            if not na(um)
+                array.push(line_labels, label.new(x, base * (1 + um / 100.0), tag + " UP " + array.get(rankTxt, r), xloc=xloc.bar_time, style=label.style_label_left, size=size.small, color=color.new(col, 80), textcolor=col))
+            float dm = array.get(dnMoves, r)
+            if not na(dm)
+                array.push(line_labels, label.new(x, base * (1 - dm / 100.0), tag + " DN " + array.get(rankTxt, r), xloc=xloc.bar_time, style=label.style_label_left, size=size.small, color=color.new(col, 80), textcolor=col))
+
+// Keep registries trimmed to current inputs each bar (reacts to input changes)
+f_trim_hist(weeks_to_keep)
+f_trim_obs(math.max(win_3m, win_1m))
+
+// =====================
+// Current (forming) weekend + Monday state
+// =====================
+var bool  weekend_active = false
+var float cur_wk_high    = na
+var float cur_wk_low     = na
+var int   cur_wk_start   = na
+
+var bool  base_latched   = false
+var float cur_base_close = na
+var int   cur_mon_end_ts = na
+
+var bool  monday_active   = false
+var float cur_mon_high    = na
+var float cur_mon_low     = na
+var float mon_base        = na
+var int   cur_mon_end_active = na
+
+// =====================
+// Detect weekend START (Friday NY close)
+// =====================
+int nyY   = year(time, tz_start)
+int nyM   = month(time, tz_start)
+int nyD   = dayofmonth(time, tz_start)
+
+int startTS_today = timestamp(tz_start, nyY, nyM, nyD, start_hour, start_min)
+bool isFridayStartMoment = (dayofweek(startTS_today, tz_start) == dayofweek.friday)
+bool startCross = isFridayStartMoment and f_cross(startTS_today)
+
+// =====================
+// Detect weekend END (Dead Gap END on Monday, Dubai) — latch base = close[1]
+// =====================
+int duY   = year(time, tz_end)
+int duM   = month(time, tz_end)
+int duD   = dayofmonth(time, tz_end)
+
+int deadGapEndTS_today = timestamp(tz_end, duY, duM, duD, end_hour, end_min)
+bool isMondayDeadGapMoment = (dayofweek(deadGapEndTS_today, tz_end) == dayofweek.monday)
+bool deadGapEndCross = isMondayDeadGapMoment and f_cross(deadGapEndTS_today)
+
+// =====================
+// State transitions
+// =====================
+// (1) Finalize the PREVIOUS Monday's observation at Tue 00:00 Dubai — push AFTER
+//     the Monday window closes so it is only ever used on LATER weekends.
+if monday_active and not na(cur_mon_end_active) and f_cross(cur_mon_end_active)
+    if not na(mon_base) and mon_base != 0 and not na(cur_mon_high) and not na(cur_mon_low)
+        float up_obs = (cur_mon_high - mon_base) / mon_base * 100.0
+        float dn_obs = (mon_base - cur_mon_low) / mon_base * 100.0
+        array.push(up_obs_arr, up_obs)
+        array.push(dn_obs_arr, dn_obs)
+        f_trim_obs(math.max(win_3m, win_1m))
+    monday_active := false
+    cur_mon_high := na
+    cur_mon_low  := na
+    mon_base     := na
+    cur_mon_end_active := na
+
+// (2) Start weekend
+if startCross
+    weekend_active := true
+    cur_wk_start := startTS_today
+    cur_wk_high := high
+    cur_wk_low  := low
+    base_latched := false
+    cur_base_close := na
+    cur_mon_end_ts := na
+
+// (3) Accumulate weekend high/low while active
+if weekend_active
+    cur_wk_high := na(cur_wk_high) ? high : math.max(cur_wk_high, high)
+    cur_wk_low  := na(cur_wk_low)  ? low  : math.min(cur_wk_low,  low)
+
+// (4) End weekend at Dead Gap END: latch base, FREEZE live stats from PRIOR
+//     observations only, store the record, draw zones + labels, open Monday.
+if weekend_active and deadGapEndCross
+    if not base_latched
+        cur_base_close := close[1]
+        base_latched := true
+
+    int monMid = timestamp(tz_end, duY, duM, duD, 0, 0)
+    cur_mon_end_ts := monMid + dayMs
+
+    // freeze live stats (obs arrays contain ONLY weekends finalized before now)
+    float[] upT3 = f_tail(up_obs_arr, win_3m)
+    float[] dnT3 = f_tail(dn_obs_arr, win_3m)
+    float[] upT1 = f_tail(up_obs_arr, win_1m)
+    float[] dnT1 = f_tail(dn_obs_arr, win_1m)
+    float um3 = f_mean(upT3)
+    float us3 = f_sd(upT3)
+    float up953 = f_p95(upT3)
+    float dm3 = f_mean(dnT3)
+    float ds3 = f_sd(dnT3)
+    float dp953 = f_p95(dnT3)
+    float um1 = f_mean(upT1)
+    float us1 = f_sd(upT1)
+    float up951 = f_p95(upT1)
+    float dm1 = f_mean(dnT1)
+    float ds1 = f_sd(dnT1)
+    float dp951 = f_p95(dnT1)
+
+    // store completed weekend record
+    array.push(wk_start_ts_arr, cur_wk_start)
+    array.push(wk_end_ts_arr,   deadGapEndTS_today)
+    array.push(mon_end_ts_arr,  cur_mon_end_ts)
+    array.push(wk_high_arr,     cur_wk_high)
+    array.push(wk_low_arr,      cur_wk_low)
+    array.push(base_close_arr,  cur_base_close)
+    array.push(u_mean3_arr, um3)
+    array.push(u_sd3_arr,   us3)
+    array.push(u_p953_arr,  up953)
+    array.push(d_mean3_arr, dm3)
+    array.push(d_sd3_arr,   ds3)
+    array.push(d_p953_arr,  dp953)
+    array.push(u_mean1_arr, um1)
+    array.push(u_sd1_arr,   us1)
+    array.push(u_p951_arr,  up951)
+    array.push(d_mean1_arr, dm1)
+    array.push(d_sd1_arr,   ds1)
+    array.push(d_p951_arr,  dp951)
+    f_trim_hist(weeks_to_keep)
+
+    // ---- CONFLUENCE ZONES (>=2 sets agree, per rank per side) ----
+    bool ok_all = show_all
+    bool ok_3   = show_3m and not na(us3)
+    bool ok_1   = show_1m and not na(us1)
+    // per-rank/side move %s, order: UP[mean,1sd,2sd,p95] then DN[mean,1sd,2sd,p95]
+    float[] allV = array.from(up_mean_pct, up_mean_pct + up_sd_pct, up_mean_pct + 2 * up_sd_pct, up_p95_pct, dn_mean_pct, dn_mean_pct + dn_sd_pct, dn_mean_pct + 2 * dn_sd_pct, dn_p95_pct)
+    float[] v3   = array.from(um3, um3 + us3, um3 + 2 * us3, up953, dm3, dm3 + ds3, dm3 + 2 * ds3, dp953)
+    float[] v1   = array.from(um1, um1 + us1, um1 + 2 * us1, up951, dm1, dm1 + ds1, dm1 + 2 * ds1, dp951)
+    bool[] isUpArr = array.from(true, true, true, true, false, false, false, false)
+    if show_confluence and not na(cur_base_close)
+        for k = 0 to 7
+            [okc, mn, mx] = f_confluence(array.get(allV, k), ok_all, array.get(v3, k), ok_3, array.get(v1, k), ok_1, tolerance_pct)
+            if okc
+                bool isUp = array.get(isUpArr, k)
+                float top = isUp ? cur_base_close * (1 + mx / 100.0) : cur_base_close * (1 - mn / 100.0)
+                float bot = isUp ? cur_base_close * (1 + mn / 100.0) : cur_base_close * (1 - mx / 100.0)
+                color bg = isUp ? color.new(color.green, 82) : color.new(color.red, 82)
+                box bx = box.new(deadGapEndTS_today, top, cur_mon_end_ts, bot, xloc=xloc.bar_time, border_color=color.new(color.gray, 70), bgcolor=bg, border_width=1)
+                array.push(conf_boxes, bx)
+                while array.size(conf_boxes) > weeks_to_keep * 8
+                    box.delete(array.shift(conf_boxes))
+
+    // ---- RIGHT-EDGE LABELS (newest weekend only) ----
+    while array.size(line_labels) > 0
+        label.delete(array.shift(line_labels))
+    float[] allUp = array.from(up_mean_pct, up_mean_pct + up_sd_pct, up_mean_pct + 2 * up_sd_pct, up_p95_pct)
+    float[] allDn = array.from(dn_mean_pct, dn_mean_pct + dn_sd_pct, dn_mean_pct + 2 * dn_sd_pct, dn_p95_pct)
+    float[] m3Up = array.from(um3, na(us3) ? na : um3 + us3, na(us3) ? na : um3 + 2 * us3, up953)
+    float[] m3Dn = array.from(dm3, na(ds3) ? na : dm3 + ds3, na(ds3) ? na : dm3 + 2 * ds3, dp953)
+    float[] m1Up = array.from(um1, na(us1) ? na : um1 + us1, na(us1) ? na : um1 + 2 * us1, up951)
+    float[] m1Dn = array.from(dm1, na(ds1) ? na : dm1 + ds1, na(ds1) ? na : dm1 + 2 * ds1, dp951)
+    if show_labels
+        f_set_labels("ALL", show_all, allUp, allDn, cur_base_close, cur_mon_end_ts, col_all)
+        f_set_labels("3M",  show_3m,  m3Up,  m3Dn,  cur_base_close, cur_mon_end_ts, col_3m)
+        f_set_labels("1M",  show_1m,  m1Up,  m1Dn,  cur_base_close, cur_mon_end_ts, col_1m)
+
+    // open the Monday window (start tracking its high/low from this bar)
+    monday_active := true
+    cur_mon_high := high
+    cur_mon_low  := low
+    mon_base     := cur_base_close
+    cur_mon_end_active := cur_mon_end_ts
+
+    // reset forming-weekend state
+    weekend_active := false
+    cur_wk_high := na
+    cur_wk_low  := na
+    cur_wk_start := na
+    base_latched := false
+
+// (5) Accumulate Monday high/low while the Monday window is open
+if monday_active
+    cur_mon_high := na(cur_mon_high) ? high : math.max(cur_mon_high, high)
+    cur_mon_low  := na(cur_mon_low)  ? low  : math.min(cur_mon_low,  low)
+
+// =====================
+// Build plot series for last N weekends + their Monday levels
+// =====================
+float wk_hi_series = na
+float wk_lo_series = na
+
+float all_up_mean = na
+float all_up_1sd  = na
+float all_up_2sd  = na
+float all_up_p95  = na
+float all_dn_mean = na
+float all_dn_1sd  = na
+float all_dn_2sd  = na
+float all_dn_p95  = na
+
+float m3_up_mean = na
+float m3_up_1sd  = na
+float m3_up_2sd  = na
+float m3_up_p95  = na
+float m3_dn_mean = na
+float m3_dn_1sd  = na
+float m3_dn_2sd  = na
+float m3_dn_p95  = na
+
+float m1_up_mean = na
+float m1_up_1sd  = na
+float m1_up_2sd  = na
+float m1_up_p95  = na
+float m1_dn_mean = na
+float m1_dn_1sd  = na
+float m1_dn_2sd  = na
+float m1_dn_p95  = na
+
+// current forming weekend hi/lo (live)
+if weekend_active and show_weekend_lines and not na(cur_wk_start)
+    wk_hi_series := cur_wk_high
+    wk_lo_series := cur_wk_low
+
+int sz = array.size(wk_start_ts_arr)
+if sz > 0
+    for i = 0 to sz - 1
+        int   s_ts  = array.get(wk_start_ts_arr, i)
+        int   e_ts  = array.get(wk_end_ts_arr, i)
+        int   m_end = array.get(mon_end_ts_arr, i)
+        float hi    = array.get(wk_high_arr, i)
+        float lo    = array.get(wk_low_arr, i)
+        float base  = array.get(base_close_arr, i)
+
+        // weekend hi/lo shown during weekend window
+        if show_weekend_lines and time >= s_ts and time < e_ts
+            wk_hi_series := hi
+            wk_lo_series := lo
+
+        // Monday levels shown from Dead Gap END -> Tue 00:00 Dubai
+        if time >= e_ts and time < m_end
+            if show_all
+                all_up_mean := base * (1 + up_mean_pct / 100.0)
+                all_up_1sd  := base * (1 + (up_mean_pct + up_sd_pct) / 100.0)
+                all_up_2sd  := base * (1 + (up_mean_pct + 2 * up_sd_pct) / 100.0)
+                all_up_p95  := base * (1 + up_p95_pct / 100.0)
+                all_dn_mean := base * (1 - dn_mean_pct / 100.0)
+                all_dn_1sd  := base * (1 - (dn_mean_pct + dn_sd_pct) / 100.0)
+                all_dn_2sd  := base * (1 - (dn_mean_pct + 2 * dn_sd_pct) / 100.0)
+                all_dn_p95  := base * (1 - dn_p95_pct / 100.0)
+            if show_3m
+                float um3 = array.get(u_mean3_arr, i)
+                float us3 = array.get(u_sd3_arr, i)
+                float up953 = array.get(u_p953_arr, i)
+                float dm3 = array.get(d_mean3_arr, i)
+                float ds3 = array.get(d_sd3_arr, i)
+                float dp953 = array.get(d_p953_arr, i)
+                m3_up_mean := base * (1 + um3 / 100.0)
+                m3_up_1sd  := base * (1 + (um3 + us3) / 100.0)
+                m3_up_2sd  := base * (1 + (um3 + 2 * us3) / 100.0)
+                m3_up_p95  := base * (1 + up953 / 100.0)
+                m3_dn_mean := base * (1 - dm3 / 100.0)
+                m3_dn_1sd  := base * (1 - (dm3 + ds3) / 100.0)
+                m3_dn_2sd  := base * (1 - (dm3 + 2 * ds3) / 100.0)
+                m3_dn_p95  := base * (1 - dp953 / 100.0)
+            if show_1m
+                float um1 = array.get(u_mean1_arr, i)
+                float us1 = array.get(u_sd1_arr, i)
+                float up951 = array.get(u_p951_arr, i)
+                float dm1 = array.get(d_mean1_arr, i)
+                float ds1 = array.get(d_sd1_arr, i)
+                float dp951 = array.get(d_p951_arr, i)
+                m1_up_mean := base * (1 + um1 / 100.0)
+                m1_up_1sd  := base * (1 + (um1 + us1) / 100.0)
+                m1_up_2sd  := base * (1 + (um1 + 2 * us1) / 100.0)
+                m1_up_p95  := base * (1 + up951 / 100.0)
+                m1_dn_mean := base * (1 - dm1 / 100.0)
+                m1_dn_1sd  := base * (1 - (dm1 + ds1) / 100.0)
+                m1_dn_2sd  := base * (1 - (dm1 + 2 * ds1) / 100.0)
+                m1_dn_p95  := base * (1 - dp951 / 100.0)
+
+// =====================
+// Plots (all editable in the Style tab)
+// =====================
+plot(wk_hi_series, "Weekend High", color=col_wk, style=plot.style_linebr)
+plot(wk_lo_series, "Weekend Low",  color=col_wk, style=plot.style_linebr)
+
+plot(all_up_mean, "ALL UP mean",     color=col_all, linewidth=1, style=plot.style_linebr)
+plot(all_up_1sd,  "ALL UP mean+1SD", color=col_all, linewidth=1, style=plot.style_linebr)
+plot(all_up_2sd,  "ALL UP mean+2SD", color=col_all, linewidth=1, style=plot.style_linebr)
+plot(all_up_p95,  "ALL UP p95",      color=col_all, linewidth=2, style=plot.style_linebr)
+plot(all_dn_mean, "ALL DOWN mean",     color=col_all, linewidth=1, style=plot.style_linebr)
+plot(all_dn_1sd,  "ALL DOWN mean+1SD", color=col_all, linewidth=1, style=plot.style_linebr)
+plot(all_dn_2sd,  "ALL DOWN mean+2SD", color=col_all, linewidth=1, style=plot.style_linebr)
+plot(all_dn_p95,  "ALL DOWN p95",      color=col_all, linewidth=2, style=plot.style_linebr)
+
+plot(m3_up_mean, "3M UP mean",     color=col_3m, linewidth=1, style=plot.style_linebr)
+plot(m3_up_1sd,  "3M UP mean+1SD", color=col_3m, linewidth=1, style=plot.style_linebr)
+plot(m3_up_2sd,  "3M UP mean+2SD", color=col_3m, linewidth=1, style=plot.style_linebr)
+plot(m3_up_p95,  "3M UP p95",      color=col_3m, linewidth=2, style=plot.style_linebr)
+plot(m3_dn_mean, "3M DOWN mean",     color=col_3m, linewidth=1, style=plot.style_linebr)
+plot(m3_dn_1sd,  "3M DOWN mean+1SD", color=col_3m, linewidth=1, style=plot.style_linebr)
+plot(m3_dn_2sd,  "3M DOWN mean+2SD", color=col_3m, linewidth=1, style=plot.style_linebr)
+plot(m3_dn_p95,  "3M DOWN p95",      color=col_3m, linewidth=2, style=plot.style_linebr)
+
+plot(m1_up_mean, "1M UP mean",     color=col_1m, linewidth=1, style=plot.style_linebr)
+plot(m1_up_1sd,  "1M UP mean+1SD", color=col_1m, linewidth=1, style=plot.style_linebr)
+plot(m1_up_2sd,  "1M UP mean+2SD", color=col_1m, linewidth=1, style=plot.style_linebr)
+plot(m1_up_p95,  "1M UP p95",      color=col_1m, linewidth=2, style=plot.style_linebr)
+plot(m1_dn_mean, "1M DOWN mean",     color=col_1m, linewidth=1, style=plot.style_linebr)
+plot(m1_dn_1sd,  "1M DOWN mean+1SD", color=col_1m, linewidth=1, style=plot.style_linebr)
+plot(m1_dn_2sd,  "1M DOWN mean+2SD", color=col_1m, linewidth=1, style=plot.style_linebr)
+plot(m1_dn_p95,  "1M DOWN p95",      color=col_1m, linewidth=2, style=plot.style_linebr)
+// ============================================================================
+// END V3. Look-ahead audit: no request.security() anywhere; every stat is frozen
+// from observations pushed strictly AFTER their Monday window closed. Causal.
+// ============================================================================

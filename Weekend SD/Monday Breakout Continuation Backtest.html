@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Monday Breakout Continuation — Weekend SD Backtest</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --panel:#ffffff; --ink:#1a1e26; --soft:#5b6472; --line:#e2e6ec;
+    --accent:#0f7d6b; --accent-2:#0a5c4f; --warn:#b4551a; --warnbg:#fff2e6;
+    --chip:#eef2f5; --good:#17a07f; --bad:#e14b4b;
+    --shadow:0 1px 3px rgba(20,30,45,.08),0 6px 20px rgba(20,30,45,.05);
+    --m3:#0f9d8c; --m1:#e08a1e; --all:#6b7280;
+    --verdbg:#fff6e6; --verdborder:#e0a94a; --verdink:#8a5a12;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0f1319; --panel:#161c24; --ink:#e7ecf2; --soft:#9aa5b3; --line:#26303c;
+      --accent:#39c9ad; --accent-2:#7fe0cd; --warn:#f0a054; --warnbg:#2a1e12;
+      --chip:#1d2530; --good:#3bd6a6; --bad:#ff6b6b;
+      --shadow:0 1px 3px rgba(0,0,0,.4),0 8px 26px rgba(0,0,0,.35);
+      --m3:#3bd6a6; --m1:#f0a054; --all:#9aa5b3;
+      --verdbg:#2a2110; --verdborder:#7a5a24; --verdink:#f2cf8f;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-size:16.5px; line-height:1.6;}
+  .wrap{max-width:1060px; margin:0 auto; padding:0 20px}
+  header.hero{background:linear-gradient(135deg,var(--accent-2),var(--accent));
+    color:#fff; padding:38px 0 30px; border-bottom:4px solid rgba(0,0,0,.12);}
+  header.hero .wrap{max-width:940px}
+  header.hero .eyebrow{text-transform:uppercase; letter-spacing:.15em; font-size:12px; opacity:.9; margin:0 0 8px}
+  header.hero h1{font-size:30px; line-height:1.15; margin:0 0 8px; font-weight:800}
+  header.hero p{margin:0; opacity:.96; font-size:15.5px}
+  main{padding:26px 0 70px}
+  section{background:var(--panel); border:1px solid var(--line); border-radius:15px;
+    padding:22px 26px 26px; margin:0 0 22px; box-shadow:var(--shadow);}
+  section>h2{font-size:22px; margin:0 0 4px; letter-spacing:-.01em}
+  section>.kicker{color:var(--accent); font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:.1em; margin:0 0 12px}
+  h3{font-size:18px; margin:22px 0 6px}
+  p{margin:9px 0}
+  ul,ol{margin:9px 0; padding-left:22px} li{margin:6px 0}
+  .soft{color:var(--soft)} strong{font-weight:700}
+  code{background:var(--chip); padding:1px 5px; border-radius:5px; font-size:13.5px}
+  .verdict{background:var(--verdbg); border:1.5px solid var(--verdborder); color:var(--verdink);
+    border-radius:15px; padding:20px 24px; margin:0 0 22px; box-shadow:var(--shadow);}
+  .verdict .tag{display:inline-block; font-weight:800; letter-spacing:.04em; font-size:13px;
+    text-transform:uppercase; background:var(--verdink); color:var(--verdbg); padding:3px 10px; border-radius:6px; margin-bottom:8px}
+  .verdict h2{margin:2px 0 8px; font-size:22px; color:var(--verdink)}
+  .verdict p{margin:7px 0; font-size:15.5px}
+  .box{border-radius:12px; padding:14px 16px; margin:15px 0; font-size:15px}
+  .box.rule{background:var(--chip); border:1px solid var(--line)}
+  .box.honesty{background:var(--warnbg); border:1px solid var(--warn)}
+  .box h4{margin:0 0 6px; font-size:15px; text-transform:uppercase; letter-spacing:.05em}
+  .tw{overflow-x:auto; margin:14px 0}
+  table{border-collapse:collapse; width:100%; font-size:14px; min-width:640px}
+  th,td{padding:7px 9px; text-align:right; border-bottom:1px solid var(--line); white-space:nowrap}
+  th:first-child,td:first-child{text-align:left; white-space:normal; min-width:150px}
+  thead th{background:var(--chip); font-size:12px; text-transform:uppercase; letter-spacing:.03em; color:var(--soft)}
+  tbody tr:hover{background:rgba(127,127,127,.06)}
+  .pos{color:var(--good); font-weight:700} .neg{color:var(--bad); font-weight:700}
+  figure{margin:16px 0; background:var(--chip); border:1px solid var(--line); border-radius:12px; padding:14px}
+  figcaption{font-size:13px; color:var(--soft); margin-top:8px}
+  svg{max-width:100%; height:auto}
+</style>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+<div class="eyebrow">Weekend SD · Breakout continuation · In-sample 2019-09 → 2024-12 · BTC-USDT perp</div>
+<h1>Monday Breakout Continuation at Weekend SD Levels</h1>
+<p>The mirror image of the failed SD fade: instead of fading a Monday stretch back to base, trade <em>with</em> it — enter when a 1-minute bar closes beyond the standard-deviation band, ride the extension. 24 pre-declared variants, honest costs, causal levels. Does continuation pay?</p>
+</div></header>
+<main><div class="wrap">
+<div class="verdict">
+<span class="tag">Verdict · Not validated</span>
+<h2>🟡 Marginal, not proven. The best pre-registered variant makes <strong>+0.31R per trade</strong> (75 trades, 60% win) but at <strong>t = 2.33</strong> — under the strict t ≥ 3 bar this idea was set up to clear. It is <strong>not</strong> a validated edge.</h2>
+<p>Sixteen of the 24 variants are positive and four reach |t| ≥ 2 — but <strong>zero reach t ≥ 3</strong>, and this idea was born from a post-hoc "mirror" of a losing strategy, where roughly one variant in 24 is expected to fluke |t| ≥ 2 by chance alone. The best cell does sit inside a coherently-positive neighbourhood (all five one-knob neighbours positive), which is mildly encouraging, but the profit is heavily concentrated in 2020–2021. Treat it as a lead to confirm on the locked 2025–26 out-of-sample data, not as a live edge.</p>
+</div>
+<section>
+<div class="kicker">The trade</div>
+<h2>How the breakout continuation works</h2>
+<p>Every weekend has a <strong>base</strong> (the Sunday-night reference close) and, from the history of past weekends, a typical Monday <strong>stretch</strong> — a mean move and a standard deviation, measured separately for the up side and the down side. We draw a band at <code>base ± (mean + k·SD)</code>. During the Monday window (Mon 02:00 → Tue 00:00 Dubai) we wait:</p>
+<ul>
+<li>When a <strong>1-minute bar closes above</strong> the up band → <strong>go long</strong> on the next bar's open (continue the up-move).</li>
+<li>When a 1-minute bar <strong>closes below</strong> the down band → <strong>go short</strong> (continue the down-move).</li>
+<li>First close-beyond of the day wins; one trade per weekend. Target sits a further <strong>1 or 2 SD</strong> out; the stop sits back toward base (at the mean line, or halfway back). Nothing left open by Tuesday 00:00 is closed at the market.</li>
+</ul>
+<figure><svg viewBox="0 0 900 340" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Breakout continuation trade schematic">
+  <defs>
+    <marker id="ar" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="var(--m3)"/></marker>
+  </defs>
+  <!-- horizontal reference lines -->
+  <line x1="60" y1="250" x2="860" y2="250" stroke="var(--all)" stroke-width="1.4" stroke-dasharray="2 4"/>
+  <text x="64" y="245" font-size="12" fill="var(--soft)">base (weekend reference)</text>
+  <line x1="60" y1="185" x2="860" y2="185" stroke="var(--m1)" stroke-width="1.4" stroke-dasharray="6 4"/>
+  <text x="64" y="180" font-size="12" fill="var(--m1)">mean line  (k = 0 band / structure stop for k = 1)</text>
+  <line x1="60" y1="135" x2="860" y2="135" stroke="var(--m3)" stroke-width="1.8"/>
+  <text x="64" y="130" font-size="12" fill="var(--m3)">up band  base + (mean + 1&#183;SD)   &#8212; k = 1 entry trigger</text>
+  <line x1="60" y1="70" x2="860" y2="70" stroke="var(--m3)" stroke-width="1.4" stroke-dasharray="6 4"/>
+  <text x="64" y="64" font-size="12" fill="var(--m3)">target  entry + 2&#183;SD further</text>
+  <!-- price path: rises, closes through band, continues to target -->
+  <polyline points="80,245 150,238 220,225 290,210 360,200 430,175 480,150 500,132" fill="none" stroke="var(--ink)" stroke-width="2.2" opacity="0.85"/>
+  <!-- the breakout close bar -->
+  <rect x="470" y="132" width="10" height="40" fill="var(--m3)"/>
+  <line x1="475" y1="124" x2="475" y2="176" stroke="var(--m3)" stroke-width="2"/>
+  <text x="430" y="118" font-size="12" fill="var(--ink)">1m bar CLOSES above band</text>
+  <!-- entry arrow at next open -->
+  <circle cx="500" cy="132" r="5" fill="var(--m3)"/>
+  <text x="508" y="128" font-size="12" fill="var(--ink)">enter LONG next open</text>
+  <line x1="500" y1="132" x2="640" y2="72" stroke="var(--m3)" stroke-width="2.4" marker-end="url(#ar)"/>
+  <!-- continuation to target -->
+  <polyline points="500,132 560,118 610,95 650,74" fill="none" stroke="var(--ink)" stroke-width="2.2" opacity="0.55" stroke-dasharray="3 3"/>
+  <text x="655" y="66" font-size="12" fill="var(--m3)">target hit (+2&#183;SD)</text>
+  <!-- stop arrow down toward mean/base -->
+  <line x1="500" y1="140" x2="500" y2="182" stroke="var(--bad)" stroke-width="2" marker-end="url(#ar)" opacity="0.8"/>
+  <text x="360" y="200" font-size="12" fill="var(--bad)">stop = back to mean line (or halfway to base)</text>
+  <text x="60" y="300" font-size="12.5" fill="var(--soft)">Long shown; a short is the mirror &#8212; a 1-minute close BELOW base &#8722; (mean + k&#183;SD), enter short, target further down, stop back toward base.</text>
+</svg><figcaption>The long case. The down side is the exact mirror. One trade per weekend, whichever side closes beyond its band first.</figcaption></figure>
+<div class="box rule"><h4>Every rule tilted against us</h4>
+<p style="margin:0">Entry uses stop-order fills (long fills at the worse of the band or the next open) plus 0.02% slippage and 0.05% fee each side. If one minute tags both stop and target, it is booked a <strong>loss</strong>. A stop that gaps through fills at the worse of the stop or that bar's open; a target never gets gap improvement. Risk is the declared band-to-stop distance, so a slipped entry loses slightly more than 1R. Levels are strictly causal — each weekend uses only earlier weekends.</p></div>
+</section>
+<section>
+<div class="kicker">The whole grid</div>
+<h2>All 24 variants — average R per trade (ungated)</h2>
+<p>Rows are the entry band (k) × the SD source; columns are the target distance × the stop. Colour is average R (green = profit, red = loss); the small number is the t-statistic. <strong>16</strong> of 24 are green, <strong>4</strong> reach |t| ≥ 2, and <strong>0</strong> reach t ≥ 3.</p>
+<div class="tw"><table><thead><tr>
+<th>band × source</th>
+<th>target 1×SD<br><span class="soft">structure stop</span></th>
+<th>target 1×SD<br><span class="soft">halfway stop</span></th>
+<th>target 2×SD<br><span class="soft">structure stop</span></th>
+<th>target 2×SD<br><span class="soft">halfway stop</span></th>
+</tr></thead><tbody>
+<tr><td>mean<br><span class="soft">3-Month (trailing 13)</span></td>
+<td style="background:rgba(225,75,75,0.139)"><strong>-0.02</strong><br><span class="soft">t -0.37 · N 171</span></td>
+<td style="background:rgba(225,75,75,0.206)"><strong>-0.06</strong><br><span class="soft">t -0.62 · N 171</span></td>
+<td style="background:rgba(23,160,127,0.254)"><strong>+0.09</strong><br><span class="soft">t 1.13 · N 171</span></td>
+<td style="background:rgba(23,160,127,0.298)"><strong>+0.12</strong><br><span class="soft">t 0.88 · N 171</span></td>
+</tr>
+<tr><td>mean<br><span class="soft">4-Week (trailing 4)</span></td>
+<td style="background:rgba(225,75,75,0.118)"><strong>-0.01</strong><br><span class="soft">t -0.19 · N 197</span></td>
+<td style="background:rgba(225,75,75,0.116)"><strong>-0.01</strong><br><span class="soft">t -0.10 · N 197</span></td>
+<td style="background:rgba(23,160,127,0.373)"><strong>+0.16</strong><br><span class="soft">t 2.01 · N 197</span></td>
+<td style="background:rgba(23,160,127,0.598)"><strong>+0.29</strong><br><span class="soft">t 2.12 · N 197</span></td>
+</tr>
+<tr><td>mean<br><span class="soft">Confluence (≥2 agree)</span></td>
+<td style="background:rgba(225,75,75,0.244)"><strong>-0.08</strong><br><span class="soft">t -0.96 · N 78</span></td>
+<td style="background:rgba(225,75,75,0.519)"><strong>-0.24</strong><br><span class="soft">t -1.77 · N 78</span></td>
+<td style="background:rgba(225,75,75,0.272)"><strong>-0.10</strong><br><span class="soft">t -0.92 · N 78</span></td>
+<td style="background:rgba(225,75,75,0.524)"><strong>-0.25</strong><br><span class="soft">t -1.47 · N 78</span></td>
+</tr>
+<tr><td>mean+1SD<br><span class="soft">3-Month (trailing 13)</span></td>
+<td style="background:rgba(23,160,127,0.330)"><strong>+0.13</strong><br><span class="soft">t 1.48 · N 75</span></td>
+<td style="background:rgba(23,160,127,0.372)"><strong>+0.16</strong><br><span class="soft">t 1.86 · N 75</span></td>
+<td style="background:rgba(23,160,127,0.627)"><strong>+0.31</strong> ★<br><span class="soft">t 2.33 · N 75</span></td>
+<td style="background:rgba(23,160,127,0.580)"><strong>+0.28</strong><br><span class="soft">t 2.22 · N 75</span></td>
+</tr>
+<tr><td>mean+1SD<br><span class="soft">4-Week (trailing 4)</span></td>
+<td style="background:rgba(23,160,127,0.299)"><strong>+0.12</strong><br><span class="soft">t 1.45 · N 111</span></td>
+<td style="background:rgba(23,160,127,0.304)"><strong>+0.12</strong><br><span class="soft">t 1.64 · N 111</span></td>
+<td style="background:rgba(23,160,127,0.448)"><strong>+0.20</strong><br><span class="soft">t 1.69 · N 111</span></td>
+<td style="background:rgba(23,160,127,0.403)"><strong>+0.18</strong><br><span class="soft">t 1.64 · N 111</span></td>
+</tr>
+<tr><td>mean+1SD<br><span class="soft">Confluence (≥2 agree)</span></td>
+<td style="background:rgba(23,160,127,0.383)"><strong>+0.17</strong><br><span class="soft">t 0.70 · N 15</span></td>
+<td style="background:rgba(23,160,127,0.331)"><strong>+0.13</strong><br><span class="soft">t 0.60 · N 15</span></td>
+<td style="background:rgba(23,160,127,0.766)"><strong>+0.39</strong><br><span class="soft">t 1.29 · N 15</span></td>
+<td style="background:rgba(23,160,127,0.682)"><strong>+0.34</strong><br><span class="soft">t 1.18 · N 15</span></td>
+</tr>
+</tbody></table></div>
+<p class="soft">★ = best variant (highest average R among N ≥ 50). The four |t| ≥ 2 cells are all in the <strong>target 2×SD</strong> columns — the "let it run further" knob — which is the one coherent pattern in the grid.</p>
+</section>
+<section>
+<div class="kicker">The trend overlay</div>
+<h2>Does a daily-trend filter help? (gated vs ungated)</h2>
+<p>The overlay keeps only breakouts whose direction agrees with the daily 4-week (28-day) momentum sign, read as of the Friday before the weekend (causal). This is a reporting overlay, <strong>not</strong> a new variant dimension — the pre-registered scorecard is the ungated column. Below, every variant both ways:</p>
+<div class="tw"><table><thead><tr>
+<th>variant</th><th>N</th><th>avg R</th><th>t</th><th>gated N</th><th>gated avg R</th><th>gated t</th></tr></thead><tbody>
+<tr><td>mean · 3M · 1×SD · structure</td>
+<td>171</td><td class="neg">-0.023</td><td>-0.37</td>
+<td>92</td><td class="neg">-0.025</td><td>-0.29</td></tr>
+<tr><td>mean · 3M · 1×SD · halfway</td>
+<td>171</td><td class="neg">-0.062</td><td>-0.62</td>
+<td>92</td><td class="pos">+0.045</td><td>0.32</td></tr>
+<tr><td>mean · 3M · 2×SD · structure</td>
+<td>171</td><td class="pos">+0.090</td><td>1.13</td>
+<td>92</td><td class="pos">+0.152</td><td>1.35</td></tr>
+<tr><td>mean · 3M · 2×SD · halfway</td>
+<td>171</td><td class="pos">+0.115</td><td>0.88</td>
+<td>92</td><td class="pos">+0.314</td><td>1.67</td></tr>
+<tr><td>mean · 1M · 1×SD · structure</td>
+<td>197</td><td class="neg">-0.010</td><td>-0.19</td>
+<td>88</td><td class="pos">+0.042</td><td>0.51</td></tr>
+<tr><td>mean · 1M · 1×SD · halfway</td>
+<td>197</td><td class="neg">-0.009</td><td>-0.10</td>
+<td>88</td><td class="pos">+0.132</td><td>0.95</td></tr>
+<tr><td>mean · 1M · 2×SD · structure</td>
+<td>197</td><td class="pos">+0.159</td><td>2.01</td>
+<td>88</td><td class="pos">+0.333</td><td>2.67</td></tr>
+<tr><td>mean · 1M · 2×SD · halfway</td>
+<td>197</td><td class="pos">+0.290</td><td>2.12</td>
+<td>88</td><td class="pos">+0.726</td><td>3.22</td></tr>
+<tr><td>mean · CONF · 1×SD · structure</td>
+<td>78</td><td class="neg">-0.084</td><td>-0.96</td>
+<td>43</td><td class="neg">-0.169</td><td>-1.36</td></tr>
+<tr><td>mean · CONF · 1×SD · halfway</td>
+<td>78</td><td class="neg">-0.245</td><td>-1.77</td>
+<td>43</td><td class="neg">-0.366</td><td>-1.92</td></tr>
+<tr><td>mean · CONF · 2×SD · structure</td>
+<td>78</td><td class="neg">-0.100</td><td>-0.92</td>
+<td>43</td><td class="neg">-0.140</td><td>-0.90</td></tr>
+<tr><td>mean · CONF · 2×SD · halfway</td>
+<td>78</td><td class="neg">-0.247</td><td>-1.47</td>
+<td>43</td><td class="neg">-0.326</td><td>-1.46</td></tr>
+<tr><td>mean+1SD · 3M · 1×SD · structure</td>
+<td>75</td><td class="pos">+0.134</td><td>1.48</td>
+<td>42</td><td class="pos">+0.168</td><td>1.42</td></tr>
+<tr><td>mean+1SD · 3M · 1×SD · halfway</td>
+<td>75</td><td class="pos">+0.159</td><td>1.86</td>
+<td>42</td><td class="pos">+0.187</td><td>1.67</td></tr>
+<tr><td>mean+1SD · 3M · 2×SD · structure ★</td>
+<td>75</td><td class="pos">+0.307</td><td>2.33</td>
+<td>42</td><td class="pos">+0.294</td><td>1.59</td></tr>
+<tr><td>mean+1SD · 3M · 2×SD · halfway</td>
+<td>75</td><td class="pos">+0.280</td><td>2.22</td>
+<td>42</td><td class="pos">+0.273</td><td>1.57</td></tr>
+<tr><td>mean+1SD · 1M · 1×SD · structure</td>
+<td>111</td><td class="pos">+0.116</td><td>1.45</td>
+<td>51</td><td class="pos">+0.269</td><td>2.29</td></tr>
+<tr><td>mean+1SD · 1M · 1×SD · halfway</td>
+<td>111</td><td class="pos">+0.119</td><td>1.64</td>
+<td>51</td><td class="pos">+0.284</td><td>2.71</td></tr>
+<tr><td>mean+1SD · 1M · 2×SD · structure</td>
+<td>111</td><td class="pos">+0.203</td><td>1.69</td>
+<td>51</td><td class="pos">+0.304</td><td>1.70</td></tr>
+<tr><td>mean+1SD · 1M · 2×SD · halfway</td>
+<td>111</td><td class="pos">+0.177</td><td>1.64</td>
+<td>51</td><td class="pos">+0.302</td><td>1.84</td></tr>
+<tr><td>mean+1SD · CONF · 1×SD · structure</td>
+<td>15</td><td class="pos">+0.165</td><td>0.70</td>
+<td>7</td><td class="pos">+0.566</td><td>1.83</td></tr>
+<tr><td>mean+1SD · CONF · 1×SD · halfway</td>
+<td>15</td><td class="pos">+0.135</td><td>0.60</td>
+<td>7</td><td class="pos">+0.516</td><td>1.73</td></tr>
+<tr><td>mean+1SD · CONF · 2×SD · structure</td>
+<td>15</td><td class="pos">+0.388</td><td>1.29</td>
+<td>7</td><td class="pos">+0.472</td><td>1.26</td></tr>
+<tr><td>mean+1SD · CONF · 2×SD · halfway</td>
+<td>15</td><td class="pos">+0.339</td><td>1.18</td>
+<td>7</td><td class="pos">+0.442</td><td>1.20</td></tr>
+</tbody></table></div>
+<p>On the <strong>best</strong> ungated cell the gate does <strong>not</strong> help: it cuts the sample to 42 trades at +0.294R and <strong>t falls to 1.59</strong>. The gate lifts some other cells but hurts this one. The single strongest gated cell — <strong>mean · 1M · 2×SD · halfway stop</strong> — reaches gated t = 3.22 (avg +0.726R, N 88), but that is a <em>second</em> post-hoc pick on top of the first, and its ungated form is only t = 2.12. Picking the best overlay after seeing the grid is exactly the self-deception this study is guarding against.</p>
+</section>
+<section>
+<div class="kicker">Best variant, up close</div>
+<h2>Deep dive — mean+1SD break · 3-Month SD · target 2×SD · structure stop ★</h2>
+<div class="tw"><table><thead><tr><th>metric</th><th>value</th><th>metric</th><th>value</th></tr></thead><tbody>
+<tr><td>trades</td><td>75</td><td>win rate</td><td>60.0%</td></tr>
+<tr><td>avg R / trade</td><td class="pos">+0.307</td><td>t-stat</td><td>2.33</td></tr>
+<tr><td>median R</td><td>+0.275</td><td>profit factor</td><td>1.87</td></tr>
+<tr><td>total R</td><td class="pos">+23.1</td><td>max drawdown (R)</td><td>6.9</td></tr>
+<tr><td>target / stop / time exits</td><td>22 / 16 / 37</td><td>long / short avg R</td><td>+0.42 / +0.20</td></tr>
+</tbody></table></div>
+<figure><svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Best-cell equity curve in R"><line x1="40" y1="250.4" x2="860" y2="250.4" stroke="var(--line)" stroke-width="1"/><polyline points="40.0,250.4 50.9,260.0 61.9,258.6 72.8,254.4 83.7,239.1 94.7,226.9 105.6,210.3 116.5,201.9 127.5,198.9 138.4,183.3 149.3,192.9 160.3,176.7 171.2,185.1 182.1,174.8 193.1,158.4 204.0,169.5 214.9,157.1 225.9,140.0 236.8,149.5 247.7,158.7 258.7,141.7 269.6,150.4 280.5,143.9 291.5,126.9 302.4,110.4 313.3,115.0 324.3,106.5 335.2,105.3 346.1,105.6 357.1,104.1 368.0,102.6 378.9,112.9 389.9,122.5 400.8,111.9 411.7,96.7 422.7,92.0 433.6,76.9 444.5,79.4 455.5,72.8 466.4,55.7 477.3,65.7 488.3,83.3 499.2,93.2 510.1,96.5 521.1,100.9 532.0,96.0 542.9,106.4 553.9,99.1 564.8,109.8 575.7,111.2 586.7,115.6 597.6,108.0 608.5,104.9 619.5,98.9 630.4,102.9 641.3,94.6 652.3,105.9 663.2,103.7 674.1,87.4 685.1,91.1 696.0,76.8 706.9,77.8 717.9,76.8 728.8,83.4 739.7,82.7 750.7,75.5 761.6,73.1 772.5,83.1 783.5,93.7 794.4,78.0 805.3,88.4 816.3,71.9 827.2,61.3 838.1,56.2 849.1,40.0 860.0,48.9" fill="none" stroke="var(--m3)" stroke-width="2.4"/><circle cx="860.0" cy="48.9" r="4" fill="var(--m3)"/><text x="852.0" y="40.9" font-size="13" fill="var(--soft)" text-anchor="end">+23.1R</text><text x="42" y="245.4" font-size="12" fill="var(--soft)">0R</text></svg><figcaption>Cumulative R across the 75 best-cell trades in time order (worst peak-to-trough drawdown ≈ 6.9R). The climb is real but uneven — steep through 2020–2021, near-flat through the 2022 bear.</figcaption></figure>
+<h3>Year by year</h3>
+<p>Positive in five of six years — but the profit is <strong>front-loaded</strong>: 2020–2021 alone are +18R of the +23R total. The 2022 bear delivered almost nothing (+0.7R). An edge that lives mostly in two trending bull years is exactly what an out-of-sample test needs to confirm.</p>
+<div class="tw"><table><thead><tr><th>year</th><th>trades</th><th>win %</th><th>avg R</th><th>total R</th></tr></thead><tbody>
+<tr><td>2019</td><td>1</td><td>0</td><td class="neg">-1.097</td><td class="neg">-1.1</td></tr>
+<tr><td>2020</td><td>14</td><td>79</td><td class="pos">+0.739</td><td class="pos">+10.3</td></tr>
+<tr><td>2021</td><td>15</td><td>67</td><td class="pos">+0.510</td><td class="pos">+7.7</td></tr>
+<tr><td>2022</td><td>13</td><td>46</td><td class="pos">+0.054</td><td class="pos">+0.7</td></tr>
+<tr><td>2023</td><td>17</td><td>53</td><td class="pos">+0.132</td><td class="pos">+2.3</td></tr>
+<tr><td>2024</td><td>15</td><td>60</td><td class="pos">+0.213</td><td class="pos">+3.2</td></tr>
+</tbody></table></div>
+<h3>Neighbourhood check</h3>
+<p>Every variant one knob away from the best cell — the honesty test for whether the winner is an isolated fluke or part of a real ridge. <strong>All 5 neighbours are positive</strong>, so the sign is coherent; but none is individually significant, so the ridge is shallow.</p>
+<div class="tw"><table><thead><tr><th>one knob changed</th><th>avg R</th><th>t</th><th>N</th></tr></thead><tbody>
+<tr><td><strong>best cell (centre)</strong></td><td class="pos">+0.307</td><td>2.33</td><td>75</td></tr>
+<tr><td>k → 0 (mean-break)</td><td class="pos">+0.090</td><td>1.13</td><td>171</td></tr>
+<tr><td>source → 4-Week</td><td class="pos">+0.203</td><td>1.69</td><td>111</td></tr>
+<tr><td>source → Confluence</td><td class="pos">+0.388</td><td>1.29</td><td>15</td></tr>
+<tr><td>target → 1×SD</td><td class="pos">+0.134</td><td>1.48</td><td>75</td></tr>
+<tr><td>stop → halfway</td><td class="pos">+0.280</td><td>2.22</td><td>75</td></tr>
+</tbody></table></div>
+<p class="soft">Coherent same-sign neighbourhood: <strong>yes</strong>. Strict winner bar (t ≥ 3 <em>and</em> coherent neighbourhood): <strong>FAILED</strong> — the neighbourhood is coherent but t = 2.33 &lt; 3.</p>
+</section>
+<section>
+<div class="kicker">Interaction with the validated fade</div>
+<h2>Overlap with the Monday fade (descriptive only)</h2>
+<p>The validated Monday fade (+0.382R over 91 trades, t 2.98) trades the <em>opposite</em> way — it fades the stretch back to base. How often does the same weekend fire <em>both</em> this breakout and the fade? Using the best variant's trigger band (mean+1SD, 3-Month), <strong>29 of the 91 fade weekends</strong> also produce a breakout trade.</p>
+<div class="tw"><table><thead><tr><th>overlap fact</th><th>count</th></tr></thead><tbody>
+<tr><td>Fade weekends (validated ledger)</td><td>91</td></tr>
+<tr><td>Weekends firing BOTH breakout &amp; fade</td><td>29</td></tr>
+<tr><td>… opposite direction (fade fades the same stretch)</td><td>25</td></tr>
+<tr><td>… fade triggers first, then breakout</td><td>22</td></tr>
+<tr><td>… breakout triggers first, then the fade fades THIS move</td><td>7</td></tr>
+</tbody></table></div>
+<p>Sequencing: on <strong>22</strong> weekends the fade tags its (closer) level first and the breakout only fires later when price closes through the further band; on <strong>7</strong> weekends the breakout fires first and the fade then enters against it — literally fading the move this trade is riding. In <strong>25 of 29</strong> overlaps the two are opposite-direction, so they are structurally antagonistic: a weekend that pays the breakout tends to hurt the fade, and vice-versa. This is descriptive context only — no rule is combined here.</p>
+</section>
+<section>
+<div class="kicker">Honesty</div>
+<h2>Why the bar was set so high</h2>
+<div class="box honesty"><h4>Post-hoc origin &amp; the multiple-comparisons trap</h4>
+<p>This strategy was <strong>not</strong> an a-priori hypothesis. It came from a <em>post-hoc mirror</em> of the failed SD fade: after the fade lost, a quick "what if we did the opposite" check showed the naive mirror's best cells near +0.25R (t ≈ 2.6) at the mean+1SD band on 3-month stats. Discovering a strategy by inverting a loser, inside the same knob space, badly inflates the odds of fooling yourself.</p>
+<p>With <strong>24 variants</strong>, pure chance is expected to throw up roughly <strong>one</strong> cell at |t| ≥ 2 even if there is no real edge. We found <strong>four</strong> — better than one, and all clustered on the same "target 2×SD" knob, which is mild structure — but <strong>none reaches t ≥ 3</strong>. So the pre-registered winner bar was deliberately strict: <strong>t ≥ 3 AND a coherent same-sign neighbourhood</strong>, or the verdict is "not validated." The best cell clears the neighbourhood half (all five neighbours positive) but misses the significance half (t = 2.33). Result: <strong>not validated.</strong></p>
+<p>Other honest caveats: the profit concentrates in 2020–2021; most exits are time-outs at the Tuesday close, not clean target hits; and the trend overlay that looks best (gated t &gt; 3 on a 4-week cell) is itself a second post-hoc pick and does not help the primary cell. Nothing here has touched the locked 2025–26 out-of-sample data.</p>
+</div>
+</section>
+<section>
+<div class="kicker">Plain English</div>
+<h2>What this means for you</h2>
+<ul>
+<li><strong>Don't trade this yet.</strong> The best version earns a real-looking +0.31R per trade, but at a confidence level (t = 2.33) below the line this test set for itself. Given where the idea came from, that is not enough to believe.</li>
+<li><strong>The shape is plausible, though.</strong> Continuation pays more when you let the target run to 2×SD, it is positive on both long and short breakouts, and every neighbour of the best cell is green. That is a genuine (if faint) ridge, not a lone spike — worth one clean test.</li>
+<li><strong>The one honest next step</strong> is to run this exact best variant — mean+1SD break, 3-Month SD, 2×SD target, structure stop — <em>once</em> on the locked 2025–26 data. If it holds near +0.3R there, it graduates from "lead" to "edge." If it fades, it was the expected fluke.</li>
+<li><strong>It fights your fade, not complements it.</strong> On the 29 weekends both fire, they are almost always opposite-direction. The breakout and the fade are two bets on the same Monday stretch — one that it continues, one that it snaps back — so they can't both be sized up on the same weekend.</li>
+</ul>
+<p class="soft">In-sample 2019-09 → 2024-12-31, BTC-USDT perpetual, 1-minute bars. 277 weekends, 24 declared variants, 2588 breakout trades in total. Costs: 0.05%/side fee, 0.02%/fill slippage, ambiguous fills booked as losses. Engine <code>bt_monday_breakout_cont.py</code>; deterministic (identical re-run hashes).</p>
+</section>
+</div></main></body></html>

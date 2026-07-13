@@ -1,0 +1,4302 @@
+[
+  {
+    "text": "Now,",
+    "start": 0.01,
+    "end": 0.44
+  },
+  {
+    "text": "I",
+    "start": 0.44,
+    "end": 0.59
+  },
+  {
+    "text": "want",
+    "start": 0.59,
+    "end": 0.91
+  },
+  {
+    "text": "to",
+    "start": 0.91,
+    "end": 1.09
+  },
+  {
+    "text": "talk",
+    "start": 1.09,
+    "end": 1.4
+  },
+  {
+    "text": "to",
+    "start": 1.46,
+    "end": 1.62
+  },
+  {
+    "text": "you",
+    "start": 1.69,
+    "end": 1.95
+  },
+  {
+    "text": "about",
+    "start": 1.96,
+    "end": 2.34
+  },
+  {
+    "text": "vectors,",
+    "start": 2.38,
+    "end": 3.06
+  },
+  {
+    "text": "volume",
+    "start": 3.13,
+    "end": 3.73
+  },
+  {
+    "text": "and",
+    "start": 3.82,
+    "end": 3.99
+  },
+  {
+    "text": "stopping",
+    "start": 3.99,
+    "end": 4.51
+  },
+  {
+    "text": "volume",
+    "start": 4.51,
+    "end": 4.92
+  },
+  {
+    "text": "candles.",
+    "start": 4.92,
+    "end": 5.68
+  },
+  {
+    "text": "The",
+    "start": 5.69,
+    "end": 5.95
+  },
+  {
+    "text": "indicator",
+    "start": 6.27,
+    "end": 6.75
+  },
+  {
+    "text": "colours",
+    "start": 6.75,
+    "end": 7.28
+  },
+  {
+    "text": "the",
+    "start": 7.37,
+    "end": 7.64
+  },
+  {
+    "text": "candles",
+    "start": 7.64,
+    "end": 8.24
+  },
+  {
+    "text": "according",
+    "start": 8.41,
+    "end": 9.03
+  },
+  {
+    "text": "to",
+    "start": 9.1,
+    "end": 9.24
+  },
+  {
+    "text": "the",
+    "start": 9.24,
+    "end": 9.51
+  },
+  {
+    "text": "PDSRA",
+    "start": 9.51,
+    "end": 10
+  },
+  {
+    "text": "and",
+    "start": 10,
+    "end": 10.22
+  },
+  {
+    "text": "basically",
+    "start": 10.22,
+    "end": 10.88
+  },
+  {
+    "text": "what",
+    "start": 10.88,
+    "end": 11.1
+  },
+  {
+    "text": "it",
+    "start": 11.1,
+    "end": 11.32
+  },
+  {
+    "text": "means",
+    "start": 11.32,
+    "end": 11.67
+  },
+  {
+    "text": "is",
+    "start": 11.67,
+    "end": 11.84
+  },
+  {
+    "text": "that",
+    "start": 11.86,
+    "end": 12.12
+  },
+  {
+    "text": "it's",
+    "start": 12.12,
+    "end": 12.4
+  },
+  {
+    "text": "colouring",
+    "start": 12.43,
+    "end": 13.04
+  },
+  {
+    "text": "the",
+    "start": 13.04,
+    "end": 13.24
+  },
+  {
+    "text": "candles",
+    "start": 13.24,
+    "end": 13.75
+  },
+  {
+    "text": "according",
+    "start": 13.75,
+    "end": 14.4
+  },
+  {
+    "text": "to",
+    "start": 14.4,
+    "end": 14.43
+  },
+  {
+    "text": "the",
+    "start": 14.57,
+    "end": 14.75
+  },
+  {
+    "text": "volume.",
+    "start": 14.75,
+    "end": 15.46
+  },
+  {
+    "text": "So",
+    "start": 15.48,
+    "end": 15.63
+  },
+  {
+    "text": "when",
+    "start": 15.64,
+    "end": 15.97
+  },
+  {
+    "text": "it",
+    "start": 16.05,
+    "end": 16.14
+  },
+  {
+    "text": "colours",
+    "start": 16.14,
+    "end": 16.73
+  },
+  {
+    "text": "the",
+    "start": 16.73,
+    "end": 16.98
+  },
+  {
+    "text": "candle",
+    "start": 16.98,
+    "end": 17.49
+  },
+  {
+    "text": "red,",
+    "start": 17.58,
+    "end": 17.8
+  },
+  {
+    "text": "what",
+    "start": 17.92,
+    "end": 18.24
+  },
+  {
+    "text": "it",
+    "start": 18.24,
+    "end": 18.4
+  },
+  {
+    "text": "means",
+    "start": 18.43,
+    "end": 18.81
+  },
+  {
+    "text": "is",
+    "start": 18.88,
+    "end": 19
+  },
+  {
+    "text": "that",
+    "start": 19,
+    "end": 19.34
+  },
+  {
+    "text": "it's",
+    "start": 19.34,
+    "end": 19.64
+  },
+  {
+    "text": "a",
+    "start": 19.64,
+    "end": 19.77
+  },
+  {
+    "text": "200%",
+    "start": 19.77,
+    "end": 20.59
+  },
+  {
+    "text": "increase",
+    "start": 20.59,
+    "end": 21.27
+  },
+  {
+    "text": "of",
+    "start": 21.27,
+    "end": 21.44
+  },
+  {
+    "text": "the",
+    "start": 21.44,
+    "end": 21.76
+  },
+  {
+    "text": "average",
+    "start": 22.35,
+    "end": 22.45
+  },
+  {
+    "text": "of",
+    "start": 22.45,
+    "end": 22.65
+  },
+  {
+    "text": "the",
+    "start": 22.65,
+    "end": 22.95
+  },
+  {
+    "text": "prior",
+    "start": 22.95,
+    "end": 23.36
+  },
+  {
+    "text": "10",
+    "start": 23.54,
+    "end": 24.03
+  },
+  {
+    "text": "candles",
+    "start": 24.03,
+    "end": 24.7
+  },
+  {
+    "text": "to",
+    "start": 24.73,
+    "end": 24.92
+  },
+  {
+    "text": "that",
+    "start": 24.92,
+    "end": 25.32
+  },
+  {
+    "text": "one.",
+    "start": 25.32,
+    "end": 25.93
+  },
+  {
+    "text": "So",
+    "start": 25.98,
+    "end": 26.16
+  },
+  {
+    "text": "this",
+    "start": 26.16,
+    "end": 26.55
+  },
+  {
+    "text": "red",
+    "start": 26.55,
+    "end": 26.84
+  },
+  {
+    "text": "candle",
+    "start": 26.84,
+    "end": 27.33
+  },
+  {
+    "text": "here",
+    "start": 27.45,
+    "end": 27.82
+  },
+  {
+    "text": "is",
+    "start": 27.82,
+    "end": 27.99
+  },
+  {
+    "text": "a",
+    "start": 28.08,
+    "end": 28.12
+  },
+  {
+    "text": "200%",
+    "start": 28.12,
+    "end": 29.1
+  },
+  {
+    "text": "increase",
+    "start": 29.1,
+    "end": 29.89
+  },
+  {
+    "text": "in",
+    "start": 29.89,
+    "end": 30.03
+  },
+  {
+    "text": "volume",
+    "start": 30.11,
+    "end": 30.68
+  },
+  {
+    "text": "of",
+    "start": 30.68,
+    "end": 30.88
+  },
+  {
+    "text": "the",
+    "start": 30.88,
+    "end": 31.17
+  },
+  {
+    "text": "prior",
+    "start": 31.17,
+    "end": 31.66
+  },
+  {
+    "text": "10",
+    "start": 31.66,
+    "end": 32.25
+  },
+  {
+    "text": "candles.",
+    "start": 32.25,
+    "end": 33.34
+  },
+  {
+    "text": "So",
+    "start": 33.36,
+    "end": 33.47
+  },
+  {
+    "text": "when",
+    "start": 33.47,
+    "end": 33.74
+  },
+  {
+    "text": "you",
+    "start": 33.93,
+    "end": 33.94
+  },
+  {
+    "text": "add",
+    "start": 33.94,
+    "end": 34.14
+  },
+  {
+    "text": "the",
+    "start": 34.14,
+    "end": 34.26
+  },
+  {
+    "text": "PDSRA",
+    "start": 34.37,
+    "end": 34.66
+  },
+  {
+    "text": "volume",
+    "start": 34.66,
+    "end": 35.07
+  },
+  {
+    "text": "down",
+    "start": 35.07,
+    "end": 35.34
+  },
+  {
+    "text": "the",
+    "start": 35.34,
+    "end": 35.54
+  },
+  {
+    "text": "bottom,",
+    "start": 35.54,
+    "end": 36.08
+  },
+  {
+    "text": "you",
+    "start": 36.08,
+    "end": 36.28
+  },
+  {
+    "text": "will",
+    "start": 36.28,
+    "end": 36.55
+  },
+  {
+    "text": "often",
+    "start": 36.55,
+    "end": 36.89
+  },
+  {
+    "text": "see",
+    "start": 36.89,
+    "end": 37.07
+  },
+  {
+    "text": "that",
+    "start": 37.16,
+    "end": 37.36
+  },
+  {
+    "text": "it",
+    "start": 37.36,
+    "end": 37.42
+  },
+  {
+    "text": "will",
+    "start": 37.49,
+    "end": 37.76
+  },
+  {
+    "text": "spike.",
+    "start": 37.76,
+    "end": 38.32
+  },
+  {
+    "text": "The",
+    "start": 38.38,
+    "end": 38.54
+  },
+  {
+    "text": "volume",
+    "start": 38.54,
+    "end": 38.95
+  },
+  {
+    "text": "will",
+    "start": 38.95,
+    "end": 39.18
+  },
+  {
+    "text": "spike",
+    "start": 39.18,
+    "end": 39.5
+  },
+  {
+    "text": "a",
+    "start": 39.5,
+    "end": 39.56
+  },
+  {
+    "text": "lot",
+    "start": 39.56,
+    "end": 39.73
+  },
+  {
+    "text": "higher",
+    "start": 39.74,
+    "end": 40.09
+  },
+  {
+    "text": "than",
+    "start": 40.13,
+    "end": 40.38
+  },
+  {
+    "text": "the",
+    "start": 40.38,
+    "end": 40.57
+  },
+  {
+    "text": "candles",
+    "start": 40.57,
+    "end": 40.92
+  },
+  {
+    "text": "that",
+    "start": 41.09,
+    "end": 41.26
+  },
+  {
+    "text": "are",
+    "start": 41.26,
+    "end": 41.42
+  },
+  {
+    "text": "prior",
+    "start": 41.49,
+    "end": 41.71
+  },
+  {
+    "text": "to",
+    "start": 41.78,
+    "end": 41.89
+  },
+  {
+    "text": "it.",
+    "start": 41.89,
+    "end": 42.28
+  },
+  {
+    "text": "And",
+    "start": 42.3,
+    "end": 42.5
+  },
+  {
+    "text": "the",
+    "start": 42.5,
+    "end": 42.71
+  },
+  {
+    "text": "reason",
+    "start": 42.87,
+    "end": 43.17
+  },
+  {
+    "text": "we",
+    "start": 43.17,
+    "end": 43.32
+  },
+  {
+    "text": "care",
+    "start": 43.32,
+    "end": 43.62
+  },
+  {
+    "text": "about",
+    "start": 43.62,
+    "end": 43.99
+  },
+  {
+    "text": "that",
+    "start": 43.99,
+    "end": 44.29
+  },
+  {
+    "text": "is",
+    "start": 44.29,
+    "end": 44.44
+  },
+  {
+    "text": "because",
+    "start": 44.44,
+    "end": 44.84
+  },
+  {
+    "text": "we",
+    "start": 45.01,
+    "end": 45.11
+  },
+  {
+    "text": "assume",
+    "start": 45.11,
+    "end": 45.56
+  },
+  {
+    "text": "that",
+    "start": 45.56,
+    "end": 45.86
+  },
+  {
+    "text": "that",
+    "start": 45.86,
+    "end": 46.16
+  },
+  {
+    "text": "is",
+    "start": 46.16,
+    "end": 46.31
+  },
+  {
+    "text": "the",
+    "start": 46.31,
+    "end": 46.45
+  },
+  {
+    "text": "market",
+    "start": 46.59,
+    "end": 46.98
+  },
+  {
+    "text": "maker",
+    "start": 46.98,
+    "end": 47.34
+  },
+  {
+    "text": "because",
+    "start": 47.34,
+    "end": 47.92
+  },
+  {
+    "text": "only",
+    "start": 47.93,
+    "end": 48.23
+  },
+  {
+    "text": "the",
+    "start": 48.23,
+    "end": 48.51
+  },
+  {
+    "text": "market",
+    "start": 48.51,
+    "end": 48.85
+  },
+  {
+    "text": "maker",
+    "start": 48.95,
+    "end": 49.29
+  },
+  {
+    "text": "can",
+    "start": 49.3,
+    "end": 49.53
+  },
+  {
+    "text": "bring",
+    "start": 49.61,
+    "end": 49.93
+  },
+  {
+    "text": "in",
+    "start": 49.93,
+    "end": 50.08
+  },
+  {
+    "text": "that",
+    "start": 50.08,
+    "end": 50.39
+  },
+  {
+    "text": "much",
+    "start": 50.39,
+    "end": 50.7
+  },
+  {
+    "text": "volume",
+    "start": 50.7,
+    "end": 51.16
+  },
+  {
+    "text": "in",
+    "start": 51.16,
+    "end": 51.27
+  },
+  {
+    "text": "one",
+    "start": 51.34,
+    "end": 51.54
+  },
+  {
+    "text": "candle.",
+    "start": 51.54,
+    "end": 52.3
+  },
+  {
+    "text": "It's",
+    "start": 52.32,
+    "end": 52.66
+  },
+  {
+    "text": "not",
+    "start": 52.89,
+    "end": 52.94
+  },
+  {
+    "text": "a",
+    "start": 52.94,
+    "end": 53.03
+  },
+  {
+    "text": "strict",
+    "start": 53.03,
+    "end": 53.58
+  },
+  {
+    "text": "rule",
+    "start": 53.58,
+    "end": 53.91
+  },
+  {
+    "text": "that",
+    "start": 53.99,
+    "end": 54.32
+  },
+  {
+    "text": "it",
+    "start": 54.32,
+    "end": 54.5
+  },
+  {
+    "text": "is",
+    "start": 54.5,
+    "end": 54.64
+  },
+  {
+    "text": "then.",
+    "start": 54.68,
+    "end": 55.36
+  },
+  {
+    "text": "It's",
+    "start": 55.4,
+    "end": 55.64
+  },
+  {
+    "text": "an",
+    "start": 55.64,
+    "end": 55.77
+  },
+  {
+    "text": "assumption",
+    "start": 55.97,
+    "end": 56.44
+  },
+  {
+    "text": "that",
+    "start": 56.44,
+    "end": 56.71
+  },
+  {
+    "text": "it's",
+    "start": 56.71,
+    "end": 56.97
+  },
+  {
+    "text": "them",
+    "start": 56.97,
+    "end": 57.24
+  },
+  {
+    "text": "because",
+    "start": 57.24,
+    "end": 57.71
+  },
+  {
+    "text": "retail",
+    "start": 57.71,
+    "end": 57.94
+  },
+  {
+    "text": "can't",
+    "start": 58.11,
+    "end": 58.44
+  },
+  {
+    "text": "spike",
+    "start": 58.44,
+    "end": 58.73
+  },
+  {
+    "text": "volume",
+    "start": 58.8,
+    "end": 59.11
+  },
+  {
+    "text": "that",
+    "start": 59.2,
+    "end": 59.44
+  },
+  {
+    "text": "much",
+    "start": 59.44,
+    "end": 59.71
+  },
+  {
+    "text": "in",
+    "start": 59.71,
+    "end": 59.92
+  },
+  {
+    "text": "one",
+    "start": 59.92,
+    "end": 60.14
+  },
+  {
+    "text": "candle.",
+    "start": 60.73,
+    "end": 61.06
+  },
+  {
+    "text": "So",
+    "start": 61.16,
+    "end": 61.3
+  },
+  {
+    "text": "that's",
+    "start": 61.3,
+    "end": 61.79
+  },
+  {
+    "text": "why",
+    "start": 61.79,
+    "end": 62.04
+  },
+  {
+    "text": "some",
+    "start": 62.04,
+    "end": 62.37
+  },
+  {
+    "text": "candles",
+    "start": 62.37,
+    "end": 62.96
+  },
+  {
+    "text": "will",
+    "start": 62.96,
+    "end": 63.29
+  },
+  {
+    "text": "be",
+    "start": 63.29,
+    "end": 63.45
+  },
+  {
+    "text": "coloured",
+    "start": 63.45,
+    "end": 64.08
+  },
+  {
+    "text": "when",
+    "start": 64.11,
+    "end": 64.45
+  },
+  {
+    "text": "they're",
+    "start": 64.45,
+    "end": 65.03
+  },
+  {
+    "text": "not",
+    "start": 65.03,
+    "end": 65.21
+  },
+  {
+    "text": "actually",
+    "start": 65.29,
+    "end": 65.95
+  },
+  {
+    "text": "a",
+    "start": 65.95,
+    "end": 66.03
+  },
+  {
+    "text": "hint",
+    "start": 66.03,
+    "end": 66.36
+  },
+  {
+    "text": "of",
+    "start": 66.36,
+    "end": 66.51
+  },
+  {
+    "text": "anything",
+    "start": 66.78,
+    "end": 67.32
+  },
+  {
+    "text": "happening",
+    "start": 67.91,
+    "end": 67.99
+  },
+  {
+    "text": "like",
+    "start": 67.99,
+    "end": 68.24
+  },
+  {
+    "text": "this",
+    "start": 68.35,
+    "end": 68.59
+  },
+  {
+    "text": "blue",
+    "start": 68.59,
+    "end": 68.89
+  },
+  {
+    "text": "candle",
+    "start": 68.89,
+    "end": 69.34
+  },
+  {
+    "text": "here.",
+    "start": 69.34,
+    "end": 69.88
+  },
+  {
+    "text": "That",
+    "start": 69.9,
+    "end": 70.17
+  },
+  {
+    "text": "simply",
+    "start": 70.47,
+    "end": 70.61
+  },
+  {
+    "text": "will",
+    "start": 70.61,
+    "end": 70.8
+  },
+  {
+    "text": "just",
+    "start": 70.91,
+    "end": 71.19
+  },
+  {
+    "text": "be",
+    "start": 71.19,
+    "end": 71.28
+  },
+  {
+    "text": "because",
+    "start": 71.33,
+    "end": 71.83
+  },
+  {
+    "text": "the",
+    "start": 71.84,
+    "end": 72.06
+  },
+  {
+    "text": "volume",
+    "start": 72.06,
+    "end": 72.44
+  },
+  {
+    "text": "prior",
+    "start": 72.61,
+    "end": 72.86
+  },
+  {
+    "text": "to",
+    "start": 72.9,
+    "end": 72.94
+  },
+  {
+    "text": "it",
+    "start": 73.01,
+    "end": 73.15
+  },
+  {
+    "text": "was",
+    "start": 73.15,
+    "end": 73.37
+  },
+  {
+    "text": "extremely",
+    "start": 73.37,
+    "end": 73.95
+  },
+  {
+    "text": "low.",
+    "start": 74.03,
+    "end": 74.56
+  },
+  {
+    "text": "So",
+    "start": 74.58,
+    "end": 74.71
+  },
+  {
+    "text": "it",
+    "start": 74.71,
+    "end": 74.86
+  },
+  {
+    "text": "didn't",
+    "start": 75.15,
+    "end": 75.31
+  },
+  {
+    "text": "take",
+    "start": 75.31,
+    "end": 75.61
+  },
+  {
+    "text": "too",
+    "start": 75.61,
+    "end": 75.84
+  },
+  {
+    "text": "much",
+    "start": 75.84,
+    "end": 76.14
+  },
+  {
+    "text": "to",
+    "start": 76.14,
+    "end": 76.29
+  },
+  {
+    "text": "increase",
+    "start": 76.34,
+    "end": 76.9
+  },
+  {
+    "text": "the",
+    "start": 76.9,
+    "end": 77.12
+  },
+  {
+    "text": "volume",
+    "start": 77.12,
+    "end": 77.59
+  },
+  {
+    "text": "in",
+    "start": 77.59,
+    "end": 77.74
+  },
+  {
+    "text": "that",
+    "start": 77.74,
+    "end": 78.04
+  },
+  {
+    "text": "candle.",
+    "start": 78.04,
+    "end": 78.73
+  },
+  {
+    "text": "When",
+    "start": 78.81,
+    "end": 79.07
+  },
+  {
+    "text": "we",
+    "start": 79.07,
+    "end": 79.2
+  },
+  {
+    "text": "have",
+    "start": 79.39,
+    "end": 79.47
+  },
+  {
+    "text": "a",
+    "start": 79.47,
+    "end": 79.54
+  },
+  {
+    "text": "look",
+    "start": 79.54,
+    "end": 79.72
+  },
+  {
+    "text": "for",
+    "start": 79.83,
+    "end": 80.01
+  },
+  {
+    "text": "these",
+    "start": 80.01,
+    "end": 80.35
+  },
+  {
+    "text": "candles",
+    "start": 80.35,
+    "end": 80.83
+  },
+  {
+    "text": "that",
+    "start": 80.92,
+    "end": 81.1
+  },
+  {
+    "text": "help",
+    "start": 81.1,
+    "end": 81.36
+  },
+  {
+    "text": "us",
+    "start": 81.36,
+    "end": 81.39
+  },
+  {
+    "text": "to",
+    "start": 81.53,
+    "end": 81.63
+  },
+  {
+    "text": "count",
+    "start": 81.63,
+    "end": 81.97
+  },
+  {
+    "text": "the",
+    "start": 81.97,
+    "end": 82.15
+  },
+  {
+    "text": "levels,",
+    "start": 82.22,
+    "end": 82.71
+  },
+  {
+    "text": "we're",
+    "start": 82.71,
+    "end": 82.97
+  },
+  {
+    "text": "not",
+    "start": 83.11,
+    "end": 83.23
+  },
+  {
+    "text": "just",
+    "start": 83.27,
+    "end": 83.68
+  },
+  {
+    "text": "looking",
+    "start": 83.69,
+    "end": 84.07
+  },
+  {
+    "text": "for",
+    "start": 84.07,
+    "end": 84.27
+  },
+  {
+    "text": "the",
+    "start": 84.27,
+    "end": 84.39
+  },
+  {
+    "text": "candle",
+    "start": 84.39,
+    "end": 84.6
+  },
+  {
+    "text": "to",
+    "start": 84.71,
+    "end": 84.83
+  },
+  {
+    "text": "be",
+    "start": 84.83,
+    "end": 84.94
+  },
+  {
+    "text": "coloured.",
+    "start": 84.94,
+    "end": 85.59
+  },
+  {
+    "text": "We're",
+    "start": 85.62,
+    "end": 86.08
+  },
+  {
+    "text": "looking",
+    "start": 86.19,
+    "end": 86.76
+  },
+  {
+    "text": "for",
+    "start": 86.76,
+    "end": 87
+  },
+  {
+    "text": "the",
+    "start": 87.05,
+    "end": 87.34
+  },
+  {
+    "text": "candle",
+    "start": 87.38,
+    "end": 87.93
+  },
+  {
+    "text": "to",
+    "start": 87.93,
+    "end": 88.12
+  },
+  {
+    "text": "also",
+    "start": 88.12,
+    "end": 88.51
+  },
+  {
+    "text": "spike",
+    "start": 88.51,
+    "end": 88.95
+  },
+  {
+    "text": "in",
+    "start": 89.02,
+    "end": 89.19
+  },
+  {
+    "text": "unusual",
+    "start": 89.19,
+    "end": 89.77
+  },
+  {
+    "text": "volume",
+    "start": 89.91,
+    "end": 90.46
+  },
+  {
+    "text": "compared",
+    "start": 90.46,
+    "end": 91.24
+  },
+  {
+    "text": "to",
+    "start": 91.24,
+    "end": 91.43
+  },
+  {
+    "text": "the",
+    "start": 91.43,
+    "end": 91.71
+  },
+  {
+    "text": "volume",
+    "start": 91.72,
+    "end": 92.26
+  },
+  {
+    "text": "that",
+    "start": 92.33,
+    "end": 92.66
+  },
+  {
+    "text": "is",
+    "start": 92.82,
+    "end": 93.02
+  },
+  {
+    "text": "around",
+    "start": 93.39,
+    "end": 93.68
+  },
+  {
+    "text": "it.",
+    "start": 93.68,
+    "end": 94.2
+  },
+  {
+    "text": "That's",
+    "start": 94.25,
+    "end": 94.63
+  },
+  {
+    "text": "why",
+    "start": 94.63,
+    "end": 94.83
+  },
+  {
+    "text": "sometimes",
+    "start": 94.83,
+    "end": 95.43
+  },
+  {
+    "text": "a",
+    "start": 95.43,
+    "end": 95.49
+  },
+  {
+    "text": "level",
+    "start": 95.49,
+    "end": 95.82
+  },
+  {
+    "text": "can",
+    "start": 95.82,
+    "end": 96.02
+  },
+  {
+    "text": "be",
+    "start": 96.02,
+    "end": 96.15
+  },
+  {
+    "text": "three",
+    "start": 96.2,
+    "end": 96.48
+  },
+  {
+    "text": "or",
+    "start": 96.48,
+    "end": 96.58
+  },
+  {
+    "text": "four",
+    "start": 96.62,
+    "end": 96.81
+  },
+  {
+    "text": "candles",
+    "start": 96.97,
+    "end": 97.3
+  },
+  {
+    "text": "like",
+    "start": 97.37,
+    "end": 97.59
+  },
+  {
+    "text": "this,",
+    "start": 97.66,
+    "end": 97.97
+  },
+  {
+    "text": "like",
+    "start": 98.06,
+    "end": 98.25
+  },
+  {
+    "text": "all",
+    "start": 98.25,
+    "end": 98.41
+  },
+  {
+    "text": "of",
+    "start": 98.55,
+    "end": 98.58
+  },
+  {
+    "text": "this",
+    "start": 98.58,
+    "end": 98.96
+  },
+  {
+    "text": "is",
+    "start": 98.98,
+    "end": 99.11
+  },
+  {
+    "text": "one",
+    "start": 99.11,
+    "end": 99.33
+  },
+  {
+    "text": "level",
+    "start": 99.55,
+    "end": 99.7
+  },
+  {
+    "text": "as",
+    "start": 99.7,
+    "end": 99.85
+  },
+  {
+    "text": "opposed",
+    "start": 99.85,
+    "end": 100.33
+  },
+  {
+    "text": "to",
+    "start": 100.35,
+    "end": 100.52
+  },
+  {
+    "text": "this",
+    "start": 100.52,
+    "end": 100.82
+  },
+  {
+    "text": "one",
+    "start": 100.82,
+    "end": 100.98
+  },
+  {
+    "text": "candle",
+    "start": 101.08,
+    "end": 101.49
+  },
+  {
+    "text": "here",
+    "start": 101.49,
+    "end": 101.79
+  },
+  {
+    "text": "being",
+    "start": 101.79,
+    "end": 102.16
+  },
+  {
+    "text": "level",
+    "start": 102.16,
+    "end": 102.53
+  },
+  {
+    "text": "one,",
+    "start": 102.53,
+    "end": 102.9
+  },
+  {
+    "text": "this",
+    "start": 102.9,
+    "end": 103.13
+  },
+  {
+    "text": "one",
+    "start": 103.27,
+    "end": 103.4
+  },
+  {
+    "text": "candle",
+    "start": 103.43,
+    "end": 103.87
+  },
+  {
+    "text": "being",
+    "start": 103.87,
+    "end": 104.29
+  },
+  {
+    "text": "level",
+    "start": 104.33,
+    "end": 104.57
+  },
+  {
+    "text": "two,",
+    "start": 104.57,
+    "end": 104.8
+  },
+  {
+    "text": "this",
+    "start": 104.91,
+    "end": 105.02
+  },
+  {
+    "text": "one",
+    "start": 105.02,
+    "end": 105.17
+  },
+  {
+    "text": "candle",
+    "start": 105.17,
+    "end": 105.47
+  },
+  {
+    "text": "being",
+    "start": 105.47,
+    "end": 105.69
+  },
+  {
+    "text": "level",
+    "start": 105.7,
+    "end": 105.93
+  },
+  {
+    "text": "three,",
+    "start": 106.01,
+    "end": 106.32
+  },
+  {
+    "text": "because",
+    "start": 106.32,
+    "end": 106.66
+  },
+  {
+    "text": "it",
+    "start": 106.66,
+    "end": 106.78
+  },
+  {
+    "text": "all",
+    "start": 106.78,
+    "end": 106.91
+  },
+  {
+    "text": "kind",
+    "start": 107.05,
+    "end": 107.12
+  },
+  {
+    "text": "of",
+    "start": 107.12,
+    "end": 107.22
+  },
+  {
+    "text": "happened",
+    "start": 107.22,
+    "end": 107.62
+  },
+  {
+    "text": "around",
+    "start": 107.62,
+    "end": 107.92
+  },
+  {
+    "text": "the",
+    "start": 107.92,
+    "end": 108.16
+  },
+  {
+    "text": "same",
+    "start": 108.17,
+    "end": 108.48
+  },
+  {
+    "text": "period",
+    "start": 108.75,
+    "end": 108.95
+  },
+  {
+    "text": "of",
+    "start": 108.95,
+    "end": 109.08
+  },
+  {
+    "text": "time.",
+    "start": 109.19,
+    "end": 109.68
+  },
+  {
+    "text": "So",
+    "start": 109.7,
+    "end": 109.81
+  },
+  {
+    "text": "counting",
+    "start": 110.27,
+    "end": 110.36
+  },
+  {
+    "text": "levels",
+    "start": 110.36,
+    "end": 110.77
+  },
+  {
+    "text": "is",
+    "start": 110.77,
+    "end": 110.9
+  },
+  {
+    "text": "probably",
+    "start": 110.9,
+    "end": 111.28
+  },
+  {
+    "text": "the",
+    "start": 111.45,
+    "end": 111.65
+  },
+  {
+    "text": "most",
+    "start": 111.65,
+    "end": 111.92
+  },
+  {
+    "text": "difficult",
+    "start": 111.92,
+    "end": 112.53
+  },
+  {
+    "text": "part",
+    "start": 112.53,
+    "end": 112.74
+  },
+  {
+    "text": "of",
+    "start": 112.81,
+    "end": 112.93
+  },
+  {
+    "text": "the",
+    "start": 112.93,
+    "end": 113.13
+  },
+  {
+    "text": "method",
+    "start": 113.13,
+    "end": 113.54
+  },
+  {
+    "text": "and",
+    "start": 113.54,
+    "end": 113.74
+  },
+  {
+    "text": "just",
+    "start": 113.74,
+    "end": 114.01
+  },
+  {
+    "text": "take",
+    "start": 114.01,
+    "end": 114.28
+  },
+  {
+    "text": "your",
+    "start": 114.29,
+    "end": 114.55
+  },
+  {
+    "text": "time",
+    "start": 114.55,
+    "end": 114.92
+  },
+  {
+    "text": "with",
+    "start": 114.94,
+    "end": 115.2
+  },
+  {
+    "text": "it",
+    "start": 115.2,
+    "end": 115.34
+  },
+  {
+    "text": "and",
+    "start": 115.51,
+    "end": 115.55
+  },
+  {
+    "text": "just",
+    "start": 115.55,
+    "end": 115.83
+  },
+  {
+    "text": "know",
+    "start": 115.83,
+    "end": 116.11
+  },
+  {
+    "text": "that",
+    "start": 116.11,
+    "end": 116.32
+  },
+  {
+    "text": "you're",
+    "start": 116.39,
+    "end": 116.81
+  },
+  {
+    "text": "going",
+    "start": 116.81,
+    "end": 117.16
+  },
+  {
+    "text": "to",
+    "start": 117.16,
+    "end": 117.26
+  },
+  {
+    "text": "feel",
+    "start": 117.3,
+    "end": 117.49
+  },
+  {
+    "text": "confused",
+    "start": 117.65,
+    "end": 118.15
+  },
+  {
+    "text": "about",
+    "start": 118.15,
+    "end": 118.5
+  },
+  {
+    "text": "whether",
+    "start": 118.5,
+    "end": 118.99
+  },
+  {
+    "text": "or",
+    "start": 119,
+    "end": 119.1
+  },
+  {
+    "text": "not",
+    "start": 119.23,
+    "end": 119.35
+  },
+  {
+    "text": "the",
+    "start": 119.39,
+    "end": 119.54
+  },
+  {
+    "text": "levels",
+    "start": 119.58,
+    "end": 120.08
+  },
+  {
+    "text": "are",
+    "start": 120.09,
+    "end": 120.31
+  },
+  {
+    "text": "in",
+    "start": 120.32,
+    "end": 120.48
+  },
+  {
+    "text": "yet",
+    "start": 120.67,
+    "end": 120.72
+  },
+  {
+    "text": "for",
+    "start": 120.72,
+    "end": 120.96
+  },
+  {
+    "text": "a",
+    "start": 120.96,
+    "end": 121
+  },
+  {
+    "text": "very",
+    "start": 121.11,
+    "end": 121.35
+  },
+  {
+    "text": "long",
+    "start": 121.35,
+    "end": 121.66
+  },
+  {
+    "text": "time.",
+    "start": 121.66,
+    "end": 122.24
+  },
+  {
+    "text": "But",
+    "start": 122.26,
+    "end": 122.47
+  },
+  {
+    "text": "at",
+    "start": 122.47,
+    "end": 122.62
+  },
+  {
+    "text": "the",
+    "start": 122.83,
+    "end": 122.85
+  },
+  {
+    "text": "end",
+    "start": 122.85,
+    "end": 123.08
+  },
+  {
+    "text": "of",
+    "start": 123.08,
+    "end": 123.16
+  },
+  {
+    "text": "the",
+    "start": 123.27,
+    "end": 123.46
+  },
+  {
+    "text": "day,",
+    "start": 123.46,
+    "end": 123.84
+  },
+  {
+    "text": "if",
+    "start": 123.84,
+    "end": 123.98
+  },
+  {
+    "text": "I",
+    "start": 124.01,
+    "end": 124.06
+  },
+  {
+    "text": "don't",
+    "start": 124.06,
+    "end": 124.44
+  },
+  {
+    "text": "know",
+    "start": 124.44,
+    "end": 124.74
+  },
+  {
+    "text": "what",
+    "start": 124.74,
+    "end": 125.04
+  },
+  {
+    "text": "level",
+    "start": 125.04,
+    "end": 125.42
+  },
+  {
+    "text": "I'm",
+    "start": 125.42,
+    "end": 125.59
+  },
+  {
+    "text": "in,",
+    "start": 125.66,
+    "end": 125.94
+  },
+  {
+    "text": "what",
+    "start": 125.94,
+    "end": 126.23
+  },
+  {
+    "text": "I",
+    "start": 126.24,
+    "end": 126.31
+  },
+  {
+    "text": "do",
+    "start": 126.31,
+    "end": 126.42
+  },
+  {
+    "text": "know",
+    "start": 126.55,
+    "end": 126.76
+  },
+  {
+    "text": "is",
+    "start": 126.76,
+    "end": 126.91
+  },
+  {
+    "text": "that",
+    "start": 126.91,
+    "end": 127.32
+  },
+  {
+    "text": "the",
+    "start": 127.34,
+    "end": 127.48
+  },
+  {
+    "text": "levels",
+    "start": 127.48,
+    "end": 127.8
+  },
+  {
+    "text": "are",
+    "start": 127.91,
+    "end": 127.96
+  },
+  {
+    "text": "going",
+    "start": 127.96,
+    "end": 128.22
+  },
+  {
+    "text": "to",
+    "start": 128.22,
+    "end": 128.24
+  },
+  {
+    "text": "end",
+    "start": 128.35,
+    "end": 128.48
+  },
+  {
+    "text": "with",
+    "start": 128.48,
+    "end": 128.69
+  },
+  {
+    "text": "a",
+    "start": 128.69,
+    "end": 128.73
+  },
+  {
+    "text": "stopping",
+    "start": 128.73,
+    "end": 129.16
+  },
+  {
+    "text": "volume",
+    "start": 129.16,
+    "end": 129.48
+  },
+  {
+    "text": "candle.",
+    "start": 129.48,
+    "end": 129.91
+  },
+  {
+    "text": "So",
+    "start": 130.02,
+    "end": 130.14
+  },
+  {
+    "text": "I",
+    "start": 130.14,
+    "end": 130.21
+  },
+  {
+    "text": "just",
+    "start": 130.21,
+    "end": 130.48
+  },
+  {
+    "text": "wait",
+    "start": 130.59,
+    "end": 130.77
+  },
+  {
+    "text": "for",
+    "start": 130.77,
+    "end": 130.92
+  },
+  {
+    "text": "that.",
+    "start": 131.03,
+    "end": 131.52
+  },
+  {
+    "text": "Once",
+    "start": 131.53,
+    "end": 131.75
+  },
+  {
+    "text": "it's",
+    "start": 131.76,
+    "end": 132
+  },
+  {
+    "text": "in,",
+    "start": 132.11,
+    "end": 132.24
+  },
+  {
+    "text": "then",
+    "start": 132.24,
+    "end": 132.44
+  },
+  {
+    "text": "I",
+    "start": 132.44,
+    "end": 132.55
+  },
+  {
+    "text": "know,",
+    "start": 132.55,
+    "end": 132.89
+  },
+  {
+    "text": "okay,",
+    "start": 132.89,
+    "end": 133.26
+  },
+  {
+    "text": "now",
+    "start": 133.26,
+    "end": 133.43
+  },
+  {
+    "text": "I",
+    "start": 133.47,
+    "end": 133.5
+  },
+  {
+    "text": "can",
+    "start": 133.5,
+    "end": 133.68
+  },
+  {
+    "text": "see",
+    "start": 133.68,
+    "end": 133.85
+  },
+  {
+    "text": "the",
+    "start": 133.86,
+    "end": 134.04
+  },
+  {
+    "text": "three",
+    "start": 134.04,
+    "end": 134.35
+  },
+  {
+    "text": "levels,",
+    "start": 134.35,
+    "end": 134.84
+  },
+  {
+    "text": "but",
+    "start": 134.84,
+    "end": 135.02
+  },
+  {
+    "text": "it's",
+    "start": 135.02,
+    "end": 135.25
+  },
+  {
+    "text": "irrelevant",
+    "start": 135.25,
+    "end": 136
+  },
+  {
+    "text": "because",
+    "start": 136.01,
+    "end": 136.38
+  },
+  {
+    "text": "I'm",
+    "start": 136.38,
+    "end": 136.53
+  },
+  {
+    "text": "not",
+    "start": 136.59,
+    "end": 136.69
+  },
+  {
+    "text": "trying",
+    "start": 136.69,
+    "end": 136.92
+  },
+  {
+    "text": "to",
+    "start": 137.03,
+    "end": 137.11
+  },
+  {
+    "text": "trade",
+    "start": 137.11,
+    "end": 137.37
+  },
+  {
+    "text": "that.",
+    "start": 137.37,
+    "end": 137.8
+  },
+  {
+    "text": "I'm",
+    "start": 137.82,
+    "end": 137.96
+  },
+  {
+    "text": "looking",
+    "start": 138.01,
+    "end": 138.2
+  },
+  {
+    "text": "for",
+    "start": 138.39,
+    "end": 138.52
+  },
+  {
+    "text": "the",
+    "start": 138.52,
+    "end": 138.69
+  },
+  {
+    "text": "reversal",
+    "start": 138.69,
+    "end": 139.14
+  },
+  {
+    "text": "anyway.",
+    "start": 139.14,
+    "end": 139.68
+  },
+  {
+    "text": "So",
+    "start": 139.7,
+    "end": 139.77
+  },
+  {
+    "text": "don't",
+    "start": 139.77,
+    "end": 140
+  },
+  {
+    "text": "worry",
+    "start": 140,
+    "end": 140.27
+  },
+  {
+    "text": "too",
+    "start": 140.27,
+    "end": 140.38
+  },
+  {
+    "text": "much",
+    "start": 140.38,
+    "end": 140.57
+  },
+  {
+    "text": "if",
+    "start": 140.57,
+    "end": 140.6
+  },
+  {
+    "text": "you're",
+    "start": 140.71,
+    "end": 140.94
+  },
+  {
+    "text": "not",
+    "start": 140.94,
+    "end": 141.05
+  },
+  {
+    "text": "sure",
+    "start": 141.07,
+    "end": 141.27
+  },
+  {
+    "text": "what",
+    "start": 141.27,
+    "end": 141.46
+  },
+  {
+    "text": "level",
+    "start": 141.46,
+    "end": 141.7
+  },
+  {
+    "text": "you're",
+    "start": 141.7,
+    "end": 141.98
+  },
+  {
+    "text": "in,",
+    "start": 141.98,
+    "end": 142.16
+  },
+  {
+    "text": "just",
+    "start": 142.16,
+    "end": 142.27
+  },
+  {
+    "text": "wait",
+    "start": 142.41,
+    "end": 142.54
+  },
+  {
+    "text": "for",
+    "start": 142.54,
+    "end": 142.66
+  },
+  {
+    "text": "that",
+    "start": 142.7,
+    "end": 143
+  },
+  {
+    "text": "stopping",
+    "start": 143,
+    "end": 143.36
+  },
+  {
+    "text": "volume",
+    "start": 143.37,
+    "end": 143.7
+  },
+  {
+    "text": "candle",
+    "start": 143.95,
+    "end": 144.06
+  },
+  {
+    "text": "because",
+    "start": 144.06,
+    "end": 144.47
+  },
+  {
+    "text": "it",
+    "start": 144.47,
+    "end": 144.58
+  },
+  {
+    "text": "gives",
+    "start": 144.58,
+    "end": 144.87
+  },
+  {
+    "text": "you",
+    "start": 144.87,
+    "end": 145.03
+  },
+  {
+    "text": "the",
+    "start": 145.04,
+    "end": 145.21
+  },
+  {
+    "text": "hint,",
+    "start": 145.21,
+    "end": 145.55
+  },
+  {
+    "text": "okay,",
+    "start": 145.55,
+    "end": 145.89
+  },
+  {
+    "text": "the",
+    "start": 145.89,
+    "end": 145.95
+  },
+  {
+    "text": "levels",
+    "start": 146.09,
+    "end": 146.41
+  },
+  {
+    "text": "are",
+    "start": 146.41,
+    "end": 146.58
+  },
+  {
+    "text": "in",
+    "start": 146.58,
+    "end": 146.69
+  },
+  {
+    "text": "now",
+    "start": 146.69,
+    "end": 146.86
+  },
+  {
+    "text": "we're",
+    "start": 146.86,
+    "end": 147.09
+  },
+  {
+    "text": "reversing.",
+    "start": 147.18,
+    "end": 147.95
+  },
+  {
+    "text": "Now",
+    "start": 147.98,
+    "end": 148.13
+  },
+  {
+    "text": "can",
+    "start": 148.13,
+    "end": 148.3
+  },
+  {
+    "text": "you",
+    "start": 148.3,
+    "end": 148.44
+  },
+  {
+    "text": "get",
+    "start": 148.55,
+    "end": 148.64
+  },
+  {
+    "text": "stopping",
+    "start": 148.64,
+    "end": 149.1
+  },
+  {
+    "text": "volume",
+    "start": 149.1,
+    "end": 149.36
+  },
+  {
+    "text": "candles",
+    "start": 149.45,
+    "end": 149.84
+  },
+  {
+    "text": "at",
+    "start": 149.84,
+    "end": 149.95
+  },
+  {
+    "text": "level",
+    "start": 149.95,
+    "end": 150.24
+  },
+  {
+    "text": "two?",
+    "start": 150.24,
+    "end": 150.55
+  },
+  {
+    "text": "Yeah,",
+    "start": 150.66,
+    "end": 150.95
+  },
+  {
+    "text": "absolutely.",
+    "start": 151.23,
+    "end": 151.56
+  },
+  {
+    "text": "But",
+    "start": 151.65,
+    "end": 151.87
+  },
+  {
+    "text": "generally",
+    "start": 152.23,
+    "end": 152.59
+  },
+  {
+    "text": "you'll",
+    "start": 152.67,
+    "end": 153.04
+  },
+  {
+    "text": "find",
+    "start": 153.07,
+    "end": 153.38
+  },
+  {
+    "text": "that",
+    "start": 153.42,
+    "end": 153.67
+  },
+  {
+    "text": "price",
+    "start": 153.76,
+    "end": 154.12
+  },
+  {
+    "text": "doesn't",
+    "start": 154.12,
+    "end": 154.68
+  },
+  {
+    "text": "return",
+    "start": 154.68,
+    "end": 155.16
+  },
+  {
+    "text": "there.",
+    "start": 155.16,
+    "end": 155.81
+  },
+  {
+    "text": "So",
+    "start": 155.84,
+    "end": 155.92
+  },
+  {
+    "text": "if",
+    "start": 155.92,
+    "end": 156.02
+  },
+  {
+    "text": "you",
+    "start": 156.02,
+    "end": 156.18
+  },
+  {
+    "text": "have",
+    "start": 156.18,
+    "end": 156.41
+  },
+  {
+    "text": "a",
+    "start": 156.41,
+    "end": 156.44
+  },
+  {
+    "text": "look",
+    "start": 156.44,
+    "end": 156.65
+  },
+  {
+    "text": "at",
+    "start": 156.65,
+    "end": 156.74
+  },
+  {
+    "text": "this,",
+    "start": 156.85,
+    "end": 157.06
+  },
+  {
+    "text": "this",
+    "start": 157.06,
+    "end": 157.22
+  },
+  {
+    "text": "is",
+    "start": 157.26,
+    "end": 157.37
+  },
+  {
+    "text": "definitely",
+    "start": 157.37,
+    "end": 157.86
+  },
+  {
+    "text": "a",
+    "start": 157.94,
+    "end": 157.96
+  },
+  {
+    "text": "level",
+    "start": 157.96,
+    "end": 158.16
+  },
+  {
+    "text": "three",
+    "start": 158.28,
+    "end": 158.39
+  },
+  {
+    "text": "stopping",
+    "start": 158.55,
+    "end": 158.88
+  },
+  {
+    "text": "volume",
+    "start": 158.95,
+    "end": 159.25
+  },
+  {
+    "text": "candle,",
+    "start": 159.25,
+    "end": 159.67
+  },
+  {
+    "text": "this",
+    "start": 159.67,
+    "end": 159.99
+  },
+  {
+    "text": "blue",
+    "start": 160.02,
+    "end": 160.29
+  },
+  {
+    "text": "one,",
+    "start": 160.29,
+    "end": 160.65
+  },
+  {
+    "text": "because",
+    "start": 160.65,
+    "end": 161.17
+  },
+  {
+    "text": "price",
+    "start": 161.17,
+    "end": 161.54
+  },
+  {
+    "text": "never",
+    "start": 161.54,
+    "end": 161.91
+  },
+  {
+    "text": "returned",
+    "start": 161.96,
+    "end": 162.5
+  },
+  {
+    "text": "to",
+    "start": 162.5,
+    "end": 162.59
+  },
+  {
+    "text": "this",
+    "start": 162.73,
+    "end": 162.94
+  },
+  {
+    "text": "week.",
+    "start": 162.94,
+    "end": 163.52
+  },
+  {
+    "text": "Whereas",
+    "start": 163.53,
+    "end": 163.91
+  },
+  {
+    "text": "if",
+    "start": 163.91,
+    "end": 164
+  },
+  {
+    "text": "you",
+    "start": 164.11,
+    "end": 164.18
+  },
+  {
+    "text": "had",
+    "start": 164.18,
+    "end": 164.34
+  },
+  {
+    "text": "a",
+    "start": 164.34,
+    "end": 164.39
+  },
+  {
+    "text": "look",
+    "start": 164.39,
+    "end": 164.61
+  },
+  {
+    "text": "at",
+    "start": 164.61,
+    "end": 164.72
+  },
+  {
+    "text": "this",
+    "start": 164.72,
+    "end": 164.92
+  },
+  {
+    "text": "blue",
+    "start": 164.92,
+    "end": 165.13
+  },
+  {
+    "text": "one,",
+    "start": 165.21,
+    "end": 165.43
+  },
+  {
+    "text": "could",
+    "start": 165.48,
+    "end": 165.71
+  },
+  {
+    "text": "you",
+    "start": 165.71,
+    "end": 165.86
+  },
+  {
+    "text": "say",
+    "start": 165.98,
+    "end": 166.03
+  },
+  {
+    "text": "that",
+    "start": 166.03,
+    "end": 166.11
+  },
+  {
+    "text": "that's",
+    "start": 166.25,
+    "end": 166.58
+  },
+  {
+    "text": "a",
+    "start": 166.58,
+    "end": 166.65
+  },
+  {
+    "text": "stopping",
+    "start": 166.65,
+    "end": 167.08
+  },
+  {
+    "text": "volume",
+    "start": 167.08,
+    "end": 167.51
+  },
+  {
+    "text": "candle?",
+    "start": 168.11,
+    "end": 168.44
+  },
+  {
+    "text": "Yeah,",
+    "start": 168.54,
+    "end": 168.94
+  },
+  {
+    "text": "it",
+    "start": 168.94,
+    "end": 169.12
+  },
+  {
+    "text": "was,",
+    "start": 169.12,
+    "end": 169.43
+  },
+  {
+    "text": "but",
+    "start": 169.43,
+    "end": 169.64
+  },
+  {
+    "text": "it",
+    "start": 169.64,
+    "end": 169.78
+  },
+  {
+    "text": "was",
+    "start": 169.78,
+    "end": 169.92
+  },
+  {
+    "text": "one",
+    "start": 169.99,
+    "end": 170.19
+  },
+  {
+    "text": "obviously",
+    "start": 170.3,
+    "end": 170.84
+  },
+  {
+    "text": "to",
+    "start": 170.85,
+    "end": 170.86
+  },
+  {
+    "text": "only",
+    "start": 170.98,
+    "end": 171.26
+  },
+  {
+    "text": "stop",
+    "start": 171.26,
+    "end": 171.52
+  },
+  {
+    "text": "level",
+    "start": 171.54,
+    "end": 171.87
+  },
+  {
+    "text": "two,",
+    "start": 171.94,
+    "end": 172.24
+  },
+  {
+    "text": "and",
+    "start": 172.24,
+    "end": 172.45
+  },
+  {
+    "text": "then",
+    "start": 172.45,
+    "end": 172.69
+  },
+  {
+    "text": "after",
+    "start": 172.83,
+    "end": 173.08
+  },
+  {
+    "text": "that",
+    "start": 173.08,
+    "end": 173.36
+  },
+  {
+    "text": "price",
+    "start": 173.36,
+    "end": 173.8
+  },
+  {
+    "text": "returned",
+    "start": 174.39,
+    "end": 174.43
+  },
+  {
+    "text": "into",
+    "start": 174.43,
+    "end": 174.72
+  },
+  {
+    "text": "the",
+    "start": 174.83,
+    "end": 174.99
+  },
+  {
+    "text": "week.",
+    "start": 174.99,
+    "end": 175.54
+  },
+  {
+    "text": "So",
+    "start": 175.58,
+    "end": 175.69
+  },
+  {
+    "text": "even",
+    "start": 175.69,
+    "end": 175.95
+  },
+  {
+    "text": "at",
+    "start": 175.95,
+    "end": 175.96
+  },
+  {
+    "text": "level",
+    "start": 176.15,
+    "end": 176.41
+  },
+  {
+    "text": "three,",
+    "start": 176.41,
+    "end": 176.87
+  },
+  {
+    "text": "that's",
+    "start": 176.87,
+    "end": 177.26
+  },
+  {
+    "text": "not",
+    "start": 177.26,
+    "end": 177.46
+  },
+  {
+    "text": "what",
+    "start": 177.52,
+    "end": 177.72
+  },
+  {
+    "text": "you",
+    "start": 177.72,
+    "end": 177.9
+  },
+  {
+    "text": "want",
+    "start": 177.94,
+    "end": 178.13
+  },
+  {
+    "text": "to",
+    "start": 178.29,
+    "end": 178.31
+  },
+  {
+    "text": "see,",
+    "start": 178.31,
+    "end": 178.62
+  },
+  {
+    "text": "because",
+    "start": 178.69,
+    "end": 179.1
+  },
+  {
+    "text": "if",
+    "start": 179.1,
+    "end": 179.23
+  },
+  {
+    "text": "price",
+    "start": 179.23,
+    "end": 179.55
+  },
+  {
+    "text": "returns",
+    "start": 179.55,
+    "end": 179.98
+  },
+  {
+    "text": "into",
+    "start": 180.03,
+    "end": 180.36
+  },
+  {
+    "text": "the",
+    "start": 180.38,
+    "end": 180.54
+  },
+  {
+    "text": "week,",
+    "start": 180.55,
+    "end": 180.94
+  },
+  {
+    "text": "then",
+    "start": 180.95,
+    "end": 181.2
+  },
+  {
+    "text": "the",
+    "start": 181.2,
+    "end": 181.28
+  },
+  {
+    "text": "damage",
+    "start": 181.39,
+    "end": 181.76
+  },
+  {
+    "text": "hasn't",
+    "start": 181.76,
+    "end": 182.17
+  },
+  {
+    "text": "been",
+    "start": 182.17,
+    "end": 182.39
+  },
+  {
+    "text": "done",
+    "start": 182.48,
+    "end": 182.68
+  },
+  {
+    "text": "yet.",
+    "start": 182.69,
+    "end": 183.12
+  },
+  {
+    "text": "So",
+    "start": 183.14,
+    "end": 183.26
+  },
+  {
+    "text": "we",
+    "start": 183.26,
+    "end": 183.4
+  },
+  {
+    "text": "always",
+    "start": 183.71,
+    "end": 183.82
+  },
+  {
+    "text": "want",
+    "start": 183.82,
+    "end": 184.04
+  },
+  {
+    "text": "to",
+    "start": 184.15,
+    "end": 184.24
+  },
+  {
+    "text": "see",
+    "start": 184.24,
+    "end": 184.45
+  },
+  {
+    "text": "price",
+    "start": 184.45,
+    "end": 184.73
+  },
+  {
+    "text": "fail",
+    "start": 184.81,
+    "end": 185.07
+  },
+  {
+    "text": "to",
+    "start": 185.08,
+    "end": 185.14
+  },
+  {
+    "text": "get",
+    "start": 185.24,
+    "end": 185.43
+  },
+  {
+    "text": "back",
+    "start": 185.43,
+    "end": 185.68
+  },
+  {
+    "text": "to",
+    "start": 185.68,
+    "end": 185.85
+  },
+  {
+    "text": "the",
+    "start": 185.85,
+    "end": 186.06
+  },
+  {
+    "text": "week",
+    "start": 186.06,
+    "end": 186.34
+  },
+  {
+    "text": "of",
+    "start": 186.34,
+    "end": 186.47
+  },
+  {
+    "text": "a",
+    "start": 186.54,
+    "end": 186.55
+  },
+  {
+    "text": "stopping",
+    "start": 186.55,
+    "end": 187.11
+  },
+  {
+    "text": "volume",
+    "start": 187.11,
+    "end": 187.53
+  },
+  {
+    "text": "candle.",
+    "start": 187.53,
+    "end": 188.21
+  },
+  {
+    "text": "So",
+    "start": 188.26,
+    "end": 188.42
+  },
+  {
+    "text": "now",
+    "start": 188.43,
+    "end": 188.72
+  },
+  {
+    "text": "we",
+    "start": 188.83,
+    "end": 188.91
+  },
+  {
+    "text": "know",
+    "start": 188.91,
+    "end": 189.3
+  },
+  {
+    "text": "that",
+    "start": 189.3,
+    "end": 189.64
+  },
+  {
+    "text": "the",
+    "start": 189.69,
+    "end": 189.98
+  },
+  {
+    "text": "high",
+    "start": 190.02,
+    "end": 190.37
+  },
+  {
+    "text": "level",
+    "start": 190.37,
+    "end": 190.8
+  },
+  {
+    "text": "volume",
+    "start": 190.97,
+    "end": 191.43
+  },
+  {
+    "text": "and",
+    "start": 191.43,
+    "end": 191.72
+  },
+  {
+    "text": "the",
+    "start": 191.72,
+    "end": 191.97
+  },
+  {
+    "text": "red",
+    "start": 192.06,
+    "end": 192.3
+  },
+  {
+    "text": "candles",
+    "start": 192.3,
+    "end": 192.98
+  },
+  {
+    "text": "are",
+    "start": 192.98,
+    "end": 193.22
+  },
+  {
+    "text": "a",
+    "start": 193.29,
+    "end": 193.35
+  },
+  {
+    "text": "200%",
+    "start": 193.36,
+    "end": 194.32
+  },
+  {
+    "text": "increase",
+    "start": 194.32,
+    "end": 195.05
+  },
+  {
+    "text": "in",
+    "start": 195.08,
+    "end": 195.3
+  },
+  {
+    "text": "the",
+    "start": 195.38,
+    "end": 195.54
+  },
+  {
+    "text": "average",
+    "start": 195.95,
+    "end": 196
+  },
+  {
+    "text": "volume",
+    "start": 196,
+    "end": 196.28
+  },
+  {
+    "text": "of",
+    "start": 196.39,
+    "end": 196.5
+  },
+  {
+    "text": "the",
+    "start": 196.5,
+    "end": 196.69
+  },
+  {
+    "text": "prior",
+    "start": 196.69,
+    "end": 196.97
+  },
+  {
+    "text": "10",
+    "start": 197.05,
+    "end": 197.39
+  },
+  {
+    "text": "candles,",
+    "start": 197.48,
+    "end": 197.95
+  },
+  {
+    "text": "it's",
+    "start": 198.08,
+    "end": 198.2
+  },
+  {
+    "text": "the",
+    "start": 198.2,
+    "end": 198.39
+  },
+  {
+    "text": "same",
+    "start": 198.39,
+    "end": 198.64
+  },
+  {
+    "text": "the",
+    "start": 198.64,
+    "end": 198.83
+  },
+  {
+    "text": "opposite",
+    "start": 198.83,
+    "end": 199.34
+  },
+  {
+    "text": "way",
+    "start": 199.34,
+    "end": 199.53
+  },
+  {
+    "text": "for",
+    "start": 199.53,
+    "end": 199.72
+  },
+  {
+    "text": "green.",
+    "start": 199.72,
+    "end": 200.32
+  },
+  {
+    "text": "So",
+    "start": 200.34,
+    "end": 200.46
+  },
+  {
+    "text": "there",
+    "start": 200.46,
+    "end": 200.8
+  },
+  {
+    "text": "are",
+    "start": 200.91,
+    "end": 201.02
+  },
+  {
+    "text": "200%",
+    "start": 201.02,
+    "end": 201.69
+  },
+  {
+    "text": "increase",
+    "start": 201.7,
+    "end": 202.26
+  },
+  {
+    "text": "as",
+    "start": 202.28,
+    "end": 202.34
+  },
+  {
+    "text": "well",
+    "start": 202.44,
+    "end": 202.66
+  },
+  {
+    "text": "in",
+    "start": 202.78,
+    "end": 202.83
+  },
+  {
+    "text": "volume",
+    "start": 202.83,
+    "end": 203.25
+  },
+  {
+    "text": "to",
+    "start": 203.25,
+    "end": 203.38
+  },
+  {
+    "text": "the",
+    "start": 203.45,
+    "end": 203.6
+  },
+  {
+    "text": "upside,",
+    "start": 203.6,
+    "end": 204.15
+  },
+  {
+    "text": "the",
+    "start": 204.15,
+    "end": 204.36
+  },
+  {
+    "text": "magenta",
+    "start": 204.36,
+    "end": 204.84
+  },
+  {
+    "text": "and",
+    "start": 204.84,
+    "end": 205.05
+  },
+  {
+    "text": "the",
+    "start": 205.05,
+    "end": 205.26
+  },
+  {
+    "text": "blue",
+    "start": 205.26,
+    "end": 205.54
+  },
+  {
+    "text": "is",
+    "start": 205.54,
+    "end": 205.7
+  },
+  {
+    "text": "a",
+    "start": 205.74,
+    "end": 205.82
+  },
+  {
+    "text": "150%",
+    "start": 206.31,
+    "end": 206.8
+  },
+  {
+    "text": "increase",
+    "start": 206.8,
+    "end": 207.59
+  },
+  {
+    "text": "in",
+    "start": 207.59,
+    "end": 207.75
+  },
+  {
+    "text": "volume.",
+    "start": 207.84,
+    "end": 208.71
+  },
+  {
+    "text": "So",
+    "start": 208.74,
+    "end": 208.87
+  },
+  {
+    "text": "when",
+    "start": 208.87,
+    "end": 209.16
+  },
+  {
+    "text": "the",
+    "start": 209.31,
+    "end": 209.39
+  },
+  {
+    "text": "blue",
+    "start": 209.39,
+    "end": 209.64
+  },
+  {
+    "text": "is",
+    "start": 209.75,
+    "end": 209.84
+  },
+  {
+    "text": "to",
+    "start": 209.84,
+    "end": 209.99
+  },
+  {
+    "text": "the",
+    "start": 209.99,
+    "end": 210.13
+  },
+  {
+    "text": "upside",
+    "start": 210.21,
+    "end": 210.65
+  },
+  {
+    "text": "and",
+    "start": 210.68,
+    "end": 210.88
+  },
+  {
+    "text": "the",
+    "start": 210.88,
+    "end": 211.06
+  },
+  {
+    "text": "magenta",
+    "start": 211.1,
+    "end": 211.62
+  },
+  {
+    "text": "is",
+    "start": 211.62,
+    "end": 211.77
+  },
+  {
+    "text": "to",
+    "start": 211.77,
+    "end": 211.92
+  },
+  {
+    "text": "the",
+    "start": 211.92,
+    "end": 212.07
+  },
+  {
+    "text": "downside.",
+    "start": 212.14,
+    "end": 213.04
+  },
+  {
+    "text": "So",
+    "start": 213.06,
+    "end": 213.2
+  },
+  {
+    "text": "if",
+    "start": 213.2,
+    "end": 213.36
+  },
+  {
+    "text": "you're",
+    "start": 213.6,
+    "end": 213.84
+  },
+  {
+    "text": "in",
+    "start": 213.84,
+    "end": 213.96
+  },
+  {
+    "text": "a",
+    "start": 214.07,
+    "end": 214.08
+  },
+  {
+    "text": "rise",
+    "start": 214.08,
+    "end": 214.4
+  },
+  {
+    "text": "and",
+    "start": 214.4,
+    "end": 214.64
+  },
+  {
+    "text": "they're",
+    "start": 214.64,
+    "end": 215.2
+  },
+  {
+    "text": "green",
+    "start": 215.2,
+    "end": 215.6
+  },
+  {
+    "text": "retracement,",
+    "start": 215.6,
+    "end": 216.64
+  },
+  {
+    "text": "green",
+    "start": 216.64,
+    "end": 217.03
+  },
+  {
+    "text": "retracement",
+    "start": 217.04,
+    "end": 217.92
+  },
+  {
+    "text": "blue,",
+    "start": 217.92,
+    "end": 218.37
+  },
+  {
+    "text": "this",
+    "start": 218.68,
+    "end": 218.8
+  },
+  {
+    "text": "tells",
+    "start": 218.8,
+    "end": 219.12
+  },
+  {
+    "text": "you",
+    "start": 219.12,
+    "end": 219.32
+  },
+  {
+    "text": "that",
+    "start": 219.32,
+    "end": 219.6
+  },
+  {
+    "text": "the",
+    "start": 219.61,
+    "end": 219.83
+  },
+  {
+    "text": "volume",
+    "start": 220.19,
+    "end": 220.32
+  },
+  {
+    "text": "is",
+    "start": 220.32,
+    "end": 220.48
+  },
+  {
+    "text": "still",
+    "start": 220.48,
+    "end": 220.88
+  },
+  {
+    "text": "strong,",
+    "start": 220.88,
+    "end": 221.51
+  },
+  {
+    "text": "but",
+    "start": 221.56,
+    "end": 221.76
+  },
+  {
+    "text": "it's",
+    "start": 221.76,
+    "end": 222.08
+  },
+  {
+    "text": "not",
+    "start": 222.08,
+    "end": 222.19
+  },
+  {
+    "text": "as",
+    "start": 222.33,
+    "end": 222.48
+  },
+  {
+    "text": "strong",
+    "start": 222.48,
+    "end": 222.95
+  },
+  {
+    "text": "as",
+    "start": 223.02,
+    "end": 223.12
+  },
+  {
+    "text": "it",
+    "start": 223.12,
+    "end": 223.28
+  },
+  {
+    "text": "was",
+    "start": 223.28,
+    "end": 223.52
+  },
+  {
+    "text": "down",
+    "start": 223.52,
+    "end": 223.77
+  },
+  {
+    "text": "here.",
+    "start": 223.91,
+    "end": 224.48
+  },
+  {
+    "text": "So",
+    "start": 224.5,
+    "end": 224.64
+  },
+  {
+    "text": "this",
+    "start": 224.64,
+    "end": 224.96
+  },
+  {
+    "text": "could",
+    "start": 225.07,
+    "end": 225.39
+  },
+  {
+    "text": "give",
+    "start": 225.39,
+    "end": 225.72
+  },
+  {
+    "text": "you",
+    "start": 225.72,
+    "end": 225.88
+  },
+  {
+    "text": "a",
+    "start": 225.97,
+    "end": 226.05
+  },
+  {
+    "text": "hint",
+    "start": 226.05,
+    "end": 226.38
+  },
+  {
+    "text": "that",
+    "start": 226.44,
+    "end": 226.71
+  },
+  {
+    "text": "the",
+    "start": 226.71,
+    "end": 226.96
+  },
+  {
+    "text": "move",
+    "start": 226.96,
+    "end": 227.29
+  },
+  {
+    "text": "might",
+    "start": 227.29,
+    "end": 227.71
+  },
+  {
+    "text": "be",
+    "start": 227.71,
+    "end": 227.83
+  },
+  {
+    "text": "over",
+    "start": 227.9,
+    "end": 228.2
+  },
+  {
+    "text": "or",
+    "start": 228.2,
+    "end": 228.36
+  },
+  {
+    "text": "it",
+    "start": 228.36,
+    "end": 228.52
+  },
+  {
+    "text": "may",
+    "start": 228.52,
+    "end": 228.65
+  },
+  {
+    "text": "need",
+    "start": 228.79,
+    "end": 229.1
+  },
+  {
+    "text": "to",
+    "start": 229.1,
+    "end": 229.26
+  },
+  {
+    "text": "take",
+    "start": 229.26,
+    "end": 229.57
+  },
+  {
+    "text": "a",
+    "start": 229.6,
+    "end": 229.67
+  },
+  {
+    "text": "rest",
+    "start": 229.67,
+    "end": 230.12
+  },
+  {
+    "text": "to",
+    "start": 230.14,
+    "end": 230.24
+  },
+  {
+    "text": "accumulate",
+    "start": 230.71,
+    "end": 230.87
+  },
+  {
+    "text": "a",
+    "start": 230.87,
+    "end": 230.93
+  },
+  {
+    "text": "little",
+    "start": 230.93,
+    "end": 231.31
+  },
+  {
+    "text": "bit",
+    "start": 231.31,
+    "end": 231.49
+  },
+  {
+    "text": "more",
+    "start": 231.49,
+    "end": 231.73
+  },
+  {
+    "text": "or",
+    "start": 231.81,
+    "end": 231.86
+  },
+  {
+    "text": "for",
+    "start": 231.89,
+    "end": 232.05
+  },
+  {
+    "text": "whatever",
+    "start": 232.08,
+    "end": 232.46
+  },
+  {
+    "text": "reason,",
+    "start": 232.58,
+    "end": 233.06
+  },
+  {
+    "text": "it",
+    "start": 233.06,
+    "end": 233.18
+  },
+  {
+    "text": "needs",
+    "start": 233.18,
+    "end": 233.47
+  },
+  {
+    "text": "to",
+    "start": 233.54,
+    "end": 233.61
+  },
+  {
+    "text": "cool",
+    "start": 233.61,
+    "end": 233.85
+  },
+  {
+    "text": "off",
+    "start": 233.94,
+    "end": 234.05
+  },
+  {
+    "text": "for",
+    "start": 234.05,
+    "end": 234.19
+  },
+  {
+    "text": "a",
+    "start": 234.24,
+    "end": 234.3
+  },
+  {
+    "text": "little",
+    "start": 234.43,
+    "end": 234.74
+  },
+  {
+    "text": "bit",
+    "start": 234.78,
+    "end": 234.99
+  },
+  {
+    "text": "before",
+    "start": 235.35,
+    "end": 235.44
+  },
+  {
+    "text": "it",
+    "start": 235.44,
+    "end": 235.59
+  },
+  {
+    "text": "makes",
+    "start": 235.59,
+    "end": 235.96
+  },
+  {
+    "text": "its",
+    "start": 235.96,
+    "end": 236.16
+  },
+  {
+    "text": "next",
+    "start": 236.19,
+    "end": 236.5
+  },
+  {
+    "text": "move.",
+    "start": 236.53,
+    "end": 237.06
+  },
+  {
+    "text": "So",
+    "start": 237.08,
+    "end": 237.21
+  },
+  {
+    "text": "a",
+    "start": 237.21,
+    "end": 237.28
+  },
+  {
+    "text": "blue",
+    "start": 237.28,
+    "end": 237.53
+  },
+  {
+    "text": "candle,",
+    "start": 237.65,
+    "end": 238.18
+  },
+  {
+    "text": "just",
+    "start": 238.18,
+    "end": 238.46
+  },
+  {
+    "text": "be",
+    "start": 238.46,
+    "end": 238.63
+  },
+  {
+    "text": "aware",
+    "start": 238.63,
+    "end": 239
+  },
+  {
+    "text": "at",
+    "start": 239.02,
+    "end": 239.08
+  },
+  {
+    "text": "the",
+    "start": 239.18,
+    "end": 239.37
+  },
+  {
+    "text": "end",
+    "start": 239.38,
+    "end": 239.6
+  },
+  {
+    "text": "of",
+    "start": 239.6,
+    "end": 239.65
+  },
+  {
+    "text": "a",
+    "start": 239.79,
+    "end": 239.82
+  },
+  {
+    "text": "three",
+    "start": 239.82,
+    "end": 240.2
+  },
+  {
+    "text": "level",
+    "start": 240.2,
+    "end": 240.58
+  },
+  {
+    "text": "rise,",
+    "start": 240.58,
+    "end": 241.03
+  },
+  {
+    "text": "it's",
+    "start": 241.03,
+    "end": 241.23
+  },
+  {
+    "text": "not",
+    "start": 241.37,
+    "end": 241.55
+  },
+  {
+    "text": "a",
+    "start": 241.55,
+    "end": 241.62
+  },
+  {
+    "text": "guarantee",
+    "start": 241.62,
+    "end": 242.39
+  },
+  {
+    "text": "of",
+    "start": 242.42,
+    "end": 242.55
+  },
+  {
+    "text": "a",
+    "start": 242.55,
+    "end": 242.62
+  },
+  {
+    "text": "reversal,",
+    "start": 242.99,
+    "end": 243.32
+  },
+  {
+    "text": "it's",
+    "start": 243.43,
+    "end": 243.69
+  },
+  {
+    "text": "a",
+    "start": 243.69,
+    "end": 243.76
+  },
+  {
+    "text": "guarantee",
+    "start": 243.76,
+    "end": 244.45
+  },
+  {
+    "text": "of",
+    "start": 244.52,
+    "end": 244.61
+  },
+  {
+    "text": "a",
+    "start": 244.61,
+    "end": 244.68
+  },
+  {
+    "text": "break.",
+    "start": 244.68,
+    "end": 245.36
+  },
+  {
+    "text": "And",
+    "start": 245.38,
+    "end": 245.51
+  },
+  {
+    "text": "you",
+    "start": 245.51,
+    "end": 245.66
+  },
+  {
+    "text": "can",
+    "start": 245.66,
+    "end": 245.8
+  },
+  {
+    "text": "see",
+    "start": 245.95,
+    "end": 245.96
+  },
+  {
+    "text": "here",
+    "start": 245.96,
+    "end": 246.17
+  },
+  {
+    "text": "that",
+    "start": 246.17,
+    "end": 246.28
+  },
+  {
+    "text": "we",
+    "start": 246.39,
+    "end": 246.48
+  },
+  {
+    "text": "went",
+    "start": 246.48,
+    "end": 246.69
+  },
+  {
+    "text": "into",
+    "start": 246.69,
+    "end": 246.9
+  },
+  {
+    "text": "consolidation",
+    "start": 246.9,
+    "end": 247.58
+  },
+  {
+    "text": "after",
+    "start": 247.58,
+    "end": 247.84
+  },
+  {
+    "text": "these",
+    "start": 247.84,
+    "end": 248.1
+  },
+  {
+    "text": "blue",
+    "start": 248.1,
+    "end": 248.31
+  },
+  {
+    "text": "ones.",
+    "start": 248.33,
+    "end": 248.71
+  },
+  {
+    "text": "It's",
+    "start": 248.78,
+    "end": 248.98
+  },
+  {
+    "text": "basically",
+    "start": 249.35,
+    "end": 249.51
+  },
+  {
+    "text": "saying",
+    "start": 249.51,
+    "end": 249.86
+  },
+  {
+    "text": "like,",
+    "start": 249.86,
+    "end": 250.16
+  },
+  {
+    "text": "we'll",
+    "start": 250.19,
+    "end": 250.48
+  },
+  {
+    "text": "kind",
+    "start": 250.48,
+    "end": 250.7
+  },
+  {
+    "text": "of",
+    "start": 250.72,
+    "end": 250.79
+  },
+  {
+    "text": "run",
+    "start": 250.88,
+    "end": 250.99
+  },
+  {
+    "text": "out",
+    "start": 250.99,
+    "end": 251.1
+  },
+  {
+    "text": "of",
+    "start": 251.22,
+    "end": 251.27
+  },
+  {
+    "text": "steam,",
+    "start": 251.27,
+    "end": 251.67
+  },
+  {
+    "text": "we",
+    "start": 251.67,
+    "end": 251.74
+  },
+  {
+    "text": "need",
+    "start": 251.78,
+    "end": 252.01
+  },
+  {
+    "text": "to",
+    "start": 252.01,
+    "end": 252.11
+  },
+  {
+    "text": "build",
+    "start": 252.18,
+    "end": 252.41
+  },
+  {
+    "text": "a",
+    "start": 252.41,
+    "end": 252.46
+  },
+  {
+    "text": "little",
+    "start": 252.46,
+    "end": 252.93
+  },
+  {
+    "text": "bit",
+    "start": 252.98,
+    "end": 253.19
+  },
+  {
+    "text": "more",
+    "start": 253.19,
+    "end": 253.36
+  },
+  {
+    "text": "before",
+    "start": 253.55,
+    "end": 253.89
+  },
+  {
+    "text": "we",
+    "start": 253.99,
+    "end": 254.1
+  },
+  {
+    "text": "do",
+    "start": 254.1,
+    "end": 254.25
+  },
+  {
+    "text": "whatever",
+    "start": 254.25,
+    "end": 254.86
+  },
+  {
+    "text": "final",
+    "start": 254.92,
+    "end": 255.24
+  },
+  {
+    "text": "damage",
+    "start": 255.24,
+    "end": 255.52
+  },
+  {
+    "text": "we",
+    "start": 255.69,
+    "end": 255.85
+  },
+  {
+    "text": "have",
+    "start": 255.85,
+    "end": 256.15
+  },
+  {
+    "text": "to",
+    "start": 256.15,
+    "end": 256.3
+  },
+  {
+    "text": "do.",
+    "start": 256.3,
+    "end": 256.69
+  },
+  {
+    "text": "And",
+    "start": 256.74,
+    "end": 256.89
+  },
+  {
+    "text": "the",
+    "start": 256.89,
+    "end": 257.06
+  },
+  {
+    "text": "same",
+    "start": 257.06,
+    "end": 257.32
+  },
+  {
+    "text": "goes",
+    "start": 257.32,
+    "end": 257.5
+  },
+  {
+    "text": "for",
+    "start": 257.5,
+    "end": 257.64
+  },
+  {
+    "text": "the",
+    "start": 257.75,
+    "end": 257.84
+  },
+  {
+    "text": "magenta",
+    "start": 257.84,
+    "end": 258.23
+  },
+  {
+    "text": "in",
+    "start": 258.23,
+    "end": 258.33
+  },
+  {
+    "text": "the",
+    "start": 258.41,
+    "end": 258.51
+  },
+  {
+    "text": "other",
+    "start": 258.51,
+    "end": 258.76
+  },
+  {
+    "text": "direction",
+    "start": 258.84,
+    "end": 259.28
+  },
+  {
+    "text": "as",
+    "start": 259.28,
+    "end": 259.31
+  },
+  {
+    "text": "well.",
+    "start": 259.45,
+    "end": 259.78
+  },
+  {
+    "text": "And",
+    "start": 259.85,
+    "end": 260.07
+  },
+  {
+    "text": "that's",
+    "start": 260.24,
+    "end": 260.56
+  },
+  {
+    "text": "all",
+    "start": 260.56,
+    "end": 260.76
+  },
+  {
+    "text": "we",
+    "start": 260.87,
+    "end": 260.96
+  },
+  {
+    "text": "need",
+    "start": 260.96,
+    "end": 261.24
+  },
+  {
+    "text": "to",
+    "start": 261.27,
+    "end": 261.44
+  },
+  {
+    "text": "know",
+    "start": 261.44,
+    "end": 261.75
+  },
+  {
+    "text": "about",
+    "start": 261.8,
+    "end": 262.16
+  },
+  {
+    "text": "volume",
+    "start": 262.16,
+    "end": 262.66
+  },
+  {
+    "text": "and",
+    "start": 262.66,
+    "end": 262.9
+  },
+  {
+    "text": "the",
+    "start": 262.9,
+    "end": 263.14
+  },
+  {
+    "text": "stopping",
+    "start": 263.14,
+    "end": 263.79
+  },
+  {
+    "text": "volume",
+    "start": 263.79,
+    "end": 264.26
+  },
+  {
+    "text": "candle",
+    "start": 264.31,
+    "end": 264.77
+  },
+  {
+    "text": "is",
+    "start": 264.77,
+    "end": 264.93
+  },
+  {
+    "text": "a",
+    "start": 264.93,
+    "end": 265.01
+  },
+  {
+    "text": "small",
+    "start": 265.01,
+    "end": 265.52
+  },
+  {
+    "text": "bodied",
+    "start": 265.54,
+    "end": 266.11
+  },
+  {
+    "text": "candle",
+    "start": 266.11,
+    "end": 266.7
+  },
+  {
+    "text": "with",
+    "start": 266.7,
+    "end": 267.1
+  },
+  {
+    "text": "a",
+    "start": 267.1,
+    "end": 267.19
+  },
+  {
+    "text": "large",
+    "start": 267.3,
+    "end": 267.69
+  },
+  {
+    "text": "wick",
+    "start": 267.69,
+    "end": 268.06
+  },
+  {
+    "text": "with",
+    "start": 268.06,
+    "end": 268.46
+  },
+  {
+    "text": "a",
+    "start": 268.49,
+    "end": 268.58
+  },
+  {
+    "text": "spike",
+    "start": 268.58,
+    "end": 269.07
+  },
+  {
+    "text": "in",
+    "start": 269.07,
+    "end": 269.25
+  },
+  {
+    "text": "volume",
+    "start": 269.34,
+    "end": 269.86
+  },
+  {
+    "text": "at",
+    "start": 269.86,
+    "end": 270.06
+  },
+  {
+    "text": "level",
+    "start": 270.06,
+    "end": 270.5
+  },
+  {
+    "text": "three.",
+    "start": 270.57,
+    "end": 271.12
+  }
+]

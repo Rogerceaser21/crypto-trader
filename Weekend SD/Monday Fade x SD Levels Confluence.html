@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Monday Fade x Weekend SD Levels — Confluence</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --panel:#ffffff; --ink:#1a1e26; --soft:#5b6472; --line:#e2e6ec;
+    --accent:#0f7d6b; --accent-2:#0a5c4f; --warn:#b4551a; --warnbg:#fff2e6;
+    --qbg:#eef6ff; --qborder:#8fbfe8; --qink:#1f4f74;
+    --chip:#eef2f5; --good:#17a07f; --bad:#e14b4b;
+    --shadow:0 1px 3px rgba(20,30,45,.08),0 6px 20px rgba(20,30,45,.05);
+    --all:#6b7280; --m3:#0f9d8c; --m1:#e08a1e;
+    --ansbg:#e7f6ee; --ansborder:#4fb587; --ansink:#12563c;
+    --verdbg:#fff6e6; --verdborder:#e0a94a; --verdink:#8a5a12;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0f1319; --panel:#161c24; --ink:#e7ecf2; --soft:#9aa5b3; --line:#26303c;
+      --accent:#39c9ad; --accent-2:#7fe0cd; --warn:#f0a054; --warnbg:#2a1e12;
+      --qbg:#12222f; --qborder:#2f5b78; --qink:#bfe0f5;
+      --chip:#1d2530; --good:#3bd6a6; --bad:#ff6b6b;
+      --shadow:0 1px 3px rgba(0,0,0,.4),0 8px 26px rgba(0,0,0,.35);
+      --all:#9aa5b3; --m3:#3bd6a6; --m1:#f0a054;
+      --ansbg:#122a1f; --ansborder:#2f8f5b; --ansink:#a5e3c6;
+      --verdbg:#2a2110; --verdborder:#7a5a24; --verdink:#f2cf8f;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-size:16.5px; line-height:1.6;}
+  .wrap{max-width:1060px; margin:0 auto; padding:0 20px}
+  header.hero{background:linear-gradient(135deg,var(--accent-2),var(--accent));
+    color:#fff; padding:38px 0 30px; border-bottom:4px solid rgba(0,0,0,.12);}
+  header.hero .wrap{max-width:940px}
+  header.hero .eyebrow{text-transform:uppercase; letter-spacing:.15em; font-size:12px; opacity:.9; margin:0 0 8px}
+  header.hero h1{font-size:30px; line-height:1.15; margin:0 0 8px; font-weight:800}
+  header.hero p{margin:0; opacity:.96; font-size:15.5px}
+  main{padding:26px 0 70px}
+  section{background:var(--panel); border:1px solid var(--line); border-radius:15px;
+    padding:22px 26px 26px; margin:0 0 22px; box-shadow:var(--shadow);}
+  section>h2{font-size:22px; margin:0 0 4px; letter-spacing:-.01em}
+  section>.kicker{color:var(--accent); font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:.1em; margin:0 0 12px}
+  h3{font-size:18px; margin:22px 0 6px}
+  p{margin:9px 0}
+  ul,ol{margin:9px 0; padding-left:22px} li{margin:5px 0}
+  .soft{color:var(--soft)} strong{font-weight:700}
+  code{background:var(--chip); padding:1px 5px; border-radius:5px; font-size:13.5px}
+  .verdict{background:var(--verdbg); border:1.5px solid var(--verdborder); color:var(--verdink);
+    border-radius:15px; padding:20px 24px; margin:0 0 22px; box-shadow:var(--shadow);}
+  .verdict .tag{display:inline-block; font-weight:800; letter-spacing:.04em; font-size:13px;
+    text-transform:uppercase; background:var(--verdink); color:var(--verdbg); padding:3px 10px; border-radius:6px; margin-bottom:8px}
+  .verdict h2{margin:2px 0 8px; font-size:22px; color:var(--verdink)}
+  .verdict p{margin:7px 0; font-size:15.5px}
+  .box{border-radius:12px; padding:14px 16px; margin:15px 0; font-size:15px}
+  .box.rule{background:var(--chip); border:1px solid var(--line)}
+  .box.honesty{background:var(--warnbg); border:1px solid var(--warn)}
+  .box.ans{background:var(--ansbg); border:1px solid var(--ansborder); color:var(--ansink)}
+  .box h4{margin:0 0 6px; font-size:15px; text-transform:uppercase; letter-spacing:.05em}
+  .tw{overflow-x:auto; margin:14px 0}
+  table{border-collapse:collapse; width:100%; font-size:14px; min-width:640px}
+  th,td{padding:7px 9px; text-align:right; border-bottom:1px solid var(--line); white-space:nowrap}
+  th:first-child,td:first-child{text-align:left; white-space:normal; min-width:190px}
+  thead th{background:var(--chip); font-size:12px; text-transform:uppercase; letter-spacing:.03em; color:var(--soft)}
+  tbody tr:hover{background:var(--chip)}
+  .pos{color:var(--good); font-weight:700} .neg{color:var(--bad); font-weight:700}
+  .rowdim td{opacity:.5}
+  .grouprow td{background:var(--chip); font-weight:700; text-align:left; font-size:13px;
+    text-transform:uppercase; letter-spacing:.04em; color:var(--soft)}
+  .thintag{display:inline-block; font-size:10px; font-weight:700; padding:0 6px; border-radius:20px;
+    background:var(--warnbg); color:var(--warn); margin-left:6px; text-transform:uppercase}
+  figure{margin:16px 0; background:var(--chip); border:1px solid var(--line); border-radius:12px; padding:14px}
+  figcaption{font-size:13px; color:var(--soft); margin-top:8px}
+  .legend span{display:inline-block; margin-right:16px; font-size:13px}
+  .sw{display:inline-block; width:12px; height:12px; border-radius:50%; vertical-align:middle; margin-right:5px}
+  svg{max-width:100%; height:auto}
+  .scatter circle.rm{fill:var(--m3); opacity:.85}
+  .scatter circle.bm{fill:var(--all); opacity:.55}
+  .scatter circle.ns{fill:none; stroke:var(--soft); stroke-width:1; opacity:.5}
+  .scatter path.rm{fill:var(--m3); opacity:.85}
+  .scatter path.bm{fill:var(--all); opacity:.6}
+  .scatter path.ns{fill:none; stroke:var(--soft); stroke-width:1; opacity:.6}
+</style>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+  <div class="eyebrow">Weekend SD &middot; Filter study &middot; In-sample 2019-10 &rarr; 2024-12 &middot; BTC-USDT perp</div>
+  <h1>Monday Fade &times; Weekend SD Levels &mdash; a confluence filter</h1>
+  <p>Igor's question: does the validated Monday fade get <em>better</em> when the M/W spike peak lands inside the weekend Standard-Deviation bands (History, 3-Month, 4-Week)? No new trades &mdash; same fade, filtered.</p>
+</div></header>
+
+<main><div class="wrap">
+
+<div class="verdict">
+  <span class="tag">Verdict &middot; Suggestive</span>
+  <h2>&#128993; The History-SD line is a real, usable filter; the other two are not. Keeping only the Mondays whose peak reached at least the History-SD <em>mean</em> lifts the fade from <strong>+0.382R to +0.502R</strong> (55 trades, 60% win, t = 3.3). But it is a soft tilt, not a proven money-machine.</h2>
+  <p>The improvement clears the pre-registered "believe it" bar on its own (t&nbsp;&ge;&nbsp;3 with N&nbsp;&ge;&nbsp;40), yet the head-to-head test of <em>kept vs dropped</em> Mondays is only a two-sample t&nbsp;&asymp;&nbsp;1.1 &mdash; so the extra +0.12R is directionally right but not statistically clean. The 3-Month SD line actually points the other way, and the exact "confluence zone" almost never triggers (3 trades). Trade it as a preference, not a gate.</p>
+</div>
+
+<section>
+  <div class="kicker">What was tested</div>
+  <h2>Same validated fade, sorted by where the peak landed</h2>
+  <p>The <strong>validated Monday fade</strong> is unchanged: an early-week spike-out of the weekend box, a 200% PVSRA vector body-closing through the 50&nbsp;EMA, a 2-of-3 retest, then fade back with a fixed 1.9R target and the stop beyond the spike. We took its <strong>frozen trade list</strong> and, for every trade, measured how far the formation peak stretched from the weekend base, then asked which of that weekend's SD bands the peak sat in.</p>
+  <div class="box rule">
+    <h4>Anchor reproduction (proof the trade list is the real one)</h4>
+    <p style="margin:0"><strong>Monday&nbsp;fade&nbsp;= +0.382R over 91 trades (t&nbsp;=&nbsp;2.98)</strong> &middot; <strong>all-week&nbsp;= +0.099R over 223 trades (t&nbsp;=&nbsp;1.23)</strong>. These match the validated backtest exactly &mdash; the filter study is built on the identical ledger, R values read verbatim.</p>
+  </div>
+  <p>The three SD sources are exactly the lines the dynamic indicator draws, computed <strong>causally</strong> (each weekend uses only earlier weekends &mdash; zero look-ahead):</p>
+  <ul>
+    <li><span class="sw" style="background:var(--all)"></span><strong>History SD</strong> &mdash; expanding, all weekends so far (the slow, stable anchor).</li>
+    <li><span class="sw" style="background:var(--m3)"></span><strong>3-Month SD</strong> &mdash; trailing 13 weekends.</li>
+    <li><span class="sw" style="background:var(--m1)"></span><strong>4-Week SD</strong> &mdash; trailing 4 weekends (fast but noisy).</li>
+  </ul>
+  <p class="soft">Note: on TradingView the History line is a fixed constant (the chart can't hold 5 years of 1-minute bars); here it is the strictly-causal expanding version, which is the honest thing to test. The 3-Month and 4-Week lines are identical to the indicator's live sets.</p>
+</section>
+
+<section>
+  <div class="kicker">The picture</div>
+  <h2>Where the peak lands, and the fade that follows</h2>
+  <figure>
+    <svg viewBox="0 0 760 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram of a Monday spike peak landing inside the up-side SD bands and fading back to the weekend base">
+      <defs>
+        <marker id="arr" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 z" fill="var(--bad)"/>
+        </marker>
+      </defs>
+      <!-- band shading -->
+      <rect x="70" y="44"  width="620" height="30" fill="var(--bad)" opacity="0.08"/>
+      <rect x="70" y="74"  width="620" height="34" fill="var(--good)" opacity="0.12"/>
+      <rect x="70" y="108" width="620" height="34" fill="var(--good)" opacity="0.06"/>
+      <!-- level lines -->
+      <line x1="70" y1="44"  x2="690" y2="44"  stroke="var(--all)" stroke-width="1.5"/>
+      <line x1="70" y1="74"  x2="690" y2="74"  stroke="var(--m3)"  stroke-width="1.5"/>
+      <line x1="70" y1="108" x2="690" y2="108" stroke="var(--m3)"  stroke-width="1.5" stroke-dasharray="4 3"/>
+      <line x1="70" y1="142" x2="690" y2="142" stroke="var(--m1)"  stroke-width="1.5" stroke-dasharray="4 3"/>
+      <line x1="70" y1="210" x2="690" y2="210" stroke="var(--ink)" stroke-width="2"/>
+      <text x="694" y="47"  font-size="12" fill="var(--all)">p95</text>
+      <text x="694" y="77"  font-size="12" fill="var(--m3)">+2SD</text>
+      <text x="694" y="111" font-size="12" fill="var(--m3)">+1SD</text>
+      <text x="694" y="145" font-size="12" fill="var(--m1)">mean</text>
+      <text x="694" y="214" font-size="12" fill="var(--ink)">weekend base</text>
+      <!-- the peak candle landing in [mean,+1SD) -->
+      <line x1="250" y1="96" x2="250" y2="212" stroke="var(--soft)" stroke-width="1"/>
+      <line x1="250" y1="120" x2="250" y2="132" stroke="var(--soft)" stroke-width="10"/>
+      <circle cx="250" cy="98" r="4" fill="var(--bad)"/>
+      <text x="264" y="102" font-size="12" fill="var(--ink)">M peak stretches up&hellip;</text>
+      <!-- fade arrow -->
+      <path d="M250,110 C330,150 360,190 430,206" fill="none" stroke="var(--bad)" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arr)"/>
+      <text x="360" y="175" font-size="12" fill="var(--bad)">&hellip;fade back toward base</text>
+      <text x="70" y="238" font-size="12.5" fill="var(--soft)">The filter asks only: did the peak reach at least the <tspan font-style="italic">mean</tspan> band before we faded it?</text>
+    </svg>
+    <figcaption>The fade is identical whatever band the peak reaches. The study just labels each trade by its highest band and compares the resulting groups.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <div class="kicker">Headline result</div>
+  <h2>Split 5 &mdash; the cell Igor would actually trade: Monday + peak reached the mean</h2>
+  <p>Baseline to beat: <strong>every Monday fade = +0.382R</strong> (91 trades). Filtering to only the Mondays whose peak reached at least each source's mean level:</p>
+  <div class="tw"><table>
+    <thead><tr><th>source / subset</th><th>N</th><th>win%</th><th>avg R</th><th>median R</th><th>t</th><th>total R</th></tr></thead>
+    <tbody>
+    <tr><td>History SD</td><td>55</td><td>60.0%</td><td class="pos">+0.502</td><td class="pos">+0.342</td><td>3.29</td><td class="pos">+27.613</td></tr>
+<tr><td>3-Month SD</td><td>59</td><td>52.5%</td><td class="pos">+0.259</td><td class="pos">+0.040</td><td>1.73</td><td class="pos">+15.256</td></tr>
+<tr><td>4-Week SD</td><td>68</td><td>55.9%</td><td class="pos">+0.378</td><td class="pos">+0.129</td><td>2.70</td><td class="pos">+25.682</td></tr>
+    </tbody>
+  </table></div>
+  <p>Only the <strong>History SD</strong> filter improves things: +0.502R at t&nbsp;=&nbsp;3.3 over 55 trades, and it is the pre-registered "believe it" cell (t&nbsp;&ge;&nbsp;3, N&nbsp;&ge;&nbsp;40). The 4-Week filter is a wash (+0.378R &asymp; baseline) and the 3-Month filter is <em>worse</em> than the baseline.</p>
+
+  <h3>Does the filter actually add anything? (the honest head-to-head)</h3>
+  <p>The right test is not "is the kept group profitable" (it inherits the already-significant Monday edge) but "are the kept Mondays <em>better</em> than the dropped ones". Two-sample Welch t of <em>reached-mean minus below-mean</em> R, Monday:</p>
+  <div class="tw"><table>
+    <thead><tr><th>source</th><th>kept N</th><th>kept avg R</th><th>dropped N</th><th>dropped avg R</th><th>two-sample t</th><th>beats +0.382?</th></tr></thead>
+    <tbody>
+      <tr><td>History SD <span class="thintag" style="background:var(--ansbg);color:var(--ansink)">best</span></td><td>55</td><td class="pos">+0.502</td><td>31</td><td class="pos">+0.187</td><td>+1.09</td><td>yes</td></tr>
+      <tr class="rowdim"><td>3-Month SD</td><td>59</td><td class="pos">+0.259</td><td>28</td><td class="pos">+0.610</td><td>&minus;1.17</td><td>no</td></tr>
+      <tr class="rowdim"><td>4-Week SD</td><td>68</td><td class="pos">+0.378</td><td>23</td><td class="pos">+0.395</td><td>&minus;0.05</td><td>&asymp; tie</td></tr>
+    </tbody>
+  </table></div>
+  <div class="box ans">
+    <h4>Read this honestly</h4>
+    <p style="margin:0">The History-SD filter raises expectancy by <strong>+0.12R</strong> and lifts win-rate to 60%, but the two-sample t of +1.1 means we <em>cannot</em> claim the kept Mondays are statistically distinct from the dropped ones. It is a genuine tilt in the right direction with weak separation &mdash; use it to <em>size up</em> stretched Mondays, not to skip the rest.</p>
+  </div>
+</section>
+
+<section>
+  <div class="kicker">Reached the mean, or not</div>
+  <h2>Split 2 &mdash; the simplest reading of the confluence idea</h2>
+  <p>Peak reached at least the mean SD level vs stayed below it, by source:</p>
+  <div class="tw"><table>
+    <thead><tr><th>source / subset</th><th>N</th><th>win%</th><th>avg R</th><th>median R</th><th>t</th><th>total R</th></tr></thead>
+    <tbody>
+    <tr class="grouprow"><td colspan="7">Monday only (baseline +0.382R, 91 trades)</td></tr>
+    <tr><td>History SD</td><td>31</td><td>45.2%</td><td class="pos">+0.186</td><td class="neg">-0.588</td><td>0.75</td><td class="pos">+5.781</td></tr>
+<tr><td>History SD</td><td>55</td><td>60.0%</td><td class="pos">+0.502</td><td class="pos">+0.342</td><td>3.29</td><td class="pos">+27.613</td></tr>
+<tr><td>3-Month SD</td><td>28</td><td>57.1%</td><td class="pos">+0.610</td><td class="pos">+1.759</td><td>2.34</td><td class="pos">+17.086</td></tr>
+<tr><td>3-Month SD</td><td>59</td><td>52.5%</td><td class="pos">+0.259</td><td class="pos">+0.040</td><td>1.73</td><td class="pos">+15.256</td></tr>
+<tr><td>4-Week SD</td><td>23</td><td>52.2%</td><td class="pos">+0.395</td><td class="pos">+0.920</td><td>1.32</td><td class="pos">+9.080</td></tr>
+<tr><td>4-Week SD</td><td>68</td><td>55.9%</td><td class="pos">+0.378</td><td class="pos">+0.129</td><td>2.70</td><td class="pos">+25.682</td></tr>
+    <tr class="grouprow"><td colspan="7">All week (baseline +0.099R, 223 trades)</td></tr>
+    <tr><td>History SD</td><td>48</td><td>41.7%</td><td class="pos">+0.059</td><td class="neg">-0.812</td><td>0.31</td><td class="pos">+2.837</td></tr>
+<tr><td>History SD</td><td>163</td><td>46.6%</td><td class="pos">+0.149</td><td class="neg">-0.077</td><td>1.62</td><td class="pos">+24.281</td></tr>
+<tr><td>3-Month SD</td><td>40</td><td>52.5%</td><td class="pos">+0.417</td><td class="pos">+0.619</td><td>1.89</td><td class="pos">+16.671</td></tr>
+<tr><td>3-Month SD</td><td>176</td><td>43.2%</td><td class="pos">+0.035</td><td class="neg">-0.103</td><td>0.41</td><td class="pos">+6.192</td></tr>
+<tr><td>4-Week SD</td><td>37</td><td>43.2%</td><td class="pos">+0.103</td><td class="neg">-1.041</td><td>0.45</td><td class="pos">+3.813</td></tr>
+<tr><td>4-Week SD</td><td>186</td><td>45.2%</td><td class="pos">+0.098</td><td class="neg">-0.087</td><td>1.15</td><td class="pos">+18.236</td></tr>
+    </tbody>
+  </table></div>
+  <p class="soft">Across all weekdays the "reached mean" tilt washes out (History +0.149R vs baseline +0.099R, t&nbsp;=&nbsp;1.6). The effect, such as it is, lives in the Monday slice &mdash; the same place the whole fade edge lives.</p>
+</section>
+
+<section>
+  <div class="kicker">Full band detail</div>
+  <h2>Split 1 &mdash; every band &times; every source (Monday)</h2>
+  <p>Four bands, three sources. Greyed rows have fewer than 20 trades &mdash; do not read them as evidence.</p>
+  <div class="tw"><table>
+    <thead><tr><th>band</th><th>N</th><th>win%</th><th>avg R</th><th>median R</th><th>t</th><th>total R</th></tr></thead>
+    <tbody>
+    <tr class="grouprow"><td colspan="7">History SD (expanding all-history)</td></tr>
+<tr><td>below mean</td><td>31</td><td>45.2%</td><td class="pos">+0.186</td><td class="neg">-0.588</td><td>0.75</td><td class="pos">+5.781</td></tr>
+<tr><td>[mean, +1SD)</td><td>42</td><td>61.9%</td><td class="pos">+0.509</td><td class="pos">+0.253</td><td>2.83</td><td class="pos">+21.369</td></tr>
+<tr class="rowdim"><td>[+1SD, +2SD) <span class="thintag">thin</span></td><td>6</td><td>50.0%</td><td class="pos">+0.390</td><td class="pos">+0.322</td><td>0.95</td><td class="pos">+2.342</td></tr>
+<tr class="rowdim"><td>>= +2SD <span class="thintag">thin</span></td><td>7</td><td>57.1%</td><td class="pos">+0.558</td><td class="pos">+0.609</td><td>1.24</td><td class="pos">+3.903</td></tr>
+<tr class="grouprow"><td colspan="7">3-Month SD (trailing 13 weekends)</td></tr>
+<tr><td>below mean</td><td>28</td><td>57.1%</td><td class="pos">+0.610</td><td class="pos">+1.759</td><td>2.34</td><td class="pos">+17.086</td></tr>
+<tr><td>[mean, +1SD)</td><td>31</td><td>58.1%</td><td class="pos">+0.336</td><td class="pos">+0.086</td><td>1.51</td><td class="pos">+10.405</td></tr>
+<tr class="rowdim"><td>[+1SD, +2SD) <span class="thintag">thin</span></td><td>10</td><td>20.0%</td><td class="neg">-0.362</td><td class="neg">-0.582</td><td>-1.22</td><td class="neg">-3.625</td></tr>
+<tr class="rowdim"><td>>= +2SD <span class="thintag">thin</span></td><td>18</td><td>61.1%</td><td class="pos">+0.471</td><td class="pos">+0.532</td><td>1.96</td><td class="pos">+8.476</td></tr>
+<tr class="grouprow"><td colspan="7">4-Week SD (trailing 4 weekends)</td></tr>
+<tr><td>below mean</td><td>23</td><td>52.2%</td><td class="pos">+0.395</td><td class="pos">+0.920</td><td>1.32</td><td class="pos">+9.080</td></tr>
+<tr><td>[mean, +1SD)</td><td>30</td><td>56.7%</td><td class="pos">+0.487</td><td class="pos">+0.666</td><td>2.02</td><td class="pos">+14.613</td></tr>
+<tr class="rowdim"><td>[+1SD, +2SD) <span class="thintag">thin</span></td><td>11</td><td>45.5%</td><td class="pos">+0.044</td><td class="neg">-0.094</td><td>0.13</td><td class="pos">+0.487</td></tr>
+<tr><td>>= +2SD</td><td>27</td><td>59.3%</td><td class="pos">+0.392</td><td class="pos">+0.094</td><td>2.07</td><td class="pos">+10.582</td></tr>
+    </tbody>
+  </table></div>
+  <p>The History-SD story is a clean staircase where it has trades: <strong>below mean +0.19R</strong> &rarr; <strong>[mean,+1SD) +0.51R (42 trades, t&nbsp;2.8)</strong>, with the higher bands too thin to trust. The 3-Month bands zig-zag (its "below mean" is the best cell), which is exactly why it fails as a filter. Peak-stretch and R barely correlate overall (r&nbsp;=&nbsp;0.06), so this is a threshold effect at the mean, not "more stretch = more money".</p>
+</section>
+
+<section>
+  <div class="kicker">Trade by trade</div>
+  <h2>Every Monday fade: return vs how far the peak stretched</h2>
+  <figure>
+    <svg viewBox="0 0 760 330" xmlns="http://www.w3.org/2000/svg" class="scatter" role="img" aria-label="Scatter of Monday fade R against peak stretch percent, colored by whether the peak reached the History SD mean">
+      <!-- axes -->
+      <line x1="78" y1="171.3" x2="712" y2="171.3" stroke="var(--ink)" stroke-width="1"/>
+      <line x1="78" y1="28" x2="78" y2="286" stroke="var(--line)" stroke-width="1"/>
+      <!-- baseline & filtered avg R guides -->
+      <line x1="78" y1="144.0" x2="712" y2="144.0" stroke="var(--all)" stroke-width="1" stroke-dasharray="5 4"/>
+      <line x1="78" y1="135.4" x2="712" y2="135.4" stroke="var(--m3)" stroke-width="1.2" stroke-dasharray="5 4"/>
+      <text x="712" y="140.0" font-size="11" fill="var(--all)" text-anchor="end">all-Mon avg +0.382R</text>
+      <text x="712" y="131.4" font-size="11" fill="var(--m3)" text-anchor="end">reached-mean avg +0.502R</text>
+      <!-- History mean ref -->
+      <line x1="188.9" y1="28" x2="188.9" y2="286" stroke="var(--soft)" stroke-width="1" stroke-dasharray="3 3"/>
+      <text x="158.9" y="300" font-size="11" fill="var(--soft)">~mean (2.8%)</text>
+      <!-- y ticks -->
+      <text x="72" y="103" font-size="11" fill="var(--soft)" text-anchor="end">+1R</text>
+      <text x="72" y="32" font-size="11" fill="var(--soft)" text-anchor="end">+2R</text>
+      <text x="72" y="175.3" font-size="11" fill="var(--soft)" text-anchor="end">0</text>
+      <text x="72" y="247" font-size="11" fill="var(--soft)" text-anchor="end">&minus;1R</text>
+      <!-- x ticks -->
+      <text x="78"  y="300" font-size="11" fill="var(--soft)" text-anchor="middle">0%</text>
+      <text x="236" y="300" font-size="11" fill="var(--soft)" text-anchor="middle">4%</text>
+      <text x="395" y="300" font-size="11" fill="var(--soft)" text-anchor="middle">8%</text>
+      <text x="553" y="300" font-size="11" fill="var(--soft)" text-anchor="middle">12%</text>
+      <text x="700" y="300" font-size="11" fill="var(--soft)" text-anchor="middle">16%+</text>
+      <text x="395" y="322" font-size="12" fill="var(--soft)" text-anchor="middle">peak stretch from weekend base (%)</text>
+      <circle cx="94.9" cy="39.8" r="4" class="bm"/>
+<circle cx="103.7" cy="105.4" r="4" class="bm"/>
+<circle cx="112.9" cy="45.7" r="4" class="bm"/>
+<circle cx="119.9" cy="44.8" r="4" class="bm"/>
+<circle cx="126.1" cy="260.7" r="4" class="bm"/>
+<circle cx="129.0" cy="248.8" r="4" class="bm"/>
+<circle cx="129.4" cy="43.8" r="4" class="bm"/>
+<circle cx="132.2" cy="43.6" r="4" class="bm"/>
+<circle cx="135.2" cy="247.1" r="4" class="bm"/>
+<circle cx="146.7" cy="40.8" r="4" class="ns"/>
+<circle cx="150.6" cy="249.8" r="4" class="bm"/>
+<circle cx="151.0" cy="42.3" r="4" class="bm"/>
+<circle cx="151.4" cy="247.9" r="4" class="bm"/>
+<circle cx="154.0" cy="213.5" r="4" class="bm"/>
+<circle cx="155.0" cy="176.7" r="4" class="bm"/>
+<circle cx="156.6" cy="247.9" r="4" class="bm"/>
+<circle cx="158.6" cy="44.1" r="4" class="bm"/>
+<circle cx="160.9" cy="246.0" r="4" class="bm"/>
+<circle cx="160.9" cy="247.3" r="4" class="rm"/>
+<circle cx="161.9" cy="246.0" r="4" class="bm"/>
+<circle cx="164.9" cy="251.6" r="4" class="bm"/>
+<circle cx="165.4" cy="40.0" r="4" class="bm"/>
+<circle cx="165.8" cy="249.0" r="4" class="bm"/>
+<circle cx="166.6" cy="40.9" r="4" class="bm"/>
+<circle cx="169.5" cy="246.0" r="4" class="bm"/>
+<circle cx="170.3" cy="245.7" r="4" class="bm"/>
+<circle cx="170.9" cy="256.0" r="4" class="bm"/>
+<circle cx="180.5" cy="40.4" r="4" class="bm"/>
+<circle cx="187.0" cy="249.1" r="4" class="bm"/>
+<circle cx="189.1" cy="158.0" r="4" class="bm"/>
+<circle cx="190.3" cy="40.1" r="4" class="rm"/>
+<circle cx="192.6" cy="41.7" r="4" class="rm"/>
+<circle cx="192.6" cy="245.5" r="4" class="bm"/>
+<circle cx="192.8" cy="41.6" r="4" class="bm"/>
+<circle cx="196.0" cy="247.4" r="4" class="rm"/>
+<circle cx="200.7" cy="39.2" r="4" class="rm"/>
+<circle cx="200.8" cy="247.5" r="4" class="ns"/>
+<circle cx="202.5" cy="244.5" r="4" class="rm"/>
+<circle cx="202.7" cy="247.3" r="4" class="rm"/>
+<circle cx="203.3" cy="39.2" r="4" class="bm"/>
+<circle cx="209.4" cy="246.7" r="4" class="ns"/>
+<circle cx="211.5" cy="37.9" r="4" class="rm"/>
+<circle cx="211.7" cy="146.8" r="4" class="rm"/>
+<circle cx="216.3" cy="40.5" r="4" class="rm"/>
+<circle cx="217.7" cy="168.5" r="4" class="rm"/>
+<circle cx="217.7" cy="41.9" r="4" class="rm"/>
+<circle cx="218.0" cy="41.3" r="4" class="rm"/>
+<circle cx="221.7" cy="247.1" r="4" class="rm"/>
+<circle cx="225.0" cy="164.6" r="4" class="rm"/>
+<circle cx="231.8" cy="146.0" r="4" class="rm"/>
+<circle cx="232.6" cy="39.3" r="4" class="rm"/>
+<circle cx="235.7" cy="246.0" r="4" class="rm"/>
+<circle cx="238.2" cy="41.1" r="4" class="rm"/>
+<circle cx="247.7" cy="245.5" r="4" class="rm"/>
+<circle cx="247.9" cy="179.7" r="4" class="rm"/>
+<circle cx="250.4" cy="165.2" r="4" class="rm"/>
+<circle cx="250.8" cy="100.5" r="4" class="ns"/>
+<circle cx="252.5" cy="247.4" r="4" class="rm"/>
+<circle cx="253.1" cy="37.9" r="4" class="rm"/>
+<circle cx="257.1" cy="40.1" r="4" class="rm"/>
+<circle cx="258.4" cy="41.6" r="4" class="rm"/>
+<circle cx="264.8" cy="39.8" r="4" class="rm"/>
+<circle cx="267.3" cy="171.3" r="4" class="rm"/>
+<circle cx="271.3" cy="180.6" r="4" class="rm"/>
+<circle cx="281.1" cy="179.2" r="4" class="rm"/>
+<circle cx="285.8" cy="248.4" r="4" class="rm"/>
+<circle cx="289.4" cy="136.4" r="4" class="rm"/>
+<circle cx="290.3" cy="40.0" r="4" class="rm"/>
+<circle cx="298.4" cy="40.1" r="4" class="rm"/>
+<circle cx="313.8" cy="41.4" r="4" class="rm"/>
+<circle cx="318.1" cy="176.8" r="4" class="rm"/>
+<circle cx="320.4" cy="130.0" r="4" class="rm"/>
+<circle cx="323.0" cy="95.8" r="4" class="rm"/>
+<circle cx="328.1" cy="97.6" r="4" class="rm"/>
+<circle cx="329.1" cy="159.6" r="4" class="rm"/>
+<circle cx="329.9" cy="245.5" r="4" class="rm"/>
+<circle cx="333.8" cy="174.6" r="4" class="rm"/>
+<circle cx="345.2" cy="41.1" r="4" class="rm"/>
+<circle cx="356.3" cy="178.1" r="4" class="rm"/>
+<circle cx="371.4" cy="123.2" r="4" class="ns"/>
+<circle cx="393.3" cy="246.3" r="4" class="rm"/>
+<circle cx="403.9" cy="124.2" r="4" class="rm"/>
+<circle cx="423.3" cy="179.7" r="4" class="rm"/>
+<circle cx="425.8" cy="172.4" r="4" class="rm"/>
+<circle cx="445.5" cy="244.8" r="4" class="rm"/>
+<circle cx="596.7" cy="219.8" r="4" class="rm"/>
+<path d="M712.0 124.7 l4 6 l-8 0 z" class="rm"/>
+<path d="M712.0 33.0 l4 6 l-8 0 z" class="rm"/>
+<path d="M712.0 34.3 l4 6 l-8 0 z" class="rm"/>
+<path d="M712.0 73.4 l4 6 l-8 0 z" class="rm"/>
+<path d="M712.0 174.6 l4 6 l-8 0 z" class="rm"/>
+    </svg>
+    <div class="legend" style="margin-top:8px">
+      <span><span class="sw" style="background:var(--m3)"></span>reached History mean (55)</span>
+      <span><span class="sw" style="background:var(--all);opacity:.55"></span>below mean (31)</span>
+      <span><span class="sw" style="border:1px solid var(--soft);background:transparent"></span>no History stats yet (5)</span>
+      <span>&#9650; = stretched 16&ndash;40% (clamped)</span>
+    </div>
+    <figcaption>No upward slope (r&nbsp;=&nbsp;0.06): winners and losers are scattered at every stretch. The teal (reached-mean) cloud simply sits a little higher on average than the grey. That gap is the whole edge &mdash; small and noisy.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <div class="kicker">The other two ideas</div>
+  <h2>Split 3 &mdash; confluence zones, and beyond-p95</h2>
+  <p>Igor's literal idea &mdash; the peak sitting where <strong>&ge;2 of the 3 lines agree</strong> on the same level (within 0.25 percentage points, exactly the indicator's shaded box) &mdash; almost never happens intraday:</p>
+  <div class="tw"><table>
+    <thead><tr><th>source / subset</th><th>N</th><th>win%</th><th>avg R</th><th>median R</th><th>t</th><th>total R</th></tr></thead>
+    <tbody>
+    <tr class="grouprow"><td colspan="7">Monday</td></tr>
+    <tr class="rowdim"><td>in zone <span class="thintag">thin</span></td><td>3</td><td>66.7%</td><td class="pos">+0.854</td><td class="pos">+1.806</td><td>0.89</td><td class="pos">+2.563</td></tr>
+<tr><td>not in zone</td><td>88</td><td>54.5%</td><td class="pos">+0.366</td><td class="pos">+0.129</td><td>2.82</td><td class="pos">+32.198</td></tr>
+    <tr class="grouprow"><td colspan="7">All week</td></tr>
+    <tr class="rowdim"><td>in zone <span class="thintag">thin</span></td><td>3</td><td>66.7%</td><td class="pos">+0.854</td><td class="pos">+1.806</td><td>0.89</td><td class="pos">+2.563</td></tr>
+<tr><td>not in zone</td><td>220</td><td>44.5%</td><td class="pos">+0.089</td><td class="neg">-0.095</td><td>1.10</td><td class="pos">+19.485</td></tr>
+    </tbody>
+  </table></div>
+  <p>Only <strong>3 Monday trades</strong> ever landed inside an exact agreement zone &mdash; far too few to conclude anything (they happened to average +0.85R, but that is noise). The tight 0.25-point agreement band is simply too narrow for a fast-moving peak to sit in. Reaching <em>beyond p95</em> (a true statistical extreme) also gave no edge over staying within it (History: +0.51R vs +0.37R, both thin/noisy). The usable signal is the plain mean line, not the exotic zones.</p>
+</section>
+
+<section>
+  <div class="kicker">Trend context</div>
+  <h2>Split 4 &mdash; fading with vs against the daily trend</h2>
+  <p>Daily 4-week momentum (TSMOM) sign as of the Friday before, using the validated Krown daily-trend machinery. "With-trend" = the fade points the same way as the daily trend; "against-trend" = it fights it.</p>
+  <div class="tw"><table>
+    <thead><tr><th>source / subset</th><th>N</th><th>win%</th><th>avg R</th><th>median R</th><th>t</th><th>total R</th></tr></thead>
+    <tbody>
+    <tr class="grouprow"><td colspan="7">Monday only</td></tr>
+    <tr><td>against_trend</td><td>51</td><td>54.9%</td><td class="pos">+0.369</td><td class="pos">+0.086</td><td>2.21</td><td class="pos">+18.815</td></tr>
+<tr class="rowdim"><td>flat <span class="thintag">thin</span></td><td>0</td><td class="soft">-</td><td class="soft">-</td><td class="soft">-</td><td class="soft">-</td><td class="">+0.000</td></tr>
+<tr><td>with_trend</td><td>40</td><td>55.0%</td><td class="pos">+0.399</td><td class="pos">+0.460</td><td>1.97</td><td class="pos">+15.947</td></tr>
+    <tr class="grouprow"><td colspan="7">All week</td></tr>
+    <tr><td>against_trend</td><td>130</td><td>40.8%</td><td class="pos">+0.013</td><td class="neg">-0.136</td><td>0.12</td><td class="pos">+1.651</td></tr>
+<tr class="rowdim"><td>flat <span class="thintag">thin</span></td><td>0</td><td class="soft">-</td><td class="soft">-</td><td class="soft">-</td><td class="soft">-</td><td class="">+0.000</td></tr>
+<tr><td>with_trend</td><td>93</td><td>50.5%</td><td class="pos">+0.219</td><td class="pos">+0.033</td><td>1.75</td><td class="pos">+20.397</td></tr>
+    </tbody>
+  </table></div>
+  <div class="box ans">
+    <h4>The interesting bit is in the all-week row</h4>
+    <p style="margin:0">On <strong>Monday the trend barely matters</strong> &mdash; with-trend +0.399R, against-trend +0.369R, both fine. But <strong>across all weekdays the fade only works with the daily trend</strong>: +0.219R (93 trades) with-trend vs +0.013R (130 trades) against. The thin all-week edge is really a <em>with-trend</em> edge. This echoes the main backtest's finding that mechanically flipping direction by regime hurts &mdash; here the softer read (prefer with-trend fades outside Monday) is supported.</p>
+  </div>
+</section>
+
+<section class="">
+  <div class="box honesty">
+    <h4>Honesty box</h4>
+    <ul style="margin:6px 0 0">
+      <li>91-trade Monday bins are <strong>thin</strong>. Splitting them into 3&ndash;4 groups leaves cells that swing on a handful of trades &mdash; every greyed (N&lt;20) row is illustration, not evidence.</li>
+      <li>We ran roughly <strong>30 comparisons</strong>. By chance alone 1&ndash;2 of them should show |t|&nbsp;&ge;&nbsp;2. The History-SD reached-mean cell (t&nbsp;=&nbsp;3.3) is the one result that clears the stricter pre-registered bar (t&nbsp;&ge;&nbsp;3, N&nbsp;&ge;&nbsp;40) &mdash; but its <em>incremental</em> value over the plain fade is only a two-sample t&nbsp;&asymp;&nbsp;1.1.</li>
+      <li>The three sources <strong>disagree</strong>: History helps, 4-Week is neutral, 3-Month inverts. A robust filter would show the same sign across all three. It does not. That is a caution flag, not a green light.</li>
+      <li>This is <strong>in-sample</strong> (2019&ndash;2024). No out-of-sample confirmation of the filter has been run &mdash; the validated fade itself held out-of-sample, but the SD filter has not been tested there.</li>
+      <li>Nothing here changes the entries or exits. It is a <strong>preference layer</strong> on an already-validated trade.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="kicker">Practical use</div>
+  <h2>How to use this on the chart</h2>
+  <p>With the <strong>Weekend + Monday SD Levels (V3 dynamic)</strong> indicator on your BTC chart, when a Monday fade sets up:</p>
+  <ol>
+    <li><strong>Find the grey History-SD "UP mean" / "DOWN mean" line</strong> for this weekend (the slow anchor line, plotted from the weekend base). This is the one that carried the signal.</li>
+    <li><strong>Did the spike peak reach or exceed that mean line before your fade trigger?</strong> If yes, this is a "stretched" Monday &mdash; historically the stronger half (60% win, +0.50R vs +0.38R). Take it with normal-to-slightly-larger conviction.</li>
+    <li><strong>If the peak never reached the mean line</strong>, it is a "shallow" Monday (+0.19R historically). Still positive, but the softer half &mdash; smaller size, or stand aside if you are being selective.</li>
+    <li><strong>Ignore the 3-Month and 4-Week lines for this filter</strong> &mdash; they did not help (3-Month actively misled). Use them only as visual context / the confluence shading.</li>
+    <li><strong>Don't wait for the confluence box or a p95 tag</strong> &mdash; those almost never contain the peak intraday and add nothing.</li>
+    <li><strong>Outside Monday</strong>, lean on the daily trend instead: only fade in the direction of the daily 4-week momentum &mdash; against-trend fades on Tue&ndash;Wed were flat.</li>
+  </ol>
+  <p class="soft">Bottom line: the History-SD mean line is a reasonable "is this Monday stretched enough" checkbox that nudges the odds; it is not a hard gate and not proven, so keep position sizes where the validated fade already put them.</p>
+</section>
+
+</div></main>
+</body>
+</html>

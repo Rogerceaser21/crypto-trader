@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Weekend SD Playbook — Campaign Wrap-up</title>
+<style>
+:root{
+ --bg:#f6f7f9;--panel:#ffffff;--ink:#1a1e26;--soft:#5b6472;--line:#e2e6ec;
+ --accent:#0f7d6b;--accent-2:#0a5c4f;--warn:#b4551a;--warnbg:#fff2e6;
+ --qbg:#eef6ff;--qborder:#8fbfe8;--qink:#1f4f74;--chip:#eef2f5;
+ --stop:#e14b4b;--tp:#17a07f;--amber:#c9a227;--band:#e9edf2;
+ --shadow:0 1px 3px rgba(20,30,45,.08),0 6px 20px rgba(20,30,45,.05);
+ --passbg:#e7f6ee;--passbd:#4fb587;--passink:#12563c;
+ --margbg:#fbf3dc;--margbd:#d8b24a;--margink:#7a5a10;
+ --deadbg:#fdecec;--deadbd:#e79b9b;--deadink:#8f2f2f;
+}
+@media (prefers-color-scheme:dark){:root{
+ --bg:#0f1319;--panel:#161c24;--ink:#e7ecf2;--soft:#9aa5b3;--line:#26303c;
+ --accent:#39c9ad;--accent-2:#7fe0cd;--warn:#f0a054;--warnbg:#2a1e12;
+ --qbg:#12222f;--qborder:#2f5b78;--qink:#bfe0f5;--chip:#1d2530;
+ --stop:#ff6b6b;--tp:#3bd6a6;--amber:#d9b53a;--band:#1c242e;
+ --shadow:0 1px 3px rgba(0,0,0,.4),0 8px 26px rgba(0,0,0,.35);
+ --passbg:#122a1f;--passbd:#2f8f5b;--passink:#a5e3c6;
+ --margbg:#2a2410;--margbd:#7f6a1f;--margink:#e6cf87;
+ --deadbg:#2a1414;--deadbd:#7f3030;--deadink:#f2b3b3;
+}}
+:root[data-theme="light"]{--bg:#f6f7f9;--panel:#ffffff;--ink:#1a1e26;--soft:#5b6472;--line:#e2e6ec;--accent:#0f7d6b;--accent-2:#0a5c4f;--warn:#b4551a;--warnbg:#fff2e6;--qbg:#eef6ff;--qborder:#8fbfe8;--qink:#1f4f74;--chip:#eef2f5;--stop:#e14b4b;--tp:#17a07f;--amber:#c9a227;--band:#e9edf2;--passbg:#e7f6ee;--passbd:#4fb587;--passink:#12563c;--margbg:#fbf3dc;--margbd:#d8b24a;--margink:#7a5a10;--deadbg:#fdecec;--deadbd:#e79b9b;--deadink:#8f2f2f;}
+:root[data-theme="dark"]{--bg:#0f1319;--panel:#161c24;--ink:#e7ecf2;--soft:#9aa5b3;--line:#26303c;--accent:#39c9ad;--accent-2:#7fe0cd;--warn:#f0a054;--warnbg:#2a1e12;--qbg:#12222f;--qborder:#2f5b78;--qink:#bfe0f5;--chip:#1d2530;--stop:#ff6b6b;--tp:#3bd6a6;--amber:#d9b53a;--band:#1c242e;--passbg:#122a1f;--passbd:#2f8f5b;--passink:#a5e3c6;--margbg:#2a2410;--margbd:#7f6a1f;--margink:#e6cf87;--deadbg:#2a1414;--deadbd:#7f3030;--deadink:#f2b3b3;}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:17px;line-height:1.62;-webkit-text-size-adjust:100%}
+a{color:var(--accent)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+header.hero{background:linear-gradient(135deg,var(--accent-2),var(--accent));color:#fff;padding:44px 0 40px;border-bottom:4px solid rgba(0,0,0,.12)}
+header.hero .wrap{max-width:920px}
+header.hero .eyebrow{text-transform:uppercase;letter-spacing:.16em;font-size:12.5px;opacity:.92;margin:0 0 10px}
+header.hero h1{font-size:34px;line-height:1.14;margin:0 0 12px;font-weight:800}
+header.hero p.sub{margin:0;max-width:760px;opacity:.96;font-size:16.5px}
+header.hero .facts{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+header.hero .facts span{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:5px 12px;font-size:13px;font-weight:600}
+header.hero .verdict-1liner{margin-top:16px;font-weight:700;font-size:17px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);border-radius:10px;padding:12px 16px}
+.toolbar{display:flex;justify-content:flex-end;gap:8px;padding:14px 0 0}
+.tbtn{background:var(--panel);border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer}
+main{padding:8px 0 20px}
+section{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:26px 30px 30px;margin:22px 0 0;box-shadow:var(--shadow);scroll-margin-top:14px}
+section>.kicker{color:var(--accent);font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.1em;margin:0 0 6px}
+section>h2{font-size:25px;margin:0 0 12px;letter-spacing:-.01em}
+h3{font-size:19px;margin:22px 0 8px}
+p{margin:10px 0}
+ul,ol{margin:10px 0;padding-left:22px}
+li{margin:6px 0}
+.lead{font-size:18px}
+.soft{color:var(--soft)}
+.tt{font-variant-numeric:tabular-nums}
+figure{margin:18px 0 8px;background:var(--band);border:1px solid var(--line);border-radius:12px;padding:16px 16px 12px}
+figure svg{display:block;width:100%;height:auto;max-width:100%}
+figure figcaption{font-size:13.5px;color:var(--soft);margin-top:10px;line-height:1.5}
+figure figcaption b{color:var(--ink)}
+/* verdict cards */
+.vgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:18px 0 4px}
+@media(max-width:760px){.vgrid{grid-template-columns:1fr}}
+.vcard{border:1px solid var(--line);border-radius:14px;padding:16px 17px;background:var(--chip);display:flex;flex-direction:column}
+.vcard.pass{border-left:6px solid var(--passbd);background:var(--passbg)}
+.vcard.marg{border-left:6px solid var(--margbd);background:var(--margbg)}
+.vcard.dead{border-left:6px solid var(--deadbd);background:var(--deadbg)}
+.vhead{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+.vname{font-weight:800;font-size:16.5px}
+.vbadge{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;border-radius:7px;padding:3px 9px;white-space:nowrap}
+.vbadge.pass{background:var(--passbd);color:#06331f}
+.vbadge.marg{background:var(--margbd);color:#3a2c00}
+.vbadge.dead{background:var(--deadbd);color:#4a1010}
+.vsent{margin:4px 0 12px;font-size:15px;line-height:1.5}
+.vcard.pass .vsent,.vcard.pass .vname{color:var(--passink)}
+.vcard.marg .vsent,.vcard.marg .vname{color:var(--margink)}
+.vcard.dead .vsent,.vcard.dead .vname{color:var(--deadink)}
+.vstats{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.chip{font-size:12.5px;font-weight:700;background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:2px 9px;font-variant-numeric:tabular-nums;color:var(--ink)}
+.vlink{margin-top:auto;font-size:13.5px;font-weight:700;text-decoration:none}
+.vlink:hover{text-decoration:underline}
+/* tables */
+.tblwrap{overflow-x:auto}
+table.stat{width:100%;border-collapse:collapse;margin:14px 0;font-size:14.5px;font-variant-numeric:tabular-nums;min-width:520px}
+table.stat th,table.stat td{text-align:right;padding:9px 12px;border-bottom:1px solid var(--line)}
+table.stat th:first-child,table.stat td:first-child{text-align:left}
+table.stat thead th{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--soft);border-bottom:2px solid var(--line)}
+table.stat td.metric{font-weight:700;color:var(--ink)}
+table.stat td.wrong{color:var(--stop);font-weight:700}
+table.stat td.right{color:var(--tp);font-weight:700}
+table.stat tr.ok td.wrong{color:var(--tp)}
+table.stat .delta{color:var(--soft);font-weight:600}
+/* boxes */
+.box{border-radius:12px;padding:15px 17px;margin:16px 0;font-size:15.5px}
+.box.rule{background:var(--chip);border:1px solid var(--line)}
+.box.warn{background:var(--warnbg);border:1px solid var(--warn);color:var(--ink)}
+.box.note{background:var(--qbg);border:1px solid var(--qborder);border-left:5px solid var(--accent-2);color:var(--qink)}
+.box.meta{background:var(--qbg);border:1px solid var(--amber);border-left:5px solid var(--amber);color:var(--qink)}
+.box b.lbl{display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em;font-size:12px}
+.box.warn b.lbl{color:var(--warn)} .box.note b.lbl{color:var(--accent-2)} .box.meta b.lbl{color:var(--amber)}
+/* play card */
+.play{border:1px solid var(--passbd);background:var(--passbg);border-radius:16px;padding:22px 24px;margin:18px 0 4px}
+.play h3{color:var(--passink);margin-top:0}
+.play .tag{display:inline-block;background:var(--passbd);color:#06331f;font-weight:800;font-size:12px;letter-spacing:.05em;text-transform:uppercase;border-radius:7px;padding:3px 10px;margin-bottom:8px}
+.play ul li b{color:var(--passink)}
+.stepgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:16px 0 4px}
+@media(max-width:760px){.stepgrid{grid-template-columns:1fr}}
+.step{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 15px}
+.step .n{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-weight:800;font-size:13px;margin-bottom:8px}
+.step h4{margin:0 0 5px;font-size:15.5px}
+.step p{margin:0;font-size:14px;color:var(--soft)}
+.step p b{color:var(--ink)}
+/* ruled-out list */
+ul.killed{list-style:none;padding-left:0;margin:14px 0 0}
+ul.killed li{position:relative;padding:12px 12px 12px 42px;border:1px solid var(--line);border-left:5px solid var(--deadbd);border-radius:12px;background:var(--panel);margin:10px 0;font-size:15px}
+ul.killed li:before{content:"\2715";position:absolute;left:14px;top:12px;color:var(--stop);font-weight:900;font-size:15px}
+ul.killed li b{color:var(--ink)}
+ul.killed li .why{display:block;color:var(--soft);font-size:13.5px;margin-top:3px}
+/* footer */
+footer{color:var(--soft);font-size:13.5px;padding:18px 0 56px}
+footer .flinks{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0 16px}
+footer .flinks a{background:var(--chip);border:1px solid var(--line);border-radius:9px;padding:8px 12px;text-decoration:none;color:var(--accent);font-weight:700;font-size:13.5px}
+footer .flinks a:hover{border-color:var(--accent)}
+.meth{background:var(--chip);border:1px solid var(--line);border-radius:12px;padding:14px 16px;color:var(--ink);font-size:14px;line-height:1.6}
+.meth b{color:var(--ink)}
+hr.sep{border:none;border-top:1px solid var(--line);margin:22px 0}
+</style>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+ <p class="eyebrow">Weekend SD Trading &middot; Campaign Wrap-up</p>
+ <h1>The Weekend SD Playbook</h1>
+ <p class="sub">Eleven investigations into whether the weekend standard-deviation levels can be traded mechanically on BTC. Here is the honest campaign result, every verdict, the corrected numbers, and the one play worth keeping &mdash; in plain language with links to each full report.</p>
+ <div class="facts">
+  <span>In-sample 2019-09 &rarr; 2024-12-31</span>
+  <span>277 weekends</span>
+  <span>BTC perp, 1-minute candles</span>
+  <span>Real fees + slippage</span>
+ </div>
+ <div class="verdict-1liner">Bottom line: the weekend SD levels are a good <b>map</b> of where price is stretched &mdash; but not a <b>signal</b>. No mechanical weekend-direction rule survives. The only real edge left is the already-validated Annie Monday fade; the SD levels' job is to be <b>context</b> for it.</div>
+</div></header>
+
+<div class="wrap">
+ <div class="toolbar">
+  <button class="tbtn" onclick="setTheme('light')">&#9728; Light</button>
+  <button class="tbtn" onclick="setTheme('dark')">&#9790; Dark</button>
+  <button class="tbtn" onclick="setTheme('auto')">Auto</button>
+ </div>
+
+ <main>
+
+ <!-- ============ VERDICT SUMMARY GRAPHIC ============ -->
+ <section id="summary">
+  <p class="kicker">The campaign at a glance</p>
+  <h2>Eleven questions, one edge</h2>
+  <p class="lead">Each investigation asked whether some piece of the weekend behaviour could be turned into a rule. Two answered a real question &mdash; one built a tool, one explained why the trade works &mdash; four turned up something real but not a clean mechanical rule, and five came back empty after costs. Below: the scoreboard, then each card in detail.</p>
+
+  <figure>
+   <svg viewBox="0 0 900 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Verdict summary: two answered, four partial, five dead">
+    <style>
+     .lbl{font:600 13px -apple-system,Segoe UI,Roboto,sans-serif;fill:var(--ink)}
+     .sub{font:500 11px -apple-system,Segoe UI,Roboto,sans-serif;fill:var(--soft)}
+     .big{font:800 30px -apple-system,Segoe UI,Roboto,sans-serif;fill:var(--ink)}
+     .cap{font:700 11px -apple-system,Segoe UI,Roboto,sans-serif;letter-spacing:.05em;text-transform:uppercase}
+    </style>
+    <!-- three tiles -->
+    <g>
+     <rect x="10" y="20" width="280" height="180" rx="14" fill="var(--passbg)" stroke="var(--passbd)" stroke-width="2"/>
+     <text x="150" y="70" text-anchor="middle" class="big" style="fill:var(--passink)">2</text>
+     <text x="150" y="98" text-anchor="middle" class="cap" style="fill:var(--passink)">Built &amp; answered</text>
+     <text x="150" y="128" text-anchor="middle" class="lbl">Dynamic levels indicator</text>
+     <text x="150" y="146" text-anchor="middle" class="lbl">&middot; why the trade works</text>
+     <text x="150" y="176" text-anchor="middle" class="sub">a map, and why it snaps back</text>
+    </g>
+    <g>
+     <rect x="310" y="20" width="280" height="180" rx="14" fill="var(--margbg)" stroke="var(--margbd)" stroke-width="2"/>
+     <text x="450" y="70" text-anchor="middle" class="big" style="fill:var(--margink)">4</text>
+     <text x="450" y="98" text-anchor="middle" class="cap" style="fill:var(--margink)">Real, but use with care</text>
+     <text x="450" y="128" text-anchor="middle" class="lbl">Corrected constants &middot; Sunday burst</text>
+     <text x="450" y="146" text-anchor="middle" class="lbl">&middot; fade sizing &middot; breakout</text>
+     <text x="450" y="176" text-anchor="middle" class="sub">useful context, not a clean rule</text>
+    </g>
+    <g>
+     <rect x="610" y="20" width="280" height="180" rx="14" fill="var(--deadbg)" stroke="var(--deadbd)" stroke-width="2"/>
+     <text x="750" y="70" text-anchor="middle" class="big" style="fill:var(--deadink)">5</text>
+     <text x="750" y="98" text-anchor="middle" class="cap" style="fill:var(--deadink)">No edge after costs</text>
+     <text x="750" y="128" text-anchor="middle" class="lbl">Fade &middot; direction &middot; ride+flip</text>
+     <text x="750" y="146" text-anchor="middle" class="lbl">&middot; indicators &middot; exits</text>
+     <text x="750" y="176" text-anchor="middle" class="sub">ruled out &mdash; don't re-test</text>
+    </g>
+   </svg>
+   <figcaption>All results are <b>in-sample</b> (2019-09 &rarr; 2024-12-31, 277 weekends). The 2025-26 out-of-sample block remains locked &mdash; one shot, only on Igor's go.</figcaption>
+  </figure>
+
+  <div class="vgrid">
+
+   <div class="vcard marg">
+    <div class="vhead"><span class="vname">1 &middot; Truth report</span><span class="vbadge marg">&#10007; constants wrong</span></div>
+    <div class="vsent">His frozen indicator constants were wrong &mdash; 5 of 6 were off. Only the UP 95th-percentile survived (+0.7%). The report delivered the corrected full-history numbers instead, and showed the distribution drifts over time (rolling 3-month mean swings from ~1.5% to 6%+), so any single frozen number is fragile.</div>
+    <div class="vstats"><span class="chip">5 of 6 off</span><span class="chip">non-stationary</span><span class="chip">corrected set delivered</span></div>
+    <a class="vlink" href="Weekend SD Truth Report.html">Full report &rarr;</a>
+   </div>
+
+   <div class="vcard pass">
+    <div class="vhead"><span class="vname">2 &middot; Dynamic levels indicator</span><span class="vbadge pass">&#10003; built</span></div>
+    <div class="vsent">A Pine v6 "dynamic" indicator: the corrected constants as defaults, plus live 1-month (4 weekends) and 3-month (13 weekends) level sets computed causally on the chart, with confluence shading where two or more sets agree within 0.25 percentage points. Percent-only. Not yet compiled in the live editor &mdash; the first paste is the compile test.</div>
+    <div class="vstats"><span class="chip">Pine v6</span><span class="chip">1-mo + 3-mo live</span><span class="chip">confluence shading</span></div>
+    <a class="vlink" href="Dynamic Weekend Levels — Install Guide.html">Install guide &rarr;</a>
+   </div>
+
+   <div class="vcard dead">
+    <div class="vhead"><span class="vname">3 &middot; Counter-trade at the SD levels</span><span class="vbadge dead">&#10007; no edge</span></div>
+    <div class="vsent">Fading price back from the weekend SD levels. All 48 declared cells were negative after costs. The best cell (confluence mean level, halfway-back target, one-SD stop) won 64.2% of the time yet still averaged &minus;0.024R (t = &minus;0.33) &mdash; the classic fade trap: many small wins, rare big losses. Pooled across 3,738 trades: &minus;0.30R.</div>
+    <div class="vstats"><span class="chip">48 / 48 negative</span><span class="chip">64.2% WR, still &minus;R</span><span class="chip">3,738 trades &minus;0.30R</span></div>
+    <a class="vlink" href="Monday Counter-Trade Backtest.html">Full report &rarr;</a>
+   </div>
+
+   <div class="vcard marg">
+    <div class="vhead"><span class="vname">4 &middot; Weekend anatomy</span><span class="vbadge marg">&#10003;&#8202;/&#8202;&#10007; mixed</span></div>
+    <div class="vsent">"Mondays are more green" is not real (49.6% green &mdash; a coin flip). The late-Sunday move IS real, but as <b>volatility</b>: Sunday 18:00&ndash;21:00 New York runs 0.528%/hr vs 0.320% typical (t = +8.99). Direction is still a coin flip. The best directional hint &mdash; a Sunday burst continuing into Monday &mdash; only reached t = +2.09, below the honest bar.</div>
+    <div class="vstats"><span class="chip">Mondays 49.6% green</span><span class="chip">burst t = +8.99</span><span class="chip">direction = coin flip</span></div>
+    <a class="vlink" href="Weekend Anatomy Report.html">Full report &rarr;</a>
+   </div>
+
+   <div class="vcard dead">
+    <div class="vhead"><span class="vname">5 &middot; Direction bake-off</span><span class="vbadge dead">&#10007; no rule</span></div>
+    <div class="vsent">Six ways to guess the weekend's direction (always-long baseline, seasonality sign, prior-week pattern, Friday-close-vs-peak, high-before-low, late-Sunday momentum) across four entry timings &mdash; 21 cells. Nothing beat always-long credibly. The only positive cell (late-Sunday momentum, +0.313% excess, t = 1.03) dies the moment you shift the window by an hour.</div>
+    <div class="vstats"><span class="chip">21 cells</span><span class="chip">best +0.313%, t = 1.03</span><span class="chip">not shift-robust</span></div>
+    <a class="vlink" href="Weekend Direction Bake-off.html">Full report &rarr;</a>
+   </div>
+
+   <div class="vcard dead">
+    <div class="vhead"><span class="vname">6 &middot; Combined ride + flip</span><span class="vbadge dead">&#10007; no value added</span></div>
+    <div class="vsent">Stacking a weekend-long "ride" with a confirmation "flip" prints +0.718R (t = 2.43) &mdash; but it decomposes into bull-market beta (the long makes +104R in the run, loses 51R in 2022) plus the already-validated fade, with one-sided synergy. Quality drops versus the fade alone (t 2.98 &rarr; 2.43) and drawdown blows out (4.6R &rarr; 46R). Adding an SD-tag or momentum flip made it worse.</div>
+    <div class="vstats"><span class="chip">+0.718R, t = 2.43</span><span class="chip">drawdown 4.6R &rarr; 46R</span><span class="chip">it's just beta + fade</span></div>
+    <a class="vlink" href="Weekend Play Combined Backtest.html">Full report &rarr;</a>
+   </div>
+
+   <div class="vcard marg">
+    <div class="vhead"><span class="vname">7 &middot; SD levels as confluence for the fade</span><span class="vbadge marg">&#10003;&#8202;/&#8202;&#10007; sizing tweak</span></div>
+    <div class="vsent">The Monday fade improves when the peak reached at least the all-history average line before failing: <b>+0.382R &rarr; +0.502R</b> per trade (55 of 91 trades, 60% win rate, t = 3.3). Caveats keep it soft: the kept-vs-dropped separation is weak (t &asymp; 1.1), the 4-week window shows nothing, and the 3-month window points the other way. Reading: full size when the peak tagged the History average line, reduced size when it didn't &mdash; a sizing preference, not a hard gate.</div>
+    <div class="vstats"><span class="chip">+0.382R &rarr; +0.502R</span><span class="chip">55 of 91, 60% WR, t = 3.3</span><span class="chip">sizing tweak, not a gate</span></div>
+    <a class="vlink" href="Monday Fade x SD Levels Confluence.html">Full report &rarr;</a>
+   </div>
+
+   <div class="vcard marg">
+    <div class="vhead"><span class="vname">8 &middot; Monday breakout continuation</span><span class="vbadge marg">&#10007; parked</span></div>
+    <div class="vsent">Joining the Monday move as it breaks the average&#8202;+&#8202;1SD level. The best declared version made <b>+0.307R</b> per trade (75 trades, 60% win rate, profit factor 1.87) &mdash; but t = 2.33, below the strict t &ge; 3 bar this campaign demands. The idea came from flipping a losing strategy, so it earns extra skepticism, and the profits are front-loaded in 2020&ndash;21. Not validated; parked.</div>
+    <div class="vstats"><span class="chip">+0.307R, PF 1.87</span><span class="chip">75 trades, 60% WR</span><span class="chip">t = 2.33 &mdash; below the bar</span></div>
+    <a class="vlink" href="Monday Breakout Continuation Backtest.html">Full report &rarr;</a>
+   </div>
+
+   <div class="vcard pass">
+    <div class="vhead"><span class="vname">9 &middot; Why the trade works</span><span class="vbadge pass">&#10003; answered</span></div>
+    <div class="vsent">Mechanism research: the weekend is a CME-closed, low-liquidity vacuum, so overshoots snap back when futures reopen Sunday night. Our own 277 weekends confirm the pull &mdash; the weekend gap fills <b>58%</b> of the time by Monday's close, 68% within 48 hours, and 79% by Friday (median 14h). The weekend base is a documented magnet, and a failed breakout is a stop-cascade tell.</div>
+    <div class="vstats"><span class="chip">gap fill 58% by Mon</span><span class="chip">68% in 48h &middot; 79% by Fri</span><span class="chip">median 14h</span></div>
+    <a class="vlink" href="Why the Monday Fade Works.html">Full report &rarr;</a>
+   </div>
+
+   <div class="vcard dead">
+    <div class="vhead"><span class="vname">10 &middot; Can any indicator improve the entry?</span><span class="vbadge dead">&#10007; no</span></div>
+    <div class="vsent">15 filters plus 3 replacement triggers tested &mdash; Bollinger %B, anchored VWAP, RSI(2), Williams %R, CCI, MFI, OBV, Keltner, ATR-stretch, Fisher, TD9, PMARP, HPDR, Stochastic, RSI-divergence. None separates winners from losers (best <b>t = 1.0</b>). Swapping the PVSRA retest for band-touch entries destroys the edge (&minus;0.6R). The confirmation retest <b>is</b> the edge &mdash; it survived all 15 challengers.</div>
+    <div class="vstats"><span class="chip">15 filters + 3 triggers</span><span class="chip">best t = 1.0</span><span class="chip">retest survived all 15</span></div>
+    <a class="vlink" href="Monday Fade Trigger Bake-off 2.html">Full report &rarr;</a>
+   </div>
+
+   <div class="vcard dead">
+    <div class="vhead"><span class="vname">11 &middot; Can better exits beat fixed 1.9R?</span><span class="vbadge dead">&#10007; no</span></div>
+    <div class="vsent">The refund rule is proven inert &mdash; it never fires, so it is removed from the checklist. Targeting the weekend base is significantly <b>worse</b> (it cuts the reversion short). One candidate survives for the future out-of-sample test: targeting the opposite side's average level, <b>+0.491R</b> vs +0.382R &mdash; but that is not statistically proven (t = 1.22).</div>
+    <div class="box meta" style="margin:6px 0 12px"><b class="lbl">One to watch</b>Opposite-side average target: +0.491R vs the fixed +0.382R, but t = 1.22 &mdash; parked for the locked out-of-sample block, not adopted now.</div>
+    <div class="vstats"><span class="chip">refund never fires</span><span class="chip">base target = worse</span><span class="chip">+0.491R candidate, t = 1.22</span></div>
+    <a class="vlink" href="Monday Fade Exit Improvements.html">Full report &rarr;</a>
+   </div>
+
+  </div>
+ </section>
+
+ <!-- ============ CORRECTED CONSTANTS ============ -->
+ <section id="constants">
+  <p class="kicker">The corrected map</p>
+  <h2>Frozen vs. true weekend levels</h2>
+  <p>The whole campaign started from a set of frozen constants baked into the old indicator. Measured against the full history, five of the six were wrong. These corrected numbers &mdash; the weekend move as a percentage of the Friday base &mdash; are now the defaults in the new dynamic indicator. Everything is percent-only.</p>
+  <div class="tblwrap">
+  <table class="stat">
+   <thead>
+    <tr><th>Weekend move (% of base)</th><th>Frozen (old)</th><th>True (full history)</th><th>Verdict</th></tr>
+   </thead>
+   <tbody>
+    <tr><td class="metric">UP &mdash; mean</td><td class="delta">was wrong</td><td class="wrong">2.8076%</td><td>&#10007; off</td></tr>
+    <tr><td class="metric">UP &mdash; standard deviation</td><td class="delta">was wrong</td><td class="wrong">3.5904%</td><td>&#10007; off</td></tr>
+    <tr class="ok"><td class="metric">UP &mdash; 95th percentile</td><td class="delta">close</td><td class="wrong">8.5684%</td><td>&#10003; survived (+0.7%)</td></tr>
+    <tr><td class="metric">DOWN &mdash; mean</td><td class="delta">was wrong</td><td class="wrong">2.7809%</td><td>&#10007; off</td></tr>
+    <tr><td class="metric">DOWN &mdash; standard deviation</td><td class="delta">was wrong</td><td class="wrong">3.2868%</td><td>&#10007; off</td></tr>
+    <tr><td class="metric">DOWN &mdash; 95th percentile</td><td class="delta">was wrong</td><td class="wrong">7.5895%</td><td>&#10007; off</td></tr>
+   </tbody>
+  </table>
+  </div>
+  <div class="box meta"><b class="lbl">The catch</b>These are full-history averages, and the distribution does not sit still &mdash; the rolling 3-month mean of the weekend move swings from about 1.5% up past 6%. That is exactly why the new indicator also draws live 1-month and 3-month level sets on the chart: so you always see the <b>current</b> stretch, not just the all-time one.</div>
+ </section>
+
+ <!-- ============ TIMELINE ============ -->
+ <section id="clock">
+  <p class="kicker">When to be awake</p>
+  <h2>The weekend clock</h2>
+  <p>The weekend "box" opens at the Friday close and price wanders inside it until the base for Monday is set. The one genuinely active window the campaign found is the late-Sunday burst &mdash; and for Igor in Dubai that lands in the small hours of Monday morning.</p>
+
+  <figure>
+   <svg viewBox="0 0 900 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Weekend timeline from Friday close to Monday session, marking the Sunday burst window and Monday base latch">
+    <style>
+     .tl{font:600 12px -apple-system,Segoe UI,Roboto,sans-serif;fill:var(--ink)}
+     .tls{font:500 11px -apple-system,Segoe UI,Roboto,sans-serif;fill:var(--soft)}
+     .tlb{font:800 12px -apple-system,Segoe UI,Roboto,sans-serif;fill:var(--ink)}
+     .day{font:700 12px -apple-system,Segoe UI,Roboto,sans-serif;letter-spacing:.04em;fill:var(--soft)}
+    </style>
+    <!-- base band -->
+    <rect x="30" y="96" width="840" height="34" rx="8" fill="var(--band)" stroke="var(--line)"/>
+    <!-- day labels -->
+    <text x="70" y="80" class="day">FRI</text>
+    <text x="270" y="80" class="day">SAT</text>
+    <text x="470" y="80" class="day">SUN</text>
+    <text x="760" y="80" class="day">MON</text>
+    <!-- day dividers -->
+    <line x1="180" y1="90" x2="180" y2="136" stroke="var(--line)" stroke-dasharray="3 4"/>
+    <line x1="380" y1="90" x2="380" y2="136" stroke="var(--line)" stroke-dasharray="3 4"/>
+    <line x1="640" y1="90" x2="640" y2="136" stroke="var(--line)" stroke-dasharray="3 4"/>
+
+    <!-- burst window highlight -->
+    <rect x="560" y="88" width="120" height="50" rx="8" fill="var(--margbg)" stroke="var(--margbd)" stroke-width="2"/>
+
+    <!-- marker: Friday close / box opens -->
+    <circle cx="70" cy="113" r="7" fill="var(--accent)"/>
+    <text x="70" y="160" text-anchor="middle" class="tlb">Box opens</text>
+    <text x="70" y="178" text-anchor="middle" class="tls">Fri 17:00 New York</text>
+
+    <!-- marker: quiet drift -->
+    <text x="300" y="120" text-anchor="middle" class="tls">quiet drift inside the box</text>
+
+    <!-- marker: burst window -->
+    <circle cx="620" cy="113" r="7" fill="var(--margbd)"/>
+    <text x="620" y="160" text-anchor="middle" class="tlb">Late-Sunday burst</text>
+    <text x="620" y="178" text-anchor="middle" class="tls">Sun 18:00&ndash;21:00 New York</text>
+    <text x="620" y="196" text-anchor="middle" class="tls" style="fill:var(--warn);font-weight:700">= Mon 02:00&ndash;05:00 Dubai</text>
+
+    <!-- marker: base latch -->
+    <circle cx="700" cy="113" r="7" fill="var(--accent-2)"/>
+    <text x="720" y="222" text-anchor="middle" class="tlb">Monday base latched</text>
+    <text x="720" y="240" text-anchor="middle" class="tls">~Mon 02:00 Dubai</text>
+
+    <!-- marker: Monday window -->
+    <circle cx="820" cy="113" r="7" fill="var(--accent)"/>
+    <text x="830" y="160" text-anchor="middle" class="tlb">Monday window</text>
+    <text x="830" y="178" text-anchor="middle" class="tls">the fade plays here</text>
+
+    <!-- volatility label above burst -->
+    <text x="620" y="66" text-anchor="middle" class="tl" style="fill:var(--margink);font-weight:800">0.528%/hr vs 0.320% typical</text>
+    <path d="M620 70 L620 84" stroke="var(--margbd)" stroke-width="2" marker-end="url(#ar)"/>
+    <defs><marker id="ar" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 Z" fill="var(--margbd)"/></marker></defs>
+   </svg>
+   <figcaption><b>Be awake, not triggered.</b> The Sunday-evening burst is when to be watching the chart &mdash; it is a spike in <b>movement</b>, not a signal about which way price goes. For Dubai that is roughly 2&ndash;5am Monday. The tradable decision comes later, in the Monday window, on the validated fade.</figcaption>
+  </figure>
+ </section>
+
+ <!-- ============ RECOMMENDED PLAY ============ -->
+ <section id="play">
+  <p class="kicker">What to actually do</p>
+  <h2>The recommended play today</h2>
+  <p class="lead">One edge came out of this whole campaign intact, and it is not new &mdash; it is the Annie Monday fade you already validated. Keep trading that. Let everything the campaign built serve it.</p>
+
+  <div class="play">
+   <span class="tag">Keep trading this</span>
+   <h3>The validated Annie Monday fade</h3>
+   <p>Fade the Monday move back into the weekend box, taken only on the confirmation trigger: a peak-2 spike-out plus a 200% PVSRA vector pushing through the 50 EMA, on the Monday-spike subset. This is the one setup that held up under real costs, walk-forward, and the locked out-of-sample block.</p>
+   <ul>
+    <li><b>+0.382R</b> per trade in-sample, on 91 trades, t = <b>2.98</b>, with a shallow 4.6R drawdown.</li>
+    <li><b>+0.54R</b> per trade on the locked 2025-26 out-of-sample run &mdash; it got <em>better</em> out of sample, not worse.</li>
+    <li><b>Sizing tweak from the confluence test:</b> full size when the Monday peak reached the gray History average line, reduced size when it didn't.</li>
+    <li><b>Refund exit rule:</b> tested &mdash; it never fires (the hard stop always comes first). Removed from the checklist.</li>
+   </ul>
+  </div>
+
+  <h3>How the campaign's other pieces support it</h3>
+  <div class="stepgrid">
+   <div class="step"><span class="n">1</span><h4>Levels = context</h4><p>Use the new dynamic indicator's level sets and <b>confluence zones</b> as a map of where price is stretched and as target/reference areas &mdash; <b>not</b> as automatic entry triggers. They tell you <em>where</em>, never <em>when</em>.</p></div>
+   <div class="step"><span class="n">2</span><h4>Sunday burst = be awake</h4><p>The late-Sunday burst (Sun 18:00&ndash;21:00 New York = <b>2&ndash;5am Monday Dubai</b>) is your cue to be watching, because movement is elevated. It is not a signal by itself &mdash; direction there is a coin flip.</p></div>
+   <div class="step"><span class="n">3</span><h4>Trigger = the fade</h4><p>Wait for the Monday confirmation trigger to actually fire. That is the only mechanical green light. The SD context and your own discretion filter which fires to take.</p></div>
+  </div>
+  <div class="box note"><b class="lbl">In one line</b>The weekend SD levels are the terrain map; the Monday confirmation trigger is the only trade. Use the map to read the ground and to place targets, then take the fade when it confirms.</div>
+ </section>
+
+ <!-- ============ RULED OUT ============ -->
+ <section id="ruledout">
+  <p class="kicker">The graveyard</p>
+  <h2>What we ruled out &mdash; don't re-test these</h2>
+  <p>These were tested honestly and came back with no edge after costs. Writing them down so nobody spends another weekend re-running them.</p>
+  <ul class="killed">
+   <li><b>The naked counter-trade at the SD levels</b> &mdash; fading price off the weekend levels.<span class="why">All 48 declared ways were negative after costs; even the 64.2%-win-rate cell still lost money. A textbook fade trap.</span></li>
+   <li><b>All six weekend direction-pickers</b> &mdash; seasonality sign, prior-week pattern, Friday-close-vs-peak, high-before-low, late-Sunday momentum, and the always-long baseline.<span class="why">Nothing beat always-long credibly; the one positive cell fell apart under a one-hour window shift.</span></li>
+   <li><b>The ride + flip structure</b> &mdash; a weekend-long stacked with a confirmation flip.<span class="why">Looked good only because it smuggled in bull-market beta and the fade you already have; quality dropped and drawdown exploded from 4.6R to 46R.</span></li>
+   <li><b>The standalone momentum / SD-tag flip</b> &mdash; flipping on a late-weekend momentum or SD-tag signal.<span class="why">Standalone it was dead (+0.007R); bolted onto the ride+flip it made results worse, not better.</span></li>
+   <li><b>The frozen indicator constants</b> &mdash; the old baked-in weekend numbers.<span class="why">Five of six were wrong; replaced by the corrected, drift-aware dynamic levels.</span></li>
+  </ul>
+ </section>
+
+ </main>
+
+ <footer>
+  <div class="flinks">
+   <a href="Weekend SD Truth Report.html">Truth Report</a>
+   <a href="Dynamic Weekend Levels — Install Guide.html">Dynamic Levels Install Guide</a>
+   <a href="Monday Counter-Trade Backtest.html">Counter-Trade Backtest</a>
+   <a href="Weekend Anatomy Report.html">Weekend Anatomy Report</a>
+   <a href="Weekend Direction Bake-off.html">Direction Bake-off</a>
+   <a href="Weekend Play Combined Backtest.html">Combined Ride+Flip Backtest</a>
+  </div>
+  <div class="meth">
+   <b>Method.</b> Causal detection only (nothing uses future bars). Ambiguous fills are scored as losses. Costs are 0.05% per side plus 0.02% slippage. Only declared parameter grids are tested &mdash; no fishing. Survivors get Monte-Carlo shuffles, sensitivity sweeps, and deterministic double-runs as proof.
+   <br><br>
+   <b>Out-of-sample is untouched.</b> Every number on this page is in-sample (2019-09 &rarr; 2024-12-31, 277 weekends). The 2025-26 block is locked &mdash; one shot, only on Igor's explicit go.
+  </div>
+ </footer>
+</div>
+
+<script>
+function setTheme(t){try{if(t==='auto'){document.documentElement.removeAttribute('data-theme');localStorage.removeItem('wsd-theme');}else{document.documentElement.setAttribute('data-theme',t);localStorage.setItem('wsd-theme',t);}}catch(e){}}
+try{var s=localStorage.getItem('wsd-theme');if(s)document.documentElement.setAttribute('data-theme',s);}catch(e){}
+</script>
+</body>
+</html>
