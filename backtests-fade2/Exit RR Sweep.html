@@ -1,0 +1,194 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Exit R:R Sweep &mdash; Monday Fade</title><style>
+    :root{--bg:#f6f7f9;--card:#fff;--ink:#1f2733;--muted:#6b7683;--line:#e3e7ee;
+      --ok:#0b8a5f;--okbg:#e7f6ef;--bad:#c0392b;--badbg:#fbe9e7;--warn:#b9770a;--warnbg:#fdf3e3;--accent:#2c5cc5;}
+    *{box-sizing:border-box;}
+    body{margin:0;background:var(--bg);color:var(--ink);
+      font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+    .wrap{max-width:1000px;margin:0 auto;padding:32px 24px 72px;}
+    h1{font-size:26px;margin:0 0 4px;letter-spacing:-.2px;}
+    .sub{color:var(--muted);font-size:13.5px;margin:0 0 20px;}
+    h2{font-size:19px;margin:38px 0 12px;padding-bottom:7px;border-bottom:2px solid var(--line);}
+    h3{font-size:15px;margin:20px 0 6px;color:#33404f;}
+    .banner{border-radius:12px;padding:18px 20px;font-size:16px;font-weight:600;margin:0 0 14px;
+      display:flex;gap:13px;align-items:flex-start;line-height:1.45;
+      background:var(--warnbg);border:1px solid #f0d9a8;color:#8a5a08;}
+    .banner.ok{background:var(--okbg);border-color:#bfe6d3;color:#0b6b4b;}
+    .banner .tag{font-size:12px;font-weight:800;letter-spacing:.5px;padding:4px 10px;border-radius:6px;
+      white-space:nowrap;background:var(--warn);color:#fff;}
+    .banner.ok .tag{background:var(--ok);}
+    .kpis{display:flex;flex-wrap:wrap;gap:12px;margin:12px 0 6px;}
+    .kpi{flex:1 1 150px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:13px 15px;}
+    .kpi .v{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;}
+    .kpi .v.neg{color:var(--bad);} .kpi .v.ok{color:var(--ok);}
+    .kpi .l{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-top:2px;}
+    table{border-collapse:collapse;width:100%;margin:10px 0;background:var(--card);
+      border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:13.5px;}
+    th,td{padding:8px 11px;text-align:left;border-bottom:1px solid var(--line);}
+    th{background:#eef1f6;font-weight:650;color:#3a4553;font-size:12.5px;}
+    tr:last-child td{border-bottom:none;}
+    td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;
+      font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:12.8px;}
+    td.pos{color:var(--ok);} td.neg{color:var(--bad);}
+    th.pcol,td.pcol{background:#f0f4fc;}
+    tr.base td{background:#eef3ff;font-weight:600;}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:14px 0;}
+    .chart{width:100%;height:auto;display:block;}
+    .chart .grid{stroke:#eef1f6;stroke-width:1;}
+    .chart .ytick{font:11px monospace;fill:var(--muted);text-anchor:end;}
+    .chart .xtick{font:11px sans-serif;fill:var(--muted);}
+    .chart .lgd{font:600 12px sans-serif;fill:#33404f;}
+    .chart .barval{font:700 11px monospace;fill:#33404f;}
+    .chart .barlab{font:600 11px monospace;fill:#6b7683;}
+    .chart .barnote{font:600 11px sans-serif;fill:#6b7683;}
+    .box{border-radius:12px;padding:16px 18px;margin:14px 0;border:1px solid;}
+    .box.honesty{background:#f4f6fb;border-color:#d9e0ee;}
+    .box.take{background:var(--warnbg);border-color:#f0d9a8;}
+    ul{margin:8px 0;padding-left:20px;} li{margin:5px 0;}
+    code{background:#eef1f6;padding:1px 6px;border-radius:4px;font-size:12.5px;
+      font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;}
+    .foot{color:var(--muted);font-size:12px;margin-top:40px;border-top:1px solid var(--line);padding-top:14px;}
+    p{margin:9px 0;}
+    .win{color:var(--ok);font-weight:700;} .lose{color:var(--bad);font-weight:700;}
+    html[data-theme="light"]{--bg:#f6f7f9;--card:#fff;--ink:#1f2733;--muted:#6b7683;--line:#e3e7ee;
+      --ok:#0b8a5f;--okbg:#e7f6ef;--bad:#c0392b;--badbg:#fbe9e7;--warn:#b9770a;--warnbg:#fdf3e3;--accent:#2c5cc5;}
+    html[data-theme="dark"]{--bg:#10141b;--card:#161b22;--ink:#e6edf3;--muted:#94a0b4;--line:#2a3140;
+      --ok:#3ddc9a;--okbg:#123028;--bad:#ff6b5e;--badbg:#2e1614;--warn:#f0b429;--warnbg:#2c2210;--accent:#6aa9ff;}
+    html[data-theme="dark"] th{background:#1c2230;color:#c7d0dc;}
+    html[data-theme="dark"] th.pcol,html[data-theme="dark"] td.pcol{background:#182233;}
+    html[data-theme="dark"] tr.base td{background:#1a2740;}
+    html[data-theme="dark"] .chart .grid{stroke:#2a3140;}
+    html[data-theme="dark"] .chart .lgd{fill:#c7d0dc;}
+    html[data-theme="dark"] .chart .barval{fill:#c7d0dc;}
+    html[data-theme="dark"] .box.honesty{background:#181d27;border-color:#2a3140;}
+    html[data-theme="dark"] code{background:#1c2230;}
+    html[data-theme="dark"] .banner{border-color:#4a3a12;color:#f0c96a;}
+    html[data-theme="dark"] .banner.ok{border-color:#1d4a37;color:#5be6b0;}
+    html[data-theme="dark"] .box.take{border-color:#4a3a12;}
+    .theme-toggle{position:fixed;top:16px;right:20px;z-index:100;background:var(--card);
+      border:1px solid var(--line);color:var(--ink);border-radius:20px;padding:6px 14px;
+      font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.10);
+      font-family:inherit;letter-spacing:.02em;}
+    html[data-theme="dark"] .theme-toggle{box-shadow:0 2px 10px rgba(0,0,0,.35);}
+    .theme-toggle:active{transform:translateY(1px);}
+@media(max-width:560px){.theme-toggle{top:10px;right:12px;padding:6px 10px;font-size:12px}body{padding-top:44px}}
+    </style>
+    <script>
+(function(){try{var t=localStorage.getItem('codexTheme');var e=(t==='light'||t==='dark')?t:((window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light');document.documentElement.setAttribute('data-theme',e);}catch(e){}})();
+</script>
+    </head><body><button type="button" id="themeToggle" class="theme-toggle" aria-label="Cycle theme: light, dark, or system">&#9683; Auto</button><div class="wrap"><h1>Best Exit for the Monday Fade &mdash; R:R Sweep</h1>
+<p class="sub">Same frozen entries every time (the validated 91 Monday-spike fades, +0.382R, t=2.98). We hold entry / stop / refund / Friday-cap fixed and vary ONLY the exit target: five fixed R:R levels (1.9R baseline, 2.5R, 3R, 4R, 5R) plus a 50%-partial scale-out. Judged head-to-head on the identical trades. Causal, in-sample 2019&ndash;2024, realistic fees and slippage. The locked 2025&ndash;26 block is untouched.</p>
+
+<div class="banner"><span class="tag">&#9888; A BETTER TARGET EXISTS &mdash; CONFIRM ON OOS FIRST</span><span>The 1.9R baseline is <b>not</b> the best fixed exit. Widening the target to <b>2.5R lifts expectancy +0.382R&nbsp;&rarr;&nbsp;+0.506R (+32%) and total +34.8R&nbsp;&rarr;&nbsp;+46.0R</b>, and it is the <b>only</b> variant that clears the pre-registered paired-t&nbsp;&ge;&nbsp;2.5 bar (t=2.56). 3.0R books the most money (+0.541R, +49R) but at paired t=2.22, just under the bar. The catch: the win is marginal (2.56 barely clears 2.5; after correcting for the 5 challengers p&nbsp;&asymp;&nbsp;0.06), drawdown grows 4.6R&nbsp;&rarr;&nbsp;6.1R, and it is strong on the primary and mid sets but flat on the smallest. <b>Promote 2.5R (watch 3.0R) to the locked out-of-sample run as the challenger; do not switch live until it survives.</b> 4R, 5R and the 50%-partial do not beat baseline.</span></div>
+
+<div class="kpis">
+<div class="kpi"><div class="v">6</div><div class="l">exit variants tested</div></div>
+<div class="kpi"><div class="v">91</div><div class="l">identical entries each</div></div>
+<div class="kpi"><div class="v ok">+0.506R</div><div class="l">2.5R expectancy (vs +0.382R)</div></div>
+<div class="kpi"><div class="v ok">2.56</div><div class="l">best paired t vs baseline</div></div>
+<div class="kpi"><div class="v">2.5</div><div class="l">paired-t bar (5 challengers)</div></div>
+</div>
+
+<h2>1 &middot; Anchor reproduced first</h2>
+<p>Before touching any new target, the baseline 1.9R exit was re-resolved on the 91 frozen entries and matched the validated Monday fade to machine precision. This proves the exit engine here is the same one that produced the flagship &mdash; so every difference below is caused only by the target change, nothing else.</p>
+<table><tr><th>quantity</th><th class="num">validated anchor</th><th class="num">reproduced here (1.9R)</th><th class="num">max per-trade R gap</th></tr>
+<tr><td>trades</td><td class="num">91</td><td class="num">91</td><td class="num" rowspan="4">4.0e-15</td></tr>
+<tr><td>expectancy (avg R)</td><td class="num">+0.382</td><td class="num">+0.3820</td></tr>
+<tr><td>total R</td><td class="num">+34.76</td><td class="num">+34.761</td></tr>
+<tr><td>t vs zero</td><td class="num">2.98</td><td class="num">2.977</td></tr>
+</table>
+
+<h2>2 &middot; The six exits, head-to-head on the 91</h2>
+<p>Every row is the <em>same</em> 91 entries; only the exit target differs. The decisive column is the <b>paired t vs baseline</b> (highlighted): it compares each variant to the 1.9R baseline trade-by-trade (per-trade R differences), isolating the exit effect with zero entry noise. With 5 challengers the pre-set bar for a real win is <b>paired t &ge; 2.5</b> (marked &#9733;). Plain-English exit name in every row.</p>
+<div style="overflow-x:auto;"><table>
+<tr><th>exit rule (plain name)</th><th class="num">N</th><th class="num">win %</th><th class="num">avg R</th><th class="num">median R</th><th class="num">t vs 0</th><th class="num">PF</th><th class="num">total R</th><th class="num">max DD (R)</th><th class="num">avg hold</th><th class="num pcol">paired t<br>vs base</th></tr>
+<tr class="base"><td>Baseline &mdash; fixed 1.9R target</td><td class="num">91</td><td class="num">54.9</td><td class="num pos">+0.382</td><td class="num">+0.164</td><td class="num">2.98</td><td class="num">2.05</td><td class="num">+34.8</td><td class="num">4.6</td><td class="num">43h</td><td class="num pcol">&mdash;</td></tr>
+<tr><td>Wider target &mdash; fixed 2.5R</td><td class="num">91</td><td class="num">53.8</td><td class="num pos">+0.506</td><td class="num">+0.094</td><td class="num">3.35</td><td class="num">2.34</td><td class="num">+46.0</td><td class="num">6.1</td><td class="num">47h</td><td class="num pcol">+2.56 &#9733;</td></tr>
+<tr><td>Wider target &mdash; fixed 3.0R</td><td class="num">91</td><td class="num">52.7</td><td class="num pos">+0.541</td><td class="num">+0.086</td><td class="num">3.31</td><td class="num">2.43</td><td class="num">+49.2</td><td class="num">6.1</td><td class="num">51h</td><td class="num pcol">+2.22</td></tr>
+<tr><td>Wider target &mdash; fixed 4.0R</td><td class="num">91</td><td class="num">49.5</td><td class="num pos">+0.420</td><td class="num">-0.014</td><td class="num">2.48</td><td class="num">2.01</td><td class="num">+38.3</td><td class="num">8.9</td><td class="num">56h</td><td class="num pcol">+0.37</td></tr>
+<tr><td>Wider target &mdash; fixed 5.0R</td><td class="num">91</td><td class="num">49.5</td><td class="num pos">+0.457</td><td class="num">-0.014</td><td class="num">2.54</td><td class="num">2.10</td><td class="num">+41.6</td><td class="num">8.9</td><td class="num">57h</td><td class="num pcol">+0.65</td></tr>
+<tr><td>Scale out &mdash; half at 1.9R, runner to Friday (breakeven stop)</td><td class="num">91</td><td class="num">54.9</td><td class="num pos">+0.425</td><td class="num">+0.164</td><td class="num">2.83</td><td class="num">2.17</td><td class="num">+38.7</td><td class="num">6.2</td><td class="num">57h</td><td class="num pcol">+0.63</td></tr>
+</table></div>
+<p style="font-size:12.5px;color:#6b7683;">Reading it straight: expectancy rises from 1.9R to a peak around 2.5&ndash;3.0R, then falls back at 4R&ndash;5R &mdash; the fade reversion typically overshoots 1.9R toward ~2.5&ndash;3R but rarely reaches 4&ndash;5R before the Friday cap (at 5R, 52 of 91 trades time out on Friday vs 30 at baseline). The wider target also deepens drawdown: 4.6R at baseline &rarr; 6.1R at 2.5&ndash;3R &rarr; 8.9R at 4&ndash;5R. The 50%-partial keeps baseline&apos;s win rate and lifts total modestly (+38.7R) but is statistically tied (paired t=0.63) and carries a deeper 6.2R drawdown.</p>
+
+<h2>3 &middot; Equity curves &mdash; baseline vs the two wider targets</h2>
+<div class="card">
+<svg viewBox="0 0 860 340" class="chart" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Equity curves"><line class="grid" x1="52.0" y1="306.0" x2="844.0" y2="306.0"/><text class="ytick" x="46.0" y="309.0">-4R</text><line class="grid" x1="52.0" y1="248.0" x2="844.0" y2="248.0"/><text class="ytick" x="46.0" y="251.0">+7R</text><line class="grid" x1="52.0" y1="190.0" x2="844.0" y2="190.0"/><text class="ytick" x="46.0" y="193.0">+19R</text><line class="grid" x1="52.0" y1="132.0" x2="844.0" y2="132.0"/><text class="ytick" x="46.0" y="135.0">+30R</text><line class="grid" x1="52.0" y1="74.0" x2="844.0" y2="74.0"/><text class="ytick" x="46.0" y="77.0">+41R</text><line class="grid" x1="52.0" y1="16.0" x2="844.0" y2="16.0"/><text class="ytick" x="46.0" y="19.0">+52R</text><line class="grid" x1="52.0" y1="286.8" x2="844.0" y2="286.8" style="stroke-dasharray:3 3"/><polyline fill="none" stroke="#2c5cc5" stroke-width="3" points="52.0,277.3 60.8,272.2 69.6,268.7 78.4,274.2 87.2,279.7 96.0,285.2 104.8,290.5 113.6,283.6 122.4,278.8 131.2,273.4 140.0,279.0 148.8,279.2 157.6,269.7 166.4,270.4 175.2,270.8 184.0,261.2 192.8,266.6 201.6,257.2 210.4,247.8 219.2,238.2 228.0,243.7 236.8,234.5 245.6,229.2 254.4,219.4 263.2,224.7 272.0,230.1 280.8,220.4 289.6,225.8 298.4,226.2 307.2,216.7 316.0,216.2 324.8,206.9 333.6,197.4 342.4,198.0 351.2,197.2 360.0,197.6 368.8,188.3 377.6,188.2 386.4,178.7 395.2,169.3 404.0,174.7 412.8,175.3 421.6,165.9 430.4,162.9 439.2,153.5 448.0,144.1 456.8,149.4 465.6,155.2 474.4,155.0 483.2,155.6 492.0,146.2 500.8,149.2 509.6,155.7 518.4,146.5 527.2,151.9 536.0,157.3 544.8,162.9 553.6,153.5 562.4,159.1 571.2,158.1 580.0,149.0 588.8,139.5 597.6,145.2 606.4,150.8 615.2,156.3 624.0,155.8 632.8,154.0 641.6,144.8 650.4,142.3 659.2,148.4 668.0,151.9 676.8,157.5 685.6,162.9 694.4,159.5 703.2,157.7 712.0,163.3 720.8,154.0 729.6,144.5 738.4,135.0 747.2,140.5 756.0,140.6 764.8,131.0 773.6,121.5 782.4,118.3 791.2,123.7 800.0,129.1 808.8,134.6 817.6,125.2 826.4,115.5 835.2,115.9 844.0,106.4"/><polyline fill="none" stroke="#0b8a5f" stroke-width="2" points="52.0,274.2 60.8,269.1 69.6,265.6 78.4,271.1 87.2,276.6 96.0,282.0 104.8,287.3 113.6,280.5 122.4,275.7 131.2,270.2 140.0,275.9 148.8,276.1 157.6,263.5 166.4,264.1 175.2,264.5 184.0,251.9 192.8,257.3 201.6,244.7 210.4,232.2 219.2,219.5 228.0,225.0 236.8,212.7 245.6,207.4 254.4,196.0 263.2,201.3 272.0,206.7 280.8,199.3 289.6,204.7 298.4,205.2 307.2,192.5 316.0,192.1 324.8,179.6 333.6,167.0 342.4,167.6 351.2,166.8 360.0,167.3 368.8,154.8 377.6,154.7 386.4,142.1 395.2,129.6 404.0,135.0 412.8,135.6 421.6,123.1 430.4,120.1 439.2,107.6 448.0,104.9 456.8,110.3 465.6,116.1 474.4,115.9 483.2,116.5 492.0,104.0 500.8,107.0 509.6,113.5 518.4,119.3 527.2,124.7 536.0,130.2 544.8,135.7 553.6,123.2 562.4,128.8 571.2,127.8 580.0,115.6 588.8,109.2 597.6,114.9 606.4,120.5 615.2,126.0 624.0,125.5 632.8,123.7 641.6,111.3 650.4,108.8 659.2,114.9 668.0,118.5 676.8,124.1 685.6,129.5 694.4,126.1 703.2,124.3 712.0,129.8 720.8,117.5 729.6,104.8 738.4,92.2 747.2,97.7 756.0,97.8 764.8,85.1 773.6,72.5 782.4,69.3 791.2,74.7 800.0,80.1 808.8,85.6 817.6,73.0 826.4,60.3 835.2,60.7 844.0,48.1"/><polyline fill="none" stroke="#b9770a" stroke-width="2" points="52.0,271.6 60.8,266.5 69.6,263.0 78.4,268.5 87.2,274.0 96.0,279.5 104.8,284.8 113.6,277.9 122.4,273.1 131.2,267.6 140.0,273.3 148.8,273.5 157.6,258.3 166.4,259.0 175.2,259.3 184.0,247.9 192.8,253.3 201.6,238.2 210.4,223.1 219.2,207.7 228.0,213.2 236.8,198.4 245.6,193.0 254.4,181.6 263.2,186.9 272.0,192.3 280.8,185.0 289.6,190.4 298.4,190.9 307.2,182.2 316.0,181.8 324.8,166.7 333.6,151.5 342.4,152.1 351.2,151.3 360.0,151.8 368.8,136.7 377.6,136.7 386.4,121.4 395.2,106.3 404.0,111.7 412.8,112.3 421.6,97.2 430.4,94.2 439.2,79.1 448.0,76.5 456.8,81.9 465.6,87.7 474.4,87.5 483.2,88.0 492.0,72.9 500.8,76.0 509.6,82.4 518.4,88.2 527.2,93.6 536.0,99.1 544.8,104.7 553.6,89.5 562.4,95.1 571.2,94.2 580.0,79.4 588.8,72.9 597.6,78.6 606.4,84.2 615.2,89.8 624.0,89.3 632.8,87.4 641.6,72.5 650.4,70.0 659.2,76.1 668.0,79.6 676.8,85.2 685.6,90.6 694.4,87.2 703.2,85.5 712.0,91.0 720.8,76.0 729.6,74.3 738.4,59.2 747.2,64.6 756.0,64.7 764.8,49.4 773.6,50.5 782.4,47.4 791.2,52.8 800.0,58.2 808.8,63.7 817.6,48.5 826.4,36.0 835.2,36.4 844.0,31.5"/><text class="xtick" x="52.0" y="332.0">trade # (chronological, 1&ndash;91)</text><rect x="60.0" y="26.0" width="16" height="4" fill="#2c5cc5"/><text x="82.0" y="30.0" class="lgd">Baseline (1.9R fixed)</text><rect x="60.0" y="44.0" width="16" height="4" fill="#0b8a5f"/><text x="82.0" y="48.0" class="lgd">Wider target 2.5R (best paired-t)</text><rect x="60.0" y="62.0" width="16" height="4" fill="#b9770a"/><text x="82.0" y="66.0" class="lgd">Wider target 3.0R (highest expectancy)</text></svg>
+</div>
+<p>Cumulative R over the 91 fades in chronological order. Both wider targets (2.5R green, 3.0R amber) finish well above the baseline (blue) &mdash; but note the deeper mid-run dips: the extra return is bought with extra variance, which is exactly what the drawdown chart below quantifies.</p>
+
+<h2>4 &middot; Drawdown &mdash; the cost of a wider target</h2>
+<div class="card">
+<svg viewBox="0 0 860 300" class="chart" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Max drawdown by variant"><line class="grid" x1="46.0" y1="222.0" x2="848.0" y2="222.0"/><text class="ytick" x="40.0" y="225.0">0R</text><line class="grid" x1="46.0" y1="178.2" x2="848.0" y2="178.2"/><text class="ytick" x="40.0" y="181.2">2R</text><line class="grid" x1="46.0" y1="134.4" x2="848.0" y2="134.4"/><text class="ytick" x="40.0" y="137.4">4R</text><line class="grid" x1="46.0" y1="90.6" x2="848.0" y2="90.6"/><text class="ytick" x="40.0" y="93.6">6R</text><line class="grid" x1="46.0" y1="46.8" x2="848.0" y2="46.8"/><text class="ytick" x="40.0" y="49.8">8R</text><rect x="86.9" y="121.7" width="81.2" height="100.3" fill="#2c5cc5" rx="2"/><text x="127.5" y="117.7" class="barval" text-anchor="middle">4.6</text><text x="127.5" y="236.0" class="barlab" text-anchor="middle">1.9R</text><rect x="217.9" y="88.1" width="81.2" height="133.9" fill="#c0392b" rx="2"/><text x="258.5" y="84.1" class="barval" text-anchor="middle">6.1</text><text x="258.5" y="236.0" class="barlab" text-anchor="middle">2.5R</text><rect x="348.9" y="88.1" width="81.2" height="133.9" fill="#c0392b" rx="2"/><text x="389.5" y="84.1" class="barval" text-anchor="middle">6.1</text><text x="389.5" y="236.0" class="barlab" text-anchor="middle">3.0R</text><rect x="479.9" y="26.6" width="81.2" height="195.4" fill="#c0392b" rx="2"/><text x="520.5" y="22.6" class="barval" text-anchor="middle">8.9</text><text x="520.5" y="236.0" class="barlab" text-anchor="middle">4.0R</text><rect x="610.9" y="26.6" width="81.2" height="195.4" fill="#c0392b" rx="2"/><text x="651.5" y="22.6" class="barval" text-anchor="middle">8.9</text><text x="651.5" y="236.0" class="barlab" text-anchor="middle">5.0R</text><rect x="741.9" y="85.8" width="81.2" height="136.2" fill="#c0392b" rx="2"/><text x="782.5" y="81.8" class="barval" text-anchor="middle">6.2</text><text x="782.5" y="236.0" class="barlab" text-anchor="middle">50% @1.9R</text><text x="46.0" y="292.0" class="barnote">peak-to-trough drawdown in R on the identical 91-trade sequence; blue = baseline, red = deeper than baseline (the cost of a wider target)</text></svg>
+</div>
+<p>Max peak-to-trough drawdown in R on the identical trade sequence. The baseline (blue) is the shallowest at 4.6R. Every wider target is deeper (red): 6.1R at 2.5&ndash;3R, 8.9R at 4&ndash;5R. This is the honest trade-off &mdash; 2.5R&apos;s +32% expectancy comes with +33% drawdown.</p>
+
+<h2>5 &middot; How each exit actually closes trades (of 91)</h2>
+<div style="overflow-x:auto;"><table>
+<tr><th>exit rule</th><th>exit-type mix</th></tr>
+<tr><td>Baseline &mdash; fixed 1.9R target</td><td style="font-size:12.5px;font-family:monospace">friday=30; stop=29; tp=32</td></tr>
+<tr><td>Wider target &mdash; fixed 2.5R</td><td style="font-size:12.5px;font-family:monospace">friday=34; stop=30; tp=27</td></tr>
+<tr><td>Wider target &mdash; fixed 3.0R</td><td style="font-size:12.5px;font-family:monospace">friday=40; stop=30; tp=21</td></tr>
+<tr><td>Wider target &mdash; fixed 4.0R</td><td style="font-size:12.5px;font-family:monospace">friday=48; stop=33; tp=10</td></tr>
+<tr><td>Wider target &mdash; fixed 5.0R</td><td style="font-size:12.5px;font-family:monospace">friday=52; stop=33; tp=6</td></tr>
+<tr><td>Scale out &mdash; half at 1.9R, runner to Friday (breakeven stop)</td><td style="font-size:12.5px;font-family:monospace">friday=30; partial_be=9; partial_friday=23; stop=29</td></tr>
+</table></div>
+<p style="font-size:12.5px;color:#6b7683;">As the target widens, target-hits (<code>tp</code>) fall (32&rarr;27&rarr;21&rarr;10&rarr;6) and Friday-cap time-outs rise (30&rarr;34&rarr;40&rarr;48&rarr;52); the stop count barely moves. <code>refund</code> never appears in any variant &mdash; the hard stop sits 5bp beyond the very wick the refund watches, so the stop always fills first (confirmed in the earlier exit study). For the partial, <code>partial_be</code> = runner stopped at breakeven after the half booked at 1.9R; <code>partial_friday</code> = runner rode to the Friday close.</p>
+
+<h2>6 &middot; Secondary sets &mdash; the F2 loosened triggers</h2>
+<p>The primary result above is the validated 91. For completeness we ran the identical sweep on the two <em>loosened-trigger</em> sets from study F2 (whose headline was that loosening the entry rule roughly <b>halves</b> the trade count &mdash; see <b>Loosened Trigger Backtest</b>). These are smaller, weaker samples used only to check the direction of the finding, not to make the call.</p>
+<h3>Set B &mdash; loosened (45 Monday entries)</h3>
+<div style="overflow-x:auto;"><table>
+<tr><th>target</th><th class="num">win %</th><th class="num">avg R</th><th class="num">total R</th><th class="num">PF</th><th class="num">max DD (R)</th><th class="num pcol">paired t vs base</th></tr>
+<tr class="base"><td>1.9R</td><td class="num">60.0</td><td class="num pos">+0.489</td><td class="num">+22.0</td><td class="num">2.27</td><td class="num">3.4</td><td class="num pcol">&mdash;</td></tr>
+<tr><td>2.5R</td><td class="num">60.0</td><td class="num pos">+0.671</td><td class="num">+30.2</td><td class="num">2.74</td><td class="num">3.4</td><td class="num pcol">+3.23 &#9733;</td></tr>
+<tr><td>3.0R</td><td class="num">57.8</td><td class="num pos">+0.636</td><td class="num">+28.6</td><td class="num">2.55</td><td class="num">3.4</td><td class="num pcol">+1.25</td></tr>
+<tr><td>4.0R</td><td class="num">55.6</td><td class="num pos">+0.399</td><td class="num">+18.0</td><td class="num">1.92</td><td class="num">6.3</td><td class="num pcol">-0.64</td></tr>
+<tr><td>5.0R</td><td class="num">55.6</td><td class="num pos">+0.439</td><td class="num">+19.8</td><td class="num">2.01</td><td class="num">6.3</td><td class="num pcol">-0.32</td></tr>
+<tr><td>50% @1.9R</td><td class="num">60.0</td><td class="num pos">+0.506</td><td class="num">+22.8</td><td class="num">2.31</td><td class="num">4.3</td><td class="num pcol">+0.16</td></tr>
+</table></div>
+<h3>Set C &mdash; further loosened (30 Monday entries)</h3>
+<div style="overflow-x:auto;"><table>
+<tr><th>target</th><th class="num">win %</th><th class="num">avg R</th><th class="num">total R</th><th class="num">PF</th><th class="num">max DD (R)</th><th class="num pcol">paired t vs base</th></tr>
+<tr class="base"><td>1.9R</td><td class="num">66.7</td><td class="num pos">+0.594</td><td class="num">+17.8</td><td class="num">2.65</td><td class="num">4.4</td><td class="num pcol">&mdash;</td></tr>
+<tr><td>2.5R</td><td class="num">63.3</td><td class="num pos">+0.665</td><td class="num">+20.0</td><td class="num">2.67</td><td class="num">4.4</td><td class="num pcol">+0.57</td></tr>
+<tr><td>3.0R</td><td class="num">63.3</td><td class="num pos">+0.761</td><td class="num">+22.8</td><td class="num">2.92</td><td class="num">4.4</td><td class="num pcol">+1.13</td></tr>
+<tr><td>4.0R</td><td class="num">63.3</td><td class="num pos">+0.504</td><td class="num">+15.1</td><td class="num">2.27</td><td class="num">4.4</td><td class="num pcol">-0.57</td></tr>
+<tr><td>5.0R</td><td class="num">63.3</td><td class="num pos">+0.571</td><td class="num">+17.1</td><td class="num">2.44</td><td class="num">4.4</td><td class="num pcol">-0.12</td></tr>
+<tr><td>50% @1.9R</td><td class="num">66.7</td><td class="num pos">+0.627</td><td class="num">+18.8</td><td class="num">2.74</td><td class="num">4.4</td><td class="num pcol">+0.23</td></tr>
+</table></div>
+<p style="font-size:12.5px;color:#6b7683;">Same shape in all three sets: expectancy climbs from 1.9R to a 2.5&ndash;3R peak, then falls at 4&ndash;5R. 2.5R clears the paired-t bar on Set B too (t=3.23) but is flat on the tiny Set C (t=0.57, N=30) &mdash; consistent with the effect being real but modest, and under-powered at N=30. The wider-target finding does not depend on the loosening.</p>
+
+<h2>7 &middot; Honesty box</h2>
+<div class="box honesty">
+<ul>
+<li><b>Pre-registered grid, all reported.</b> All six exits (1.9R / 2.5R / 3R / 4R / 5R / 50%-partial) were declared before running; every one is in the table; none was added or dropped after seeing results.</li>
+<li><b>Multiple-testing bar.</b> 5 challengers vs the 1.9R baseline &rarr; the pre-set bar is paired t&nbsp;&ge;&nbsp;2.5. Only 2.5R clears it (t=2.56, uncorrected p=0.012). Bonferroni across the 5 tests puts it at p&nbsp;&asymp;&nbsp;0.06 &mdash; it clears the declared bar but is <em>borderline</em> after correction, not a slam dunk.</li>
+<li><b>Higher average is not enough.</b> 3.0R has the highest expectancy (+0.541R) and total (+49R) of any variant, yet its paired t is 2.22 &mdash; below the bar. It is reported as promising, not proven.</li>
+<li><b>Return AND drawdown, together.</b> The wider target&apos;s extra return is bought with a deeper drawdown (4.6R&rarr;6.1R at 2.5&ndash;3R). The verdict weighs both.</li>
+<li><b>Same-bar ambiguity = loss.</b> When a 15m bar touches both stop and target, the minute data decides and a same-minute tie is scored a loss &mdash; the conservative choice, applied identically to every variant and every target.</li>
+<li><b>Partial is a conservative single-management model.</b> The 50%-partial books exactly half at 1.9R, moves the remainder to breakeven, and runs it to the Friday cap with no second target &mdash; each leg is half-size (half R). Real discretionary scaling can only be tested as declared, not tuned.</li>
+<li><b>Determinism.</b> The full sweep was run twice; the per-trade output CSVs are md5-identical across runs.</li>
+</ul></div>
+
+<h2>8 &middot; What to change, if anything</h2>
+<div class="box take">
+<p><b>Take the 2.5R target to the locked out-of-sample run as the challenger.</b> On the validated 91 it is the single exit that clears the pre-registered paired-t bar, lifting expectancy +32% and total return +32%, and the same lift shows up on the loosened Set B. That is enough to <em>test</em> it OOS &mdash; not enough to switch live today, because the clearance is marginal (2.56 vs 2.5) and borderline after multiple-comparisons correction.</p>
+<p><b>Watch 3.0R alongside it.</b> It books the most money of any variant (+0.541R, +49R) at the same 6.1R drawdown as 2.5R, and fits the mechanism (the Monday reversion tends to overshoot toward the 2.5&ndash;3R zone). It just falls short of the significance bar here. If both survive OOS, prefer whichever holds its edge; if only one does, that is the new target.</p>
+<p><b>Do not widen to 4R or 5R.</b> Expectancy falls back and drawdown blows out to 8.9R &mdash; the fade simply does not run that far inside the trading week; over half the trades time out on Friday.</p>
+<p><b>Skip the 50%-partial.</b> It is statistically tied with the baseline (paired t=0.63) and carries a deeper drawdown (6.2R vs 4.6R). Booking half at 1.9R throws away the very overshoot that the wider target is there to capture.</p>
+<p><b>Keep the baseline live until OOS confirms.</b> The 1.9R exit remains the validated default; 2.5R is the pending challenger, not yet the live rule.</p>
+</div>
+
+<div class="foot">Causal 1-minute backtest, in-sample 2019-09&rarr;2024-12. Entries frozen from the validated flagship (bt2_ledger_a/b/c &mdash; ledger_a byte-identical to weekly_trades_a); only the exit target varies. Fees 0.05%/side, slippage 0.02%/fill, 1R = $100 fixed. Anchor reproduced to 4e-15 R. Deterministic; run twice with identical md5. Self-contained &mdash; no external resources. Engine: backtests/bt_weekly2_exits.py.</div></div><script>
+(function(){
+  var btn=document.getElementById('themeToggle');
+  if(!btn)return;
+  var mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;
+  function stored(){try{var t=localStorage.getItem('codexTheme');return (t==='light'||t==='dark'||t==='system')?t:'system';}catch(e){return 'system';}}
+  function eff(m){return (m==='light'||m==='dark')?m:((mq&&mq.matches)?'dark':'light');}
+  function apply(){var m=stored();document.documentElement.setAttribute('data-theme',eff(m));btn.textContent=(m==='light')?'\u25D0 Light':(m==='dark')?'\u25D1 Dark':'\u25D3 Auto';}
+  apply();
+  btn.addEventListener('click',function(){var order={light:'dark',dark:'system',system:'light'};var n=order[stored()];try{localStorage.setItem('codexTheme',n);}catch(e){}apply();});
+  if(mq){var h=function(){if(stored()==='system')apply();};if(mq.addEventListener)mq.addEventListener('change',h);else if(mq.addListener)mq.addListener(h);}
+})();
+</script></body></html>
