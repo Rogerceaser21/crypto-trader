@@ -146,9 +146,37 @@ footer .flinks a{background:var(--chip);border:1px solid var(--line);border-radi
 footer .flinks a:hover{border-color:var(--accent)}
 hr.sep{border:none;border-top:1px solid var(--line);margin:24px 0}
 @media(max-width:900px){.layout{grid-template-columns:1fr;gap:16px}nav.toc{position:static;order:-1}header.hero h1{font-size:27px}section{padding:20px 18px 24px}.vbadge{margin-left:0}}
+
+/* ==== house theme toggle (added 2026-07-13) ==== */
+.toolbar{display:none!important}
+html[data-theme="light"]{--bg:#f6f7f9;--panel:#ffffff;--ink:#1a1e26;--soft:#5b6472;--line:#e2e6ec;
+ --accent:#5b46c9;--accent-2:#3f2fa3;--warn:#b4551a;--warnbg:#fff2e6;
+ --qbg:#f0edff;--qborder:#b7abee;--qink:#3a2f74;--chip:#eef2f5;
+ --stop:#e14b4b;--tp:#17a07f;--amber:#c9a227;
+ --shadow:0 1px 3px rgba(20,30,45,.08),0 6px 20px rgba(20,30,45,.05);
+ --passbg:#e7f6ee;--passbd:#4fb587;--passink:#12563c;
+ --margbg:#fbf3dc;--margbd:#d8b24a;--margink:#7a5a10;
+ --deadbg:#fdecec;--deadbd:#e79b9b;--deadink:#8f2f2f;}
+html[data-theme="dark"]{--bg:#0f1319;--panel:#161c24;--ink:#e7ecf2;--soft:#9aa5b3;--line:#26303c;
+ --accent:#9d8cf0;--accent-2:#c3b7ff;--warn:#f0a054;--warnbg:#2a1e12;
+ --qbg:#1c1830;--qborder:#4a3f78;--qink:#cbc2f2;--chip:#1d2530;
+ --stop:#ff6b6b;--tp:#3bd6a6;--amber:#d9b53a;
+ --shadow:0 1px 3px rgba(0,0,0,.4),0 8px 26px rgba(0,0,0,.35);
+ --passbg:#122a1f;--passbd:#2f8f5b;--passink:#a5e3c6;
+ --margbg:#2a2410;--margbd:#7f6a1f;--margink:#e6cf87;
+ --deadbg:#2a1414;--deadbd:#7f3030;--deadink:#f2b3b3;}
+.theme-toggle{position:fixed;top:16px;right:20px;z-index:100;background:var(--panel,var(--card,#fff));border:1px solid var(--line,#ccc);color:var(--ink,#222);border-radius:20px;padding:6px 14px;font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.10);font-family:inherit;letter-spacing:.02em}
+html[data-theme="dark"] .theme-toggle{box-shadow:0 2px 10px rgba(0,0,0,.35)}
+.theme-toggle:active{transform:translateY(1px)}
+@media(max-width:560px){.theme-toggle{top:10px;right:12px;padding:6px 10px;font-size:12px}body{padding-top:44px}}
 </style>
+<script>
+(function(){try{var t=localStorage.getItem('codexTheme');var e=(t==='light'||t==='dark')?t:((window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light');document.documentElement.setAttribute('data-theme',e);}catch(e){}})();
+</script>
+
 </head>
 <body>
+<button type="button" id="themeToggle" class="theme-toggle" aria-label="Cycle theme: light, dark, or system">&#9683; Auto</button>
 <header class="hero"><div class="wrap">
  <p class="eyebrow">DaviddTech campaign &middot; scorecard v3 &middot; 2026-07-13</p>
  <h1>DaviddTech Scorecard &mdash; what survived the meat grinder</h1>
@@ -680,5 +708,18 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:24px 0}
 <script>
 function setTheme(m){try{if(m==='auto'){localStorage.removeItem('dt-theme');document.documentElement.removeAttribute('data-theme');}else{localStorage.setItem('dt-theme',m);document.documentElement.setAttribute('data-theme',m);}}catch(e){}}
 (function(){try{var t=localStorage.getItem('dt-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+</script>
+<script>
+(function(){
+  var btn=document.getElementById('themeToggle');
+  if(!btn)return;
+  var mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;
+  function stored(){try{var t=localStorage.getItem('codexTheme');return (t==='light'||t==='dark'||t==='system')?t:'system';}catch(e){return 'system';}}
+  function eff(m){return (m==='light'||m==='dark')?m:((mq&&mq.matches)?'dark':'light');}
+  function apply(){var m=stored();document.documentElement.setAttribute('data-theme',eff(m));btn.textContent=(m==='light')?'\u25D0 Light':(m==='dark')?'\u25D1 Dark':'\u25D3 Auto';}
+  apply();
+  btn.addEventListener('click',function(){var order={light:'dark',dark:'system',system:'light'};var n=order[stored()];try{localStorage.setItem('codexTheme',n);}catch(e){}apply();});
+  if(mq){var h=function(){if(stored()==='system')apply();};if(mq.addEventListener)mq.addEventListener('change',h);else if(mq.addListener)mq.addListener(h);}
+})();
 </script>
 </body></html>

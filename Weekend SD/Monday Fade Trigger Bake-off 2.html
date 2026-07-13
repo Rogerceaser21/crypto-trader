@@ -103,11 +103,19 @@
   figcaption{font-size:13px; color:var(--soft); margin-top:8px}
   svg{max-width:100%; height:auto; display:block}
   .src{font-size:12.5px; color:var(--soft)}
+
+/* ==== house theme toggle (added 2026-07-13) ==== */
+.theme-toggle{position:fixed;top:16px;right:20px;z-index:100;background:var(--panel,var(--card,#fff));border:1px solid var(--line,#ccc);color:var(--ink,#222);border-radius:20px;padding:6px 14px;font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.10);font-family:inherit;letter-spacing:.02em}
+html[data-theme="dark"] .theme-toggle{box-shadow:0 2px 10px rgba(0,0,0,.35)}
+.theme-toggle:active{transform:translateY(1px)}
+@media(max-width:560px){.theme-toggle{top:10px;right:12px;padding:6px 10px;font-size:12px}body{padding-top:44px}}
 </style>
-<script>(function(){var t=localStorage.getItem('wsd-theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}})();</script>
+<script>
+(function(){try{var t=localStorage.getItem('codexTheme');var e=(t==='light'||t==='dark')?t:((window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light');document.documentElement.setAttribute('data-theme',e);}catch(e){}})();
+</script>
 </head>
 <body>
-<button id="themeBtn" title="Switch light/dark theme" onclick="(function(){var h=document.documentElement;var cur=h.getAttribute('data-theme');var next;if(cur==='dark'){next='light';}else if(cur==='light'){next='dark';}else{next=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'light':'dark';}h.setAttribute('data-theme',next);try{localStorage.setItem('wsd-theme',next);}catch(e){}})()">◐ Light / Dark</button>
+<button type="button" id="themeToggle" class="theme-toggle" aria-label="Cycle theme: light, dark, or system">&#9683; Auto</button>
 <header class="hero"><div class="wrap">
   <div class="eyebrow">Weekend SD · R2 · In-sample 2019-09 → 2024-12-31 · BTC-USDT perp · 15m native</div>
   <h1>Monday Fade — Trigger Bake-off 2</h1>
@@ -303,5 +311,18 @@
 </section>
 
 </div></main>
+<script>
+(function(){
+  var btn=document.getElementById('themeToggle');
+  if(!btn)return;
+  var mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;
+  function stored(){try{var t=localStorage.getItem('codexTheme');return (t==='light'||t==='dark'||t==='system')?t:'system';}catch(e){return 'system';}}
+  function eff(m){return (m==='light'||m==='dark')?m:((mq&&mq.matches)?'dark':'light');}
+  function apply(){var m=stored();document.documentElement.setAttribute('data-theme',eff(m));btn.textContent=(m==='light')?'\u25D0 Light':(m==='dark')?'\u25D1 Dark':'\u25D3 Auto';}
+  apply();
+  btn.addEventListener('click',function(){var order={light:'dark',dark:'system',system:'light'};var n=order[stored()];try{localStorage.setItem('codexTheme',n);}catch(e){}apply();});
+  if(mq){var h=function(){if(stored()==='system')apply();};if(mq.addEventListener)mq.addEventListener('change',h);else if(mq.addListener)mq.addListener(h);}
+})();
+</script>
 </body>
 </html>

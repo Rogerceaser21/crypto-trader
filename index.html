@@ -187,10 +187,12 @@ footer .wrap{display:flex; flex-direction:column; gap:8px}
   .grid{grid-template-columns:1fr; gap:11px}
 }
 </style>
-<script>(function(){var t=localStorage.getItem("codexTheme");if(t)document.documentElement.dataset.theme=t;})();</script>
+<script>
+(function(){try{var t=localStorage.getItem('codexTheme');var e=(t==='light'||t==='dark')?t:((window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light');document.documentElement.setAttribute('data-theme',e);}catch(e){}})();
+</script>
 </head>
 <body>
-<button type="button" id="themeToggle" class="theme-toggle" aria-label="Toggle light/dark theme"></button>
+<button type="button" id="themeToggle" class="theme-toggle" aria-label="Cycle theme: light, dark, or system">&#9683; Auto</button>
 
 
 <header class="hero">
@@ -364,18 +366,14 @@ footer .wrap{display:flex; flex-direction:column; gap:8px}
 <script>
 (function(){
   var btn=document.getElementById('themeToggle');
-  function effective(){
-    return document.documentElement.dataset.theme ||
-      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-  }
-  function label(){ btn.innerHTML = effective()==='dark' ? '\u25D0 Light' : '\u25D1 Dark'; }
-  btn.addEventListener('click', function(){
-    var next = effective()==='dark' ? 'light' : 'dark';
-    document.documentElement.dataset.theme = next;
-    localStorage.setItem('codexTheme', next);
-    label();
-  });
-  label();
+  if(!btn)return;
+  var mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;
+  function stored(){try{var t=localStorage.getItem('codexTheme');return (t==='light'||t==='dark'||t==='system')?t:'system';}catch(e){return 'system';}}
+  function eff(m){return (m==='light'||m==='dark')?m:((mq&&mq.matches)?'dark':'light');}
+  function apply(){var m=stored();document.documentElement.setAttribute('data-theme',eff(m));btn.textContent=(m==='light')?'\u25D0 Light':(m==='dark')?'\u25D1 Dark':'\u25D3 Auto';}
+  apply();
+  btn.addEventListener('click',function(){var order={light:'dark',dark:'system',system:'light'};var n=order[stored()];try{localStorage.setItem('codexTheme',n);}catch(e){}apply();});
+  if(mq){var h=function(){if(stored()==='system')apply();};if(mq.addEventListener)mq.addEventListener('change',h);else if(mq.addListener)mq.addListener(h);}
 })();
 </script>
 </body>

@@ -165,9 +165,37 @@
     header.hero h1{font-size:27px}
     section{padding:20px 18px 24px}
   }
+
+/* ==== house theme toggle (added 2026-07-13) ==== */
+.toolbar{display:none!important}
+html[data-theme="light"]{--bg:#f6f7f9; --panel:#ffffff; --ink:#1a1e26; --soft:#5b6472; --line:#e2e6ec;
+    --accent:#0f7d6b; --accent-2:#0a5c4f; --warn:#b4551a; --warnbg:#fff2e6;
+    --qbg:#eef6ff; --qborder:#8fbfe8; --qink:#1f4f74;
+    --chip:#eef2f5; --stop:#e14b4b; --tp:#17a07f; --shadow:0 1px 3px rgba(20,30,45,.08),0 6px 20px rgba(20,30,45,.05);
+    --dz:#8a94a6; --asia:#c9a227; --uk:#2f8f5b; --us:#c0553b;
+    --ansbg:#e7f6ee; --ansborder:#4fb587; --ansink:#12563c;}
+html[data-theme="dark"]{--bg:#0f1319; --panel:#161c24; --ink:#e7ecf2; --soft:#9aa5b3; --line:#26303c;
+      --accent:#39c9ad; --accent-2:#7fe0cd; --warn:#f0a054; --warnbg:#2a1e12;
+      --qbg:#12222f; --qborder:#2f5b78; --qink:#bfe0f5;
+      --chip:#1d2530; --stop:#ff6b6b; --tp:#3bd6a6; --shadow:0 1px 3px rgba(0,0,0,.4),0 8px 26px rgba(0,0,0,.35);
+      --dz:#7a8496; --asia:#d9b53a; --uk:#3fae72; --us:#d76b50;
+      --ansbg:#122a1f; --ansborder:#2f8f5b; --ansink:#a5e3c6;}
+html[data-theme="light"] .rr{color:#fff}
+html[data-theme="dark"] .rr{color:#06231d}
+html[data-theme="light"] .setup-tag{background:var(--accent-2);color:#fff}
+html[data-theme="dark"] .setup-tag{background:var(--accent);color:#06231d}
+.theme-toggle{position:fixed;top:16px;right:20px;z-index:100;background:var(--panel,var(--card,#fff));border:1px solid var(--line,#ccc);color:var(--ink,#222);border-radius:20px;padding:6px 14px;font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.10);font-family:inherit;letter-spacing:.02em}
+html[data-theme="dark"] .theme-toggle{box-shadow:0 2px 10px rgba(0,0,0,.35)}
+.theme-toggle:active{transform:translateY(1px)}
+@media(max-width:560px){.theme-toggle{top:10px;right:12px;padding:6px 10px;font-size:12px}body{padding-top:44px}}
 </style>
+<script>
+(function(){try{var t=localStorage.getItem('codexTheme');var e=(t==='light'||t==='dark')?t:((window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light');document.documentElement.setAttribute('data-theme',e);}catch(e){}})();
+</script>
+
 </head>
 <body>
+<button type="button" id="themeToggle" class="theme-toggle" aria-label="Cycle theme: light, dark, or system">&#9683; Auto</button>
 
 <header class="hero">
   <div class="wrap">
@@ -682,6 +710,19 @@
       root.setAttribute('data-theme', cur==='dark'?'light':'dark');
     });
   })();
+</script>
+<script>
+(function(){
+  var btn=document.getElementById('themeToggle');
+  if(!btn)return;
+  var mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;
+  function stored(){try{var t=localStorage.getItem('codexTheme');return (t==='light'||t==='dark'||t==='system')?t:'system';}catch(e){return 'system';}}
+  function eff(m){return (m==='light'||m==='dark')?m:((mq&&mq.matches)?'dark':'light');}
+  function apply(){var m=stored();document.documentElement.setAttribute('data-theme',eff(m));btn.textContent=(m==='light')?'\u25D0 Light':(m==='dark')?'\u25D1 Dark':'\u25D3 Auto';}
+  apply();
+  btn.addEventListener('click',function(){var order={light:'dark',dark:'system',system:'light'};var n=order[stored()];try{localStorage.setItem('codexTheme',n);}catch(e){}apply();});
+  if(mq){var h=function(){if(stored()==='system')apply();};if(mq.addEventListener)mq.addEventListener('change',h);else if(mq.addListener)mq.addListener(h);}
+})();
 </script>
 </body>
 </html>

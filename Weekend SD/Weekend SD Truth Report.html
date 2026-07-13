@@ -50,7 +50,29 @@
     li{margin:4px 0;}
     code{background:#eef1f6;padding:1px 6px;border-radius:4px;font-size:12.5px;}
     .foot{color:var(--muted);font-size:12px;margin-top:40px;border-top:1px solid var(--line);padding-top:14px;}
-    </style></head><body><div class="wrap">
+    
+/* ==== house theme toggle (added 2026-07-13) ==== */
+html[data-theme="light"]{--bg:#f7f8fa;--card:#ffffff;--ink:#1f2733;--muted:#6b7683;--line:#e3e7ee;
+          --ok:#0b8a5f;--okbg:#e7f6ef;--bad:#c0392b;--badbg:#fbe9e7;--accent:#2c5cc5;}
+html[data-theme="dark"]{--bg:#10141b;--card:#161b22;--ink:#e6edf3;--muted:#94a0b4;--line:#2a3140;--ok:#3ddc9a;--okbg:#123028;--bad:#ff6b5e;--badbg:#2e1614;--warn:#f0b429;--warnbg:#2c2210;--accent:#6aa9ff}
+html[data-theme="dark"] h3{color:#c7d0dc}
+html[data-theme="dark"] .banner.ok{border-color:#1d4a37;color:#7ee0b4}
+html[data-theme="dark"] .banner.bad{border-color:#5a2620;color:#ff9d92}
+html[data-theme="dark"] th{background:#1c2230;color:#c7d0dc}
+html[data-theme="dark"] tr.wrong td{background:#2a1614}
+html[data-theme="dark"] .chart .grid{stroke:#2a3140}
+html[data-theme="dark"] .chart .axis{stroke:#3a4453}
+html[data-theme="dark"] code{background:#1c2230}
+.theme-toggle{position:fixed;top:16px;right:20px;z-index:100;background:var(--panel,var(--card,#fff));border:1px solid var(--line,#ccc);color:var(--ink,#222);border-radius:20px;padding:6px 14px;font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.10);font-family:inherit;letter-spacing:.02em}
+html[data-theme="dark"] .theme-toggle{box-shadow:0 2px 10px rgba(0,0,0,.35)}
+.theme-toggle:active{transform:translateY(1px)}
+@media(max-width:560px){.theme-toggle{top:10px;right:12px;padding:6px 10px;font-size:12px}body{padding-top:44px}}
+</style>
+<script>
+(function(){try{var t=localStorage.getItem('codexTheme');var e=(t==='light'||t==='dark')?t:((window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light');document.documentElement.setAttribute('data-theme',e);}catch(e){}})();
+</script>
+</head><body>
+<button type="button" id="themeToggle" class="theme-toggle" aria-label="Cycle theme: light, dark, or system">&#9683; Auto</button><div class="wrap">
 
 <h1>Weekend SD Truth Report</h1>
 <p class="sub">Monday move distributions recomputed from our own 1-minute BTCUSDT-perp candles
@@ -169,4 +191,17 @@ So <strong>no in-sample sub-period cleanly reproduces the frozen numbers</strong
 paper analysis only, no trades. Outputs: <code>weekend_observations.csv</code>,
 <code>weekend_sd_stats.csv</code>.</p>
 
-</div></body></html>
+</div><script>
+(function(){
+  var btn=document.getElementById('themeToggle');
+  if(!btn)return;
+  var mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;
+  function stored(){try{var t=localStorage.getItem('codexTheme');return (t==='light'||t==='dark'||t==='system')?t:'system';}catch(e){return 'system';}}
+  function eff(m){return (m==='light'||m==='dark')?m:((mq&&mq.matches)?'dark':'light');}
+  function apply(){var m=stored();document.documentElement.setAttribute('data-theme',eff(m));btn.textContent=(m==='light')?'\u25D0 Light':(m==='dark')?'\u25D1 Dark':'\u25D3 Auto';}
+  apply();
+  btn.addEventListener('click',function(){var order={light:'dark',dark:'system',system:'light'};var n=order[stored()];try{localStorage.setItem('codexTheme',n);}catch(e){}apply();});
+  if(mq){var h=function(){if(stored()==='system')apply();};if(mq.addEventListener)mq.addEventListener('change',h);else if(mq.addListener)mq.addListener(h);}
+})();
+</script>
+</body></html>

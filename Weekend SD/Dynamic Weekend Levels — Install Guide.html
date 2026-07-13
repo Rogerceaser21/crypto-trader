@@ -75,16 +75,11 @@
 @media(max-width:560px){.theme-toggle{top:10px;right:12px;padding:6px 10px;font-size:12px}body{padding-top:44px}}
 </style>
 <script>
-(function(){
-  try{
-    var t=localStorage.getItem('codexTheme');
-    if(t==='light'||t==='dark'){document.documentElement.setAttribute('data-theme',t);}
-  }catch(e){}
-})();
+(function(){try{var t=localStorage.getItem('codexTheme');var e=(t==='light'||t==='dark')?t:((window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light');document.documentElement.setAttribute('data-theme',e);}catch(e){}})();
 </script>
 </head>
 <body>
-<button type="button" id="themeToggle" class="theme-toggle" aria-label="Toggle light/dark theme">&#9680; Light</button>
+<button type="button" id="themeToggle" class="theme-toggle" aria-label="Cycle theme: light, dark, or system">&#9683; Auto</button>
 <div class="wrap">
 
 <header>
@@ -622,22 +617,17 @@ plot(m3_dn_p95, &quot;3-Months DOWN p95&quot;,  style=plot.style_linebr, color=c
   })();
 </script>
 <script>
-  (function(){
-    var btn=document.getElementById('themeToggle');
-    if(!btn)return;
-    var NATIVE='dark'; // this doc's own default look when nothing is stored
-    function current(){return document.documentElement.getAttribute('data-theme')||NATIVE;}
-    function render(){
-      btn.textContent = current()==='light' ? '◑ Dark' : '◐ Light';
-    }
-    render();
-    btn.addEventListener('click',function(){
-      var next = current()==='light' ? 'dark' : 'light';
-      document.documentElement.setAttribute('data-theme', next);
-      try{localStorage.setItem('codexTheme', next);}catch(e){}
-      render();
-    });
-  })();
+(function(){
+  var btn=document.getElementById('themeToggle');
+  if(!btn)return;
+  var mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;
+  function stored(){try{var t=localStorage.getItem('codexTheme');return (t==='light'||t==='dark'||t==='system')?t:'system';}catch(e){return 'system';}}
+  function eff(m){return (m==='light'||m==='dark')?m:((mq&&mq.matches)?'dark':'light');}
+  function apply(){var m=stored();document.documentElement.setAttribute('data-theme',eff(m));btn.textContent=(m==='light')?'\u25D0 Light':(m==='dark')?'\u25D1 Dark':'\u25D3 Auto';}
+  apply();
+  btn.addEventListener('click',function(){var order={light:'dark',dark:'system',system:'light'};var n=order[stored()];try{localStorage.setItem('codexTheme',n);}catch(e){}apply();});
+  if(mq){var h=function(){if(stored()==='system')apply();};if(mq.addEventListener)mq.addEventListener('change',h);else if(mq.addListener)mq.addListener(h);}
+})();
 </script>
 </body>
 </html>
