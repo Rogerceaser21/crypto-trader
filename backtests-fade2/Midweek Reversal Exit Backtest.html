@@ -1,0 +1,239 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Midweek Reversal Exit &mdash; Backtest</title>
+<style>
+:root{--bg:#0e1117;--card:#161b22;--panel2:#1c2230;--ink:#e6edf3;--muted:#94a0b4;--line:#2a3140;
+  --ok:#3ddc9a;--okbg:#123028;--bad:#ff6b5e;--badbg:#2e1614;--warn:#f0b429;--warnbg:#2c2210;--accent:#6aa9ff;}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+.wrap{max-width:1000px;margin:0 auto;padding:34px 24px 80px;}
+h1{font-size:27px;margin:0 0 4px;letter-spacing:-.2px;}
+.eyebrow{letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:var(--accent);font-weight:700;}
+.sub{color:var(--muted);font-size:13.5px;margin:6px 0 20px;max-width:82ch;}
+h2{font-size:19px;margin:40px 0 12px;padding-bottom:7px;border-bottom:2px solid var(--line);}
+h3{font-size:15px;margin:20px 0 6px;color:var(--ink);}
+.banner{border-radius:12px;padding:18px 20px;font-size:15.5px;font-weight:500;margin:0 0 16px;
+  display:flex;gap:13px;align-items:flex-start;line-height:1.5;
+  background:var(--badbg);border:1px solid #5a2a24;color:#ffb3ab;}
+.banner .tag{font-size:12px;font-weight:800;letter-spacing:.5px;padding:5px 11px;border-radius:6px;
+  white-space:nowrap;background:var(--bad);color:#2a0f0c;}
+.banner b{color:#fff;}
+.kpis{display:flex;flex-wrap:wrap;gap:12px;margin:14px 0 6px;}
+.kpi{flex:1 1 150px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:13px 15px;}
+.kpi .v{font-size:21px;font-weight:700;font-variant-numeric:tabular-nums;}
+.kpi .v.neg{color:var(--bad);} .kpi .v.ok{color:var(--ok);}
+.kpi .l{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-top:3px;}
+table{border-collapse:collapse;width:100%;margin:10px 0;background:var(--card);
+  border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:13.5px;}
+th,td{padding:8px 11px;text-align:left;border-bottom:1px solid var(--line);}
+th{background:var(--panel2);font-weight:650;color:#c7d0dc;font-size:12.3px;}
+tr:last-child td{border-bottom:none;}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;
+  font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:12.6px;}
+td.pos{color:var(--ok);} td.neg{color:var(--bad);}
+th.pcol,td.pcol{background:rgba(106,169,255,.10);}
+th.pcol2,td.pcol2{background:rgba(240,180,41,.09);}
+tr.base td{background:rgba(106,169,255,.09);font-weight:600;}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:14px 0;}
+.chart{width:100%;height:auto;display:block;}
+.chart .grid{stroke:var(--line);stroke-width:1;}
+.chart .ytick{font:11px monospace;fill:var(--muted);text-anchor:end;}
+.chart .xtick{font:11px sans-serif;fill:var(--muted);}
+.chart .lgd{font:600 12px sans-serif;fill:#c7d0dc;}
+.chart .barval{font:700 12px monospace;fill:#c7d0dc;}
+.chart .barlab{font:600 12px sans-serif;fill:var(--muted);}
+.chart .barnote{font:600 11px sans-serif;fill:var(--muted);}
+.box{border-radius:12px;padding:16px 18px;margin:14px 0;border:1px solid;}
+.box.honesty{background:#181d27;border-color:var(--line);}
+.box.take{background:var(--warnbg);border-color:#4a3a12;}
+.box h3{margin-top:0;}
+ul{margin:8px 0;padding-left:20px;} li{margin:5px 0;}
+code{background:var(--panel2);padding:1px 6px;border-radius:4px;font-size:12.5px;
+  font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;}
+.foot{color:var(--muted);font-size:12px;margin-top:44px;border-top:1px solid var(--line);padding-top:14px;}
+p{margin:9px 0;}
+.small{font-size:12.5px;color:var(--muted);}
+html[data-theme="light"]{--bg:#f6f7f9;--card:#fff;--panel2:#eef1f6;--ink:#1f2733;--muted:#6b7683;--line:#e3e7ee;
+  --ok:#0b8a5f;--okbg:#e7f6ef;--bad:#c0392b;--badbg:#fbe9e7;--warn:#b9770a;--warnbg:#fdf3e3;--accent:#2c5cc5;}
+html[data-theme="light"] th{background:#eef1f6;color:#3a4553;}
+html[data-theme="light"] .banner{border-color:#f0c3bd;color:#8a2b20;}
+html[data-theme="light"] .banner .tag{color:#fff;}
+html[data-theme="light"] .banner b{color:#5a1a13;}
+html[data-theme="light"] th.pcol,html[data-theme="light"] td.pcol{background:#eef4ff;}
+html[data-theme="light"] th.pcol2,html[data-theme="light"] td.pcol2{background:#fdf3e0;}
+html[data-theme="light"] tr.base td{background:#eef3ff;}
+html[data-theme="light"] .box.honesty{background:#f4f6fb;border-color:#d9e0ee;}
+html[data-theme="light"] .box.take{background:#fdf3e3;border-color:#f0d9a8;}
+html[data-theme="light"] .chart .lgd,html[data-theme="light"] .chart .barval{fill:#33404f;}
+.theme-toggle{position:fixed;top:16px;right:20px;z-index:100;background:var(--card);
+  border:1px solid var(--line);color:var(--ink);border-radius:20px;padding:6px 14px;
+  font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.35);
+  font-family:inherit;letter-spacing:.02em;}
+html[data-theme="light"] .theme-toggle{box-shadow:0 2px 10px rgba(0,0,0,.10);}
+.theme-toggle:active{transform:translateY(1px);}
+@media(max-width:560px){.theme-toggle{top:10px;right:12px;padding:6px 10px;font-size:12px}body{padding-top:44px}}
+</style>
+<script>(function(){try{var t=localStorage.getItem('codexTheme');var e=(t==='light'||t==='dark')?t:((window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light');document.documentElement.setAttribute('data-theme',e);}catch(e){}})();</script>
+</head><body>
+<button type="button" id="themeToggle" class="theme-toggle" aria-label="Cycle theme: light, dark, or system">&#9683; Auto</button>
+<div class="wrap">
+<div class="eyebrow">Annie Trading &middot; Monday fade &middot; exit study F7</div>
+<h1>The Midweek Reversal Exit &mdash; does the course-faithful exit beat a fixed target?</h1>
+<p class="sub">Annie's rule for closing the Monday fade is <b>not</b> a fixed R:R &mdash; it is discretionary:
+&ldquo;there is a midweek reversal, usually Wednesday, Thursday, sometimes Friday, where we basically have another
+M or W&hellip; or Final Damage&hellip; that's when you're supposed to exit.&rdquo; That exit was never mechanically tested.
+Here we hold the <b>frozen validated 91 Monday-spike fades</b> (same entries every time, baseline +0.382R) and replace the
+1.9R target with exactly that: exit when an <b>opposite-direction M/W or Final Damage completes midweek on the 1H</b>.
+Six pre-declared cells. Causal detection (reusing the calibrated <code>patterns.py</code> M/W + Final-Damage logic), realistic
+fees &amp; slippage, in-sample 2019&ndash;2024 only; the locked 2025&ndash;26 block is untouched.</p>
+
+<div class="banner"><span class="tag">&#10008; NO MECHANICAL EDGE OVER A FIXED TARGET</span>
+<span>The course-faithful midweek-reversal exit is a <b>real, detectable event</b> &mdash; 50&ndash;70 of the 91 fades do
+exit on a genuine opposite M/W/FD, firing Wed/Thu with a few on Friday, exactly as Annie describes &mdash; but as a
+<b>mechanical rule it does not beat simply holding a fixed target</b>. Every one of the six cells lands
+<b>below</b> the +0.382R baseline (expectancy +0.292R&nbsp;to&nbsp;+0.372R),
+and <b>every paired-t vs the baseline is negative</b> (best = -0.09, a dead heat, on the V3 no-consolidation
+runner). Against the F3 winner (fixed 2.5R, +0.506R) it is clearly worse (paired&nbsp;t -2.08
+to -1.21). Pre-registered bar was paired&nbsp;t&nbsp;&ge;&nbsp;2.5 on 6 cells &mdash;
+<b>nothing clears it; nothing even turns positive.</b> Verdict: <b>keep the fixed target</b>. The midweek reversal is
+meaningful as a discretionary read, not as a mechanical exit &mdash; it takes profit too early and gives back the reversion
+edge the fixed target keeps.</span></div>
+
+<div class="kpis">
+<div class="kpi"><div class="v">6</div><div class="l">pre-declared exit cells</div></div>
+<div class="kpi"><div class="v">91</div><div class="l">identical frozen entries each</div></div>
+<div class="kpi"><div class="v">+0.372R</div><div class="l">best midweek expectancy (V3) vs +0.382R</div></div>
+<div class="kpi"><div class="v neg">-0.09</div><div class="l">best paired t vs baseline (a tie)</div></div>
+<div class="kpi"><div class="v">2.5</div><div class="l">paired-t bar (6 cells) &mdash; uncleared</div></div>
+</div>
+
+<h2>1 &middot; What the midweek reversal exit is (plain English)</h2>
+<p>The Monday fade enters against a Sun/Mon spike out of the weekend box: a spike <b>up</b> is faded <b>short</b> (an M / top
+formed), a spike <b>down</b> is faded <b>long</b> (a W / bottom formed). Annie then holds the trade until the market prints the
+<b>opposite</b> reversal in the middle of the week &mdash; another M/W (or a Final Damage fake-out) &mdash; and exits there,
+rather than at a mechanical R multiple.</p>
+<div class="card">
+<ul>
+<li><b>Long trade &rarr; exit on a TOP (M / FDM).</b> A short trade &rarr; exit on a BOTTOM (W / FDW). The exit pattern is the
+mirror of the entry, so it marks the point the favourable move is done.</li>
+<li><b>Detected causally on the 1H</b> with the same building blocks the entry detector uses: a <code>k=3</code> fractal
+peak-2 &ldquo;spike-out&rdquo;, a prominent same-side peak-1 in a ~2-day lookback, and the exact <code>patterns.py</code>
+classifier (peak-2 vicinity band <code>MAX_SHORTFALL = 0.35</code>; a lower-high inside the band = M/W, an overshoot inside the
+band that closes back in = Final Damage, anything wider = a breakout and ignored).</li>
+<li><b>No look-ahead.</b> A fractal peak is only knowable 3 bars later, so the &ldquo;completion bar&rdquo; is
+<code>peak&nbsp;+&nbsp;3</code>; the completion bar must be timestamped <b>Wed 00:00 New York or later</b> and after entry; the
+exit fills at the <b>open of the next 15m bar</b> after the 1H completion bar closes, with adverse slippage.</li>
+<li><b>Everything else stays the flagship:</b> the baseline hard stop is kept, the 1.9R target is dropped (the level exit
+replaces it), the refund rule is OFF, and the Friday UK-session cap is the fallback if no midweek reversal ever forms.</li>
+</ul>
+</div>
+
+<h2>2 &middot; Anchor reproduced first</h2>
+<p>Before testing any exit, the frozen baseline is confirmed byte-for-byte: the 1.9R column of the validated F3 ledger &mdash;
+the same 91 entries, in the same order, that every cell below is judged against.</p>
+<table><tr><th>quantity</th><th class="num">validated anchor (fixed 1.9R)</th><th class="num">F3 winner (fixed 2.5R)</th></tr>
+<tr><td>trades</td><td class="num">91</td><td class="num">91</td></tr>
+<tr><td>expectancy (avg R)</td><td class="num">+0.381994</td><td class="num">+0.505594</td></tr>
+<tr><td>total R</td><td class="num">+34.76</td><td class="num">+46.01</td></tr>
+<tr><td>t vs zero</td><td class="num">2.977</td><td class="num">3.351</td></tr>
+</table>
+<p class="small">Baseline column mean = <b>+0.382R</b> &mdash; matches the flagship anchor of record. Every difference below
+is caused only by the exit rule, nothing else.</p>
+
+<h2>3 &middot; The six exit cells, head-to-head on the 91</h2>
+<p>Every row is the <em>same</em> 91 entries; only the exit rule differs. The decisive columns are the two <b>paired-t</b>
+columns: each variant is compared to a fixed-target baseline <em>trade-by-trade</em> (per-trade R differences), which isolates
+the exit effect with zero entry noise. With 6 pre-declared cells the bar for a real win is <b>paired&nbsp;t&nbsp;&ge;&nbsp;2.5</b>
+(would be marked &#9733;). The two grey/amber baseline rows are the fixed targets it must beat.</p>
+<div style="overflow-x:auto;"><table>
+<tr><th>exit rule (plain name)</th><th class="num">N</th><th class="num">win %</th><th class="num">avg R</th>
+<th class="num">med R</th><th class="num">t vs 0</th><th class="num">PF</th><th class="num">total R</th>
+<th class="num">max DD</th><th class="num">avg hold</th><th class="num pcol">paired t<br>vs 1.9R</th>
+<th class="num pcol2">paired t<br>vs 2.5R</th></tr>
+<tr class="base"><td>Baseline &mdash; fixed 1.9R target</td><td class="num">91</td><td class="num">54.9</td><td class="num pos">+0.382</td><td class="num">+0.164</td><td class="num">2.98</td><td class="num">2.05</td><td class="num">+34.8</td><td class="num">4.6</td><td class="num">&mdash;</td><td class="num pcol">&mdash;</td><td class="num pcol2">&mdash;</td></tr>
+<tr class="base"><td>F3 winner &mdash; fixed 2.5R target</td><td class="num">91</td><td class="num">53.8</td><td class="num pos">+0.506</td><td class="num">+0.094</td><td class="num">3.35</td><td class="num">2.34</td><td class="num">+46.0</td><td class="num">6.1</td><td class="num">&mdash;</td><td class="num pcol">&mdash;</td><td class="num pcol2">&mdash;</td></tr>
+<tr><td>V1 M/W only — hold to midweek reversal</td><td class="num">91</td><td class="num">54.9</td><td class="num pos">+0.346</td><td class="num">+0.075</td><td class="num">2.26</td><td class="num">2.03</td><td class="num">+31.5</td><td class="num">5.8</td><td class="num">41h</td><td class="num pcol">-0.30</td><td class="num pcol2">-1.30</td></tr><tr><td>V1 M/W only + 50% off at 1.9R</td><td class="num">91</td><td class="num">59.3</td><td class="num pos">+0.337</td><td class="num">+0.187</td><td class="num">2.73</td><td class="num">2.17</td><td class="num">+30.7</td><td class="num">4.1</td><td class="num">41h</td><td class="num pcol">-0.54</td><td class="num pcol2">-1.78</td></tr><tr><td>V2 M/W + Final Damage — hold to midweek reversal</td><td class="num">91</td><td class="num">54.9</td><td class="num pos">+0.292</td><td class="num">+0.078</td><td class="num">2.11</td><td class="num">1.91</td><td class="num">+26.5</td><td class="num">5.8</td><td class="num">36h</td><td class="num pcol">-0.80</td><td class="num pcol2">-1.83</td></tr><tr><td>V2 M/W + Final Damage + 50% off at 1.9R</td><td class="num">91</td><td class="num">59.3</td><td class="num pos">+0.312</td><td class="num">+0.193</td><td class="num">2.70</td><td class="num">2.15</td><td class="num">+28.4</td><td class="num">4.1</td><td class="num">36h</td><td class="num pcol">-0.87</td><td class="num pcol2">-2.08</td></tr><tr><td>V3 (V2 + no-consolidation) — hold to midweek reversal</td><td class="num">91</td><td class="num">53.8</td><td class="num pos">+0.372</td><td class="num">+0.065</td><td class="num">2.39</td><td class="num">2.07</td><td class="num">+33.8</td><td class="num">6.9</td><td class="num">42h</td><td class="num pcol">-0.09</td><td class="num pcol2">-1.21</td></tr><tr><td>V3 (V2 + no-consolidation) + 50% off at 1.9R</td><td class="num">91</td><td class="num">58.2</td><td class="num pos">+0.357</td><td class="num">+0.178</td><td class="num">2.78</td><td class="num">2.19</td><td class="num">+32.5</td><td class="num">4.7</td><td class="num">42h</td><td class="num pcol">-0.34</td><td class="num pcol2">-1.84</td></tr>
+</table></div>
+<p class="small">Reading it straight: the midweek exit keeps a healthy standalone profile (PF ~2, t-vs-0 above 2, positive expectancy)
+&mdash; it is <em>not</em> a broken rule &mdash; but head-to-head it loses ground to both fixed targets. The best single cell is
+<b>V3 (V2 + no-consolidation) — hold to midweek reversal</b> at +0.372R, still a hair under baseline and a statistical tie
+(paired&nbsp;t&nbsp;-0.09). Adding Final Damage (V2) makes it <em>worse</em>, because FD fires earlier and cuts winners
+short; the no-consolidation filter (V3) is the only knob that helps, and only enough to draw level with baseline.</p>
+
+<h2>4 &middot; Equity curves &mdash; midweek exit vs the two fixed targets</h2>
+<div class="card"><svg viewBox="0 0 860 340" class="chart" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Equity curves"><line class="grid" x1="52.0" y1="306.0" x2="844.0" y2="306.0"/><text class="ytick" x="46.0" y="309.0">-4R</text><line class="grid" x1="52.0" y1="250.2" x2="844.0" y2="250.2"/><text class="ytick" x="46.0" y="253.2">+6R</text><line class="grid" x1="52.0" y1="188.9" x2="844.0" y2="188.9"/><text class="ytick" x="46.0" y="191.9">+17R</text><line class="grid" x1="52.0" y1="133.1" x2="844.0" y2="133.1"/><text class="ytick" x="46.0" y="136.1">+27R</text><line class="grid" x1="52.0" y1="71.8" x2="844.0" y2="71.8"/><text class="ytick" x="46.0" y="74.8">+38R</text><line class="grid" x1="52.0" y1="16.0" x2="844.0" y2="16.0"/><text class="ytick" x="46.0" y="19.0">+48R</text><line class="grid" x1="52.0" y1="283.7" x2="844.0" y2="283.7" style="stroke-dasharray:3 3"/><polyline fill="none" stroke="#2c5cc5" stroke-width="3" points="52.0,273.5 60.8,268.0 69.6,264.3 78.4,270.2 87.2,276.1 96.0,282.0 104.8,287.7 113.6,280.3 122.4,275.2 131.2,269.3 140.0,275.3 148.8,275.6 157.6,265.3 166.4,266.1 175.2,266.5 184.0,256.3 192.8,262.0 201.6,251.9 210.4,241.8 219.2,231.4 228.0,237.4 236.8,227.5 245.6,221.8 254.4,211.2 263.2,217.0 272.0,222.8 280.8,212.3 289.6,218.2 298.4,218.6 307.2,208.4 316.0,207.9 324.8,197.9 333.6,187.6 342.4,188.3 351.2,187.4 360.0,187.9 368.8,177.8 377.6,177.8 386.4,167.5 395.2,157.4 404.0,163.3 412.8,163.9 421.6,153.8 430.4,150.6 439.2,140.5 448.0,130.3 456.8,136.1 465.6,142.3 474.4,142.1 483.2,142.7 492.0,132.6 500.8,135.9 509.6,142.8 518.4,132.9 527.2,138.7 536.0,144.6 544.8,150.5 553.6,140.4 562.4,146.4 571.2,145.4 580.0,135.6 588.8,125.4 597.6,131.5 606.4,137.6 615.2,143.5 624.0,143.0 632.8,141.0 641.6,131.1 650.4,128.4 659.2,135.0 668.0,138.7 676.8,144.8 685.6,150.6 694.4,146.9 703.2,145.0 712.0,150.9 720.8,141.0 729.6,130.8 738.4,120.6 747.2,126.5 756.0,126.6 764.8,116.3 773.6,106.1 782.4,102.7 791.2,108.5 800.0,114.3 808.8,120.2 817.6,110.0 826.4,99.6 835.2,100.0 844.0,89.8"/><polyline fill="none" stroke="#0b8a5f" stroke-width="2" points="52.0,270.2 60.8,264.7 69.6,260.9 78.4,266.9 87.2,272.7 96.0,278.6 104.8,284.3 113.6,276.9 122.4,271.8 131.2,265.9 140.0,272.0 148.8,272.2 157.6,258.7 166.4,259.4 175.2,259.8 184.0,246.2 192.8,252.0 201.6,238.5 210.4,225.1 219.2,211.4 228.0,217.3 236.8,204.1 245.6,198.4 254.4,186.1 263.2,191.8 272.0,197.6 280.8,189.7 289.6,195.5 298.4,196.0 307.2,182.4 316.0,181.9 324.8,168.5 333.6,155.0 342.4,155.6 351.2,154.7 360.0,155.2 368.8,141.8 377.6,141.8 386.4,128.2 395.2,114.7 404.0,120.6 412.8,121.2 421.6,107.8 430.4,104.5 439.2,91.1 448.0,88.3 456.8,94.0 465.6,100.3 474.4,100.1 483.2,100.7 492.0,87.2 500.8,90.5 509.6,97.4 518.4,103.7 527.2,109.5 536.0,115.4 544.8,121.3 553.6,107.9 562.4,113.9 571.2,112.8 580.0,99.7 588.8,92.8 597.6,98.9 606.4,105.0 615.2,110.9 624.0,110.3 632.8,108.4 641.6,95.1 650.4,92.4 659.2,99.0 668.0,102.8 676.8,108.8 685.6,114.6 694.4,110.9 703.2,109.0 712.0,115.0 720.8,101.7 729.6,88.1 738.4,74.6 747.2,80.5 756.0,80.6 764.8,66.9 773.6,53.4 782.4,50.0 791.2,55.8 800.0,61.6 808.8,67.5 817.6,54.0 826.4,40.2 835.2,40.7 844.0,27.1"/><polyline fill="none" stroke="#b9770a" stroke-width="2.5" points="52.0,261.7 60.8,260.2 69.6,258.9 78.4,264.8 87.2,265.2 96.0,271.1 104.8,271.0 113.6,271.7 122.4,266.5 131.2,260.9 140.0,266.9 148.8,267.0 157.6,250.8 166.4,251.9 175.2,252.3 184.0,241.8 192.8,247.6 201.6,244.9 210.4,231.7 219.2,227.2 228.0,233.1 236.8,206.0 245.6,205.0 254.4,201.9 263.2,207.6 272.0,213.4 280.8,213.0 289.6,210.6 298.4,211.1 307.2,208.5 316.0,207.2 324.8,187.0 333.6,170.9 342.4,167.2 351.2,162.5 360.0,163.1 368.8,169.1 377.6,169.1 386.4,158.9 395.2,157.1 404.0,162.9 412.8,163.6 421.6,134.0 430.4,133.0 439.2,139.1 448.0,134.6 456.8,138.5 465.6,144.7 474.4,144.4 483.2,144.9 492.0,130.3 500.8,133.6 509.6,140.6 518.4,146.8 527.2,152.6 536.0,158.5 544.8,164.4 553.6,151.7 562.4,157.7 571.2,156.6 580.0,163.0 588.8,153.4 597.6,159.5 606.4,165.5 615.2,165.9 624.0,165.3 632.8,165.0 641.6,153.2 650.4,148.0 659.2,154.6 668.0,155.8 676.8,161.9 685.6,167.7 694.4,164.6 703.2,162.7 712.0,168.7 720.8,141.1 729.6,133.0 738.4,123.8 747.2,129.7 756.0,130.1 764.8,123.2 773.6,117.3 782.4,116.9 791.2,113.5 800.0,119.3 808.8,125.2 817.6,115.5 826.4,105.5 835.2,106.0 844.0,95.0"/><text class="xtick" x="52.0" y="332.0">trade # (chronological, 1&ndash;91)</text><rect x="60.0" y="26.0" width="16" height="4" fill="#2c5cc5"/><text x="82.0" y="30.0" class="lgd">Baseline fixed 1.9R  (+34.8R)</text><rect x="60.0" y="44.0" width="16" height="4" fill="#0b8a5f"/><text x="82.0" y="48.0" class="lgd">F3 winner fixed 2.5R  (+46.0R)</text><rect x="60.0" y="62.0" width="16" height="4" fill="#b9770a"/><text x="82.0" y="66.0" class="lgd">Best midweek exit — V3 runner  (+33.8R)</text></svg></div>
+<p>Cumulative R over the 91 fades in chronological order. The F3 winner (2.5R, green) finishes clearly highest; the best
+midweek cell (V3 runner, amber) tracks the 1.9R baseline (blue) almost exactly and ends fractionally below it. The midweek exit
+does not compound any advantage over the whole sample &mdash; it simply substitutes an earlier, pattern-timed close for the
+fixed target and nets out the same, with more drawdown.</p>
+
+<h2>5 &middot; When the midweek exit actually fires (by day)</h2>
+<div class="card"><svg viewBox="0 0 860 300" class="chart" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Midweek exit timing by day"><line class="grid" x1="60.0" y1="232.0" x2="848.0" y2="232.0"/><text class="ytick" x="54.0" y="235.0">0</text><line class="grid" x1="60.0" y1="181.5" x2="848.0" y2="181.5"/><text class="ytick" x="54.0" y="184.5">10</text><line class="grid" x1="60.0" y1="131.0" x2="848.0" y2="131.0"/><text class="ytick" x="54.0" y="134.0">20</text><line class="grid" x1="60.0" y1="80.5" x2="848.0" y2="80.5"/><text class="ytick" x="54.0" y="83.5">30</text><line class="grid" x1="60.0" y1="30.0" x2="848.0" y2="30.0"/><text class="ytick" x="54.0" y="33.0">40</text><rect x="90.3" y="70.4" width="62" height="161.6" fill="#2c5cc5" rx="2"/><text x="121.3" y="66.4" class="barval" text-anchor="middle">32</text><rect x="160.3" y="40.1" width="62" height="191.9" fill="#0b8a5f" rx="2"/><text x="191.3" y="36.1" class="barval" text-anchor="middle">38</text><rect x="230.3" y="85.6" width="62" height="146.4" fill="#b9770a" rx="2"/><text x="261.3" y="81.6" class="barval" text-anchor="middle">29</text><text x="191.3" y="250.0" class="barlab" text-anchor="middle">Wednesday</text><rect x="353.0" y="126.0" width="62" height="106.0" fill="#2c5cc5" rx="2"/><text x="384.0" y="122.0" class="barval" text-anchor="middle">21</text><rect x="423.0" y="100.7" width="62" height="131.3" fill="#0b8a5f" rx="2"/><text x="454.0" y="96.7" class="barval" text-anchor="middle">26</text><rect x="493.0" y="126.0" width="62" height="106.0" fill="#b9770a" rx="2"/><text x="524.0" y="122.0" class="barval" text-anchor="middle">21</text><text x="454.0" y="250.0" class="barlab" text-anchor="middle">Thursday</text><rect x="615.7" y="181.5" width="62" height="50.5" fill="#2c5cc5" rx="2"/><text x="646.7" y="177.5" class="barval" text-anchor="middle">10</text><rect x="685.7" y="201.7" width="62" height="30.3" fill="#0b8a5f" rx="2"/><text x="716.7" y="197.7" class="barval" text-anchor="middle">6</text><rect x="755.7" y="176.4" width="62" height="55.6" fill="#b9770a" rx="2"/><text x="786.7" y="172.4" class="barval" text-anchor="middle">11</text><text x="716.7" y="250.0" class="barlab" text-anchor="middle">Friday</text><rect x="66.0" y="16.0" width="14" height="14" fill="#2c5cc5" rx="2"/><text x="86.0" y="27.0" class="lgd">V1 M/W only</text><rect x="316.0" y="16.0" width="14" height="14" fill="#0b8a5f" rx="2"/><text x="336.0" y="27.0" class="lgd">V2 +Final Damage</text><rect x="566.0" y="16.0" width="14" height="14" fill="#b9770a" rx="2"/><text x="586.0" y="27.0" class="lgd">V3 +no-consolidation</text><text x="60.0" y="292" class="barnote">count of the 91 fades that exit on a midweek reversal, by New-York trading day of the completion bar (Wed 00:00 NY gate). No detections land before Wednesday by construction.</text></svg></div>
+<p>This is the part that <b>validates Annie's description</b>: of the fades that close on a midweek reversal, the completion
+bar lands overwhelmingly on <b>Wednesday and Thursday, with a handful on Friday</b> &mdash; her exact words. The Wed-00:00-NY
+gate guarantees nothing fires earlier. So the mechanism is faithful and the timing is real; it is only the <em>P&amp;L</em>
+that fails to improve on a fixed target.</p>
+
+<h2>6 &middot; How each cell closes its trades (of 91)</h2>
+<div style="overflow-x:auto;"><table>
+<tr><th>exit rule</th><th>families (midweek / stop / friday)</th><th>raw breakdown</th></tr>
+<tr><td>V1 M/W only — hold to midweek reversal</td><td style="font-family:monospace;font-size:12.5px">midweek=51; stop=27; friday=13</td><td style="font-family:monospace;font-size:12px;color:var(--muted)">friday=13; midweek=51; stop=27</td></tr><tr><td>V1 M/W only + 50% off at 1.9R</td><td style="font-family:monospace;font-size:12.5px">midweek=51; stop=27; friday=13</td><td style="font-family:monospace;font-size:12px;color:var(--muted)">friday=7; midweek=39; partial_friday=6; partial_midweek=12; partial_stop=4; stop=23</td></tr><tr><td>V2 M/W + Final Damage — hold to midweek reversal</td><td style="font-family:monospace;font-size:12.5px">midweek=59; stop=25; friday=7</td><td style="font-family:monospace;font-size:12px;color:var(--muted)">friday=7; midweek=59; stop=25</td></tr><tr><td>V2 M/W + Final Damage + 50% off at 1.9R</td><td style="font-family:monospace;font-size:12.5px">midweek=59; stop=25; friday=7</td><td style="font-family:monospace;font-size:12px;color:var(--muted)">friday=6; midweek=42; partial_friday=1; partial_midweek=17; partial_stop=4; stop=21</td></tr><tr><td>V3 (V2 + no-consolidation) — hold to midweek reversal</td><td style="font-family:monospace;font-size:12.5px">midweek=50; stop=27; friday=14</td><td style="font-family:monospace;font-size:12px;color:var(--muted)">friday=14; midweek=50; stop=27</td></tr><tr><td>V3 (V2 + no-consolidation) + 50% off at 1.9R</td><td style="font-family:monospace;font-size:12.5px">midweek=50; stop=27; friday=14</td><td style="font-family:monospace;font-size:12px;color:var(--muted)">friday=10; midweek=32; partial_friday=4; partial_midweek=18; partial_stop=4; stop=23</td></tr>
+</table></div>
+<p class="small">The midweek reversal genuinely does the closing work: <b>59 of 91</b>
+trades exit on a detected reversal in V2, 51 in V1, and
+50 in V3 (the no-consolidation filter suppresses the low-quality ones, pushing a
+few back to the Friday cap). The stop count is stable across cells; <code>friday</code> = no midweek reversal formed before the
+UK-session cap. In the partial cells, <code>partial_midweek</code>/<code>partial_stop</code>/<code>partial_friday</code> are the
+remainder's fate after the half booked at 1.9R.</p>
+
+<h2>7 &middot; Honest verdict &amp; caveats</h2>
+<div class="box honesty">
+<h3>What this does and does not say</h3>
+<ul>
+<li><b>The midweek reversal is faithfully captured</b> and behaves exactly as described (Wed/Thu-heavy, occasional Friday). This
+is a genuine, causal, mechanically-detectable event &mdash; not a fudge.</li>
+<li><b>It does not beat a fixed target.</b> All six cells sit below +0.382R with negative paired-t; the pre-registered bar
+(paired&nbsp;t&nbsp;&ge;&nbsp;2.5) is not cleared by any, and none even turns positive &mdash; so the multiple-comparisons
+correction across the 6 cells is moot: there is no candidate win to discount.</li>
+<li><b>Why it underperforms:</b> the opposite M/W/FD typically completes <em>after</em> the reversion has already run past 1.9R
+but <em>before</em> it reaches the 2.5&ndash;3R zone the F3 sweep found optimal &mdash; so it systematically books winners a bit
+early while doing nothing to cut losers (the hard stop still governs those). Adding Final Damage (V2) worsens this; only the
+no-consolidation filter (V3) recovers the difference back to a tie.</li>
+<li><b>Drawdown is higher</b> than the 1.9R baseline (up to 6.9R vs 4.6R) for the runner cells &mdash; you pay more variance for
+the same money. The 50%-partial overlay trims that (down to ~4.1&ndash;4.7R) and lifts win-rate, but at slightly lower
+expectancy: a variance play, not an edge gain.</li>
+<li><b>Scope:</b> in-sample 2019&ndash;2024 on the frozen entries; BTC-USDT perp; the locked 2025&ndash;26 out-of-sample block
+was not touched. No OOS run is warranted &mdash; there is no promotable challenger here.</li>
+</ul>
+</div>
+<div class="box take">
+<h3>The take</h3>
+<p style="margin-bottom:0"><b>Trade the fixed target, keep the midweek reversal as a discretionary overlay.</b> If you are
+watching the chart and a clean opposite M/W/FD prints Wed/Thu, taking profit there is reasonable &mdash; but the numbers say a
+mechanical 1.9R (or the F3-preferred 2.5R) target does at least as well with less work and less drawdown. The midweek reversal
+earns its place in the <em>playbook narrative</em>, not in the <em>exit rule</em>.</p>
+</div>
+
+<div class="foot">
+Task F7 &middot; <code>backtests/bt_weekly2_midweek_exit.py</code> on the frozen <code>backtests/f3_exits_ledger_a.csv</code>
+(91 entries). Detector reuse: <code>detectors/patterns.py</code> (<code>find_pivots</code>, <code>_internal_leg</code>,
+<code>_shortfall_frac</code>, <code>_overshoot_frac</code>, <code>_closes_back_inside</code>, <code>MAX_SHORTFALL=0.35</code>,
+<code>is_reversal_candle</code>) per <code>detectors/CALIBRATION_V2.md</code>; fill conventions reused verbatim from
+<code>backtests/bt_weekly.py</code> (fee 0.05%/side, slippage 0.02%/fill, 1m intrabar, same-bar ambiguity = loss, 1R = $100).
+Declared knobs: peak-1 lookback 48&times;1H, fractal k=3, peak separation 3, consolidation window 8&times;1H at &le;1.5% band,
+partial at 1.9R. Determinism: full run &times;2, per-trade CSV md5 identical. In-sample 2019&ndash;2024; 2025&ndash;26 locked.
+Not financial advice &mdash; a backtest of a course rule.
+</div>
+</div>
+<script>(function(){
+  var btn=document.getElementById('themeToggle');if(!btn)return;
+  var mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;
+  function stored(){try{var t=localStorage.getItem('codexTheme');return (t==='light'||t==='dark'||t==='system')?t:'system';}catch(e){return 'system';}}
+  function eff(m){return (m==='light'||m==='dark')?m:((mq&&mq.matches)?'dark':'light');}
+  function apply(){var m=stored();document.documentElement.setAttribute('data-theme',eff(m));btn.textContent=(m==='light')?'\u25D0 Light':(m==='dark')?'\u25D1 Dark':'\u25D3 Auto';}
+  apply();
+  btn.addEventListener('click',function(){var order={light:'dark',dark:'system',system:'light'};var n=order[stored()];try{localStorage.setItem('codexTheme',n);}catch(e){}apply();});
+  if(mq){var h=function(){if(stored()==='system')apply();};if(mq.addEventListener)mq.addEventListener('change',h);else if(mq.addListener)mq.addListener(h);}
+})();</script>
+</body></html>
