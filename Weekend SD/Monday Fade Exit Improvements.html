@@ -45,7 +45,36 @@
     .foot{color:var(--muted);font-size:12px;margin-top:40px;border-top:1px solid var(--line);padding-top:14px;}
     p{margin:9px 0;}
     .win{color:var(--ok);font-weight:700;} .lose{color:var(--bad);font-weight:700;}
-    </style></head><body><div class="wrap"><h1>Better Exits for the Monday Fade &mdash; Backtest</h1>
+    /* ---- Theme toggle (added 2026-07-13) ---- */
+    html[data-theme="light"]{--bg:#f6f7f9;--card:#fff;--ink:#1f2733;--muted:#6b7683;--line:#e3e7ee;
+      --ok:#0b8a5f;--okbg:#e7f6ef;--bad:#c0392b;--badbg:#fbe9e7;--warn:#b9770a;--warnbg:#fdf3e3;--accent:#2c5cc5;}
+    html[data-theme="dark"]{--bg:#10141b;--card:#161b22;--ink:#e6edf3;--muted:#94a0b4;--line:#2a3140;
+      --ok:#3ddc9a;--okbg:#123028;--bad:#ff6b5e;--badbg:#2e1614;--warn:#f0b429;--warnbg:#2c2210;--accent:#6aa9ff;}
+    html[data-theme="dark"] th{background:#1c2230;color:#c7d0dc;}
+    html[data-theme="dark"] th.pcol,html[data-theme="dark"] td.pcol{background:#182233;}
+    html[data-theme="dark"] tr.base td{background:#1a2740;}
+    html[data-theme="dark"] .chart .grid{stroke:#2a3140;}
+    html[data-theme="dark"] .box.honesty{background:#181d27;border-color:#2a3140;}
+    html[data-theme="dark"] code{background:#1c2230;}
+    html[data-theme="dark"] .banner{border-color:#4a3a12;color:#f0c96a;}
+    html[data-theme="dark"] .banner.ok{border-color:#1d4a37;color:#5be6b0;}
+    html[data-theme="dark"] .box.take{border-color:#4a3a12;}
+    .theme-toggle{position:fixed;top:16px;right:20px;z-index:100;background:var(--card);
+      border:1px solid var(--line);color:var(--ink);border-radius:20px;padding:6px 14px;
+      font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.10);
+      font-family:inherit;letter-spacing:.02em;}
+    html[data-theme="dark"] .theme-toggle{box-shadow:0 2px 10px rgba(0,0,0,.35);}
+    .theme-toggle:active{transform:translateY(1px);}
+    </style>
+    <script>
+    (function(){
+      try{
+        var t=localStorage.getItem('codexTheme');
+        if(t==='light'||t==='dark'){document.documentElement.setAttribute('data-theme',t);}
+      }catch(e){}
+    })();
+    </script>
+    </head><body><button type="button" id="themeToggle" class="theme-toggle" aria-label="Toggle light/dark theme">&#9681; Dark</button><div class="wrap"><h1>Better Exits for the Monday Fade &mdash; Backtest</h1>
 <p class="sub">Same validated entries every time (the 91 Monday-spike fades, +0.382R, t=2.98). We freeze the entries and vary ONLY the exit: 8 declared exit rules, judged head-to-head against the baseline on the identical trades. Causal, in-sample (2019&ndash;2024), realistic fees and slippage.</p>
 <div class="banner"><span class="tag">&#9888; KEEP THE BASELINE EXIT</span><span>No alternative exit clears the paired-t&nbsp;&ge;&nbsp;2.5 bar for a real improvement on the identical entries, so the validated 1.9R exit stays. The best challenger &mdash; <b>Target the opposite-side average level</b> &mdash; numerically lifts expectancy to +0.491R (vs baseline +0.382R) at the same 4.6R drawdown, but only paired t=1.22: <b>promising, not proven</b>. Re-test it out-of-sample before trading it; do not switch now.</span></div>
 <div class="kpis">
@@ -118,4 +147,21 @@
 <p><b>Drop the refund rule from the mental checklist</b> for this setup &mdash; it never fires (the stop pre-empts it), so it is cognitive load with zero effect (Variant 8 confirms).</p>
 <p><b>Do not shorten the hold.</b> The base-magnet and opposite-mean targets and the overnight-flat rule all give away the multi-day mean reversion that makes this fade pay; the average winning fade needs ~43 hours to work.</p>
 </div>
-<div class="foot">Causal 1-minute backtest, in-sample 2019-09&rarr;2024-12. Entries frozen from the validated flagship (bt_weekly.py); only exits vary. Fees 0.05%/side, slippage 0.02%/fill, 1R = $100 fixed. Deterministic; run twice with identical md5. Self-contained &mdash; no external resources.</div></div></body></html>
+<div class="foot">Causal 1-minute backtest, in-sample 2019-09&rarr;2024-12. Entries frozen from the validated flagship (bt_weekly.py); only exits vary. Fees 0.05%/side, slippage 0.02%/fill, 1R = $100 fixed. Deterministic; run twice with identical md5. Self-contained &mdash; no external resources.</div></div><script>
+  (function(){
+    var btn=document.getElementById('themeToggle');
+    if(!btn)return;
+    var NATIVE='light'; // this doc's own default look when nothing is stored
+    function current(){return document.documentElement.getAttribute('data-theme')||NATIVE;}
+    function render(){
+      btn.textContent = current()==='dark' ? '◐ Light' : '◑ Dark';
+    }
+    render();
+    btn.addEventListener('click',function(){
+      var next = current()==='dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try{localStorage.setItem('codexTheme', next);}catch(e){}
+      render();
+    });
+  })();
+</script></body></html>

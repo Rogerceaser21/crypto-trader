@@ -52,9 +52,38 @@
   .foot{color:var(--muted);font-size:12.5px;margin-top:50px;border-top:1px solid var(--line);padding-top:16px}
   .muted{color:var(--muted)}
   ul.tight{margin:6px 0 6px 0;padding-left:20px} ul.tight li{margin:4px 0}
+
+  /* ---- Theme toggle (added 2026-07-13) ---- */
+  html[data-theme="light"]{
+    --bg:#f7f9fc; --panel:#ffffff; --panel2:#eef1f6; --ink:#1a2230; --muted:#5b6472;
+    --line:#d7dde6; --accent:#2f6fe0; --all:#6b6f7a; --m3:#178f83; --m1:#c97400;
+    --up:#1e7d34; --dn:#c92c22; --warn:#a6740b;
+  }
+  html[data-theme="light"] code, html[data-theme="light"] kbd{background:#eef1f5;color:var(--ink)}
+  html[data-theme="light"] pre.src{background:#eef1f5;color:#1a2230}
+  html[data-theme="light"] .callout{background:rgba(166,116,11,.10)}
+  html[data-theme="light"] .callout.good{background:rgba(23,143,131,.10)}
+  html[data-theme="light"] .btn,
+  html[data-theme="light"] ol.steps li::before,
+  html[data-theme="light"] .tag{color:#fff}
+  .theme-toggle{position:fixed;top:16px;right:20px;z-index:100;background:var(--panel);
+    border:1px solid var(--line);color:var(--ink);border-radius:20px;padding:6px 14px;
+    font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.35);
+    font-family:inherit;letter-spacing:.02em}
+  html[data-theme="light"] .theme-toggle{box-shadow:0 2px 10px rgba(0,0,0,.10)}
+  .theme-toggle:active{transform:translateY(1px)}
 </style>
+<script>
+(function(){
+  try{
+    var t=localStorage.getItem('codexTheme');
+    if(t==='light'||t==='dark'){document.documentElement.setAttribute('data-theme',t);}
+  }catch(e){}
+})();
+</script>
 </head>
 <body>
+<button type="button" id="themeToggle" class="theme-toggle" aria-label="Toggle light/dark theme">&#9680; Light</button>
 <div class="wrap">
 
 <header>
@@ -588,6 +617,24 @@ plot(m3_dn_p95, &quot;3-Months DOWN p95&quot;,  style=plot.style_linebr, color=c
         var s=window.getSelection();s.removeAllRanges();s.addRange(r);
         try{document.execCommand('copy');done();}catch(e){}
       }
+    });
+  })();
+</script>
+<script>
+  (function(){
+    var btn=document.getElementById('themeToggle');
+    if(!btn)return;
+    var NATIVE='dark'; // this doc's own default look when nothing is stored
+    function current(){return document.documentElement.getAttribute('data-theme')||NATIVE;}
+    function render(){
+      btn.textContent = current()==='light' ? '◑ Dark' : '◐ Light';
+    }
+    render();
+    btn.addEventListener('click',function(){
+      var next = current()==='light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', next);
+      try{localStorage.setItem('codexTheme', next);}catch(e){}
+      render();
     });
   })();
 </script>
