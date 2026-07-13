@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Annie Monday Fade — LIVE — Indicator Reference</title>
+<style>
+  :root{
+    --bg:#0e1117; --panel:#161b22; --panel2:#1c2230; --ink:#e6edf3; --muted:#9aa4b2;
+    --line:#2a3140; --accent:#6aa9ff; --all:#9598a1; --m3:#26a69a; --m1:#ff9800;
+    --up:#3fb950; --dn:#f85149; --warn:#e3b341;
+    --regbull:#26a69a; --hidbull:#26c6da; --regbear:#ef5350; --hidbear:#ff9800;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  .wrap{max-width:940px;margin:0 auto;padding:34px 22px 90px;}
+  header{border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:8px}
+  .eyebrow{letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:var(--accent);font-weight:700}
+  h1{font-size:30px;margin:8px 0 6px;line-height:1.2}
+  h2{font-size:21px;margin:38px 0 12px;padding-top:8px;border-top:1px solid var(--line)}
+  h3{font-size:16px;margin:22px 0 8px;color:var(--ink)}
+  p{color:var(--ink)}
+  .sub{color:var(--muted);font-size:15px;max-width:70ch}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:14px 0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:720px){.grid2{grid-template-columns:1fr}}
+  code,kbd{background:#0b0f16;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px}
+  kbd{color:var(--accent)}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:14px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--panel2);color:var(--muted);font-weight:600;font-size:12.5px;text-transform:uppercase;letter-spacing:.04em}
+  td.n{font-family:ui-monospace,Menlo,monospace;white-space:nowrap}
+  .tag{display:inline-block;font-size:11px;font-weight:700;border-radius:20px;padding:2px 10px;color:#0b0f16}
+  .tag.all{background:var(--all)} .tag.m3{background:var(--m3)} .tag.m1{background:var(--m1)}
+  ol.steps{counter-reset:s;list-style:none;padding-left:0;margin:0}
+  ol.steps li{position:relative;padding:10px 0 10px 46px;border-bottom:1px solid var(--line)}
+  ol.steps li:last-child{border-bottom:0}
+  ol.steps li::before{counter-increment:s;content:counter(s);position:absolute;left:0;top:10px;
+    width:30px;height:30px;border-radius:50%;background:var(--accent);color:#0b0f16;font-weight:800;
+    display:flex;align-items:center;justify-content:center;font-size:14px}
+  .callout{border-left:4px solid var(--warn);background:rgba(227,179,65,.08);padding:12px 16px;border-radius:8px;margin:12px 0}
+  .callout.good{border-left-color:var(--m3);background:rgba(38,166,154,.08)}
+  .callout.bad{border-left-color:var(--dn);background:rgba(248,81,73,.09)}
+  .callout b{color:var(--ink)}
+  pre.src{background:#0b0f16;border:1px solid var(--line);border-radius:10px;padding:16px;overflow:auto;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.5;color:#c9d3e0;max-height:560px}
+  .copybar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:14px 0 6px}
+  .btn{background:var(--accent);color:#0b0f16;border:0;border-radius:8px;padding:9px 16px;font-weight:700;cursor:pointer;font-size:14px}
+  .btn:active{transform:translateY(1px)}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;margin:6px 0 2px;font-size:13px;color:var(--muted)}
+  .legend span{display:inline-flex;align-items:center;gap:7px}
+  .sw{width:26px;height:0;border-top-width:3px;border-top-style:solid;display:inline-block}
+  .sw.dash{border-top-style:dashed}
+  .foot{color:var(--muted);font-size:12.5px;margin-top:50px;border-top:1px solid var(--line);padding-top:16px}
+  .muted{color:var(--muted)}
+  ul.tight{margin:6px 0 6px 0;padding-left:20px} ul.tight li{margin:4px 0}
+  .pill{display:inline-block;font-size:11px;font-weight:700;border-radius:20px;padding:2px 10px;color:#0b0f16;background:var(--up)}
+  .pill.no{background:var(--dn);color:#fff}
+
+  /* ---- Theme toggle ---- */
+  html[data-theme="light"]{
+    --bg:#f7f9fc; --panel:#ffffff; --panel2:#eef1f6; --ink:#1a2230; --muted:#5b6472;
+    --line:#d7dde6; --accent:#2f6fe0; --all:#6b6f7a; --m3:#178f83; --m1:#c97400;
+    --up:#1e7d34; --dn:#c92c22; --warn:#a6740b;
+    --regbull:#178f83; --hidbull:#0e93a6; --regbear:#c92c22; --hidbear:#c97400;
+  }
+  html[data-theme="light"] code, html[data-theme="light"] kbd{background:#eef1f5;color:var(--ink)}
+  html[data-theme="light"] pre.src{background:#eef1f5;color:#1a2230}
+  html[data-theme="light"] .callout{background:rgba(166,116,11,.10)}
+  html[data-theme="light"] .callout.good{background:rgba(23,143,131,.10)}
+  html[data-theme="light"] .callout.bad{background:rgba(201,44,34,.09)}
+  html[data-theme="light"] .btn,
+  html[data-theme="light"] ol.steps li::before,
+  html[data-theme="light"] .tag{color:#fff}
+  html[data-theme="light"] .pill{color:#fff}
+  .theme-toggle{position:fixed;top:16px;right:20px;z-index:100;background:var(--panel);
+    border:1px solid var(--line);color:var(--ink);border-radius:20px;padding:6px 14px;
+    font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.35);
+    font-family:inherit;letter-spacing:.02em}
+  html[data-theme="light"] .theme-toggle{box-shadow:0 2px 10px rgba(0,0,0,.10)}
+  .theme-toggle:active{transform:translateY(1px)}
+@media(max-width:560px){.theme-toggle{top:10px;right:12px;padding:6px 10px;font-size:12px}body{padding-top:44px}}
+</style>
+<script>
+(function(){try{var t=localStorage.getItem('codexTheme');var e=(t==='light'||t==='dark')?t:((window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light');document.documentElement.setAttribute('data-theme',e);}catch(e){}})();
+</script>
+</head>
+<body>
+<button type="button" id="themeToggle" class="theme-toggle" aria-label="Toggle light/dark theme">&#9680; Light</button>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Annie Trading &middot; Strategy V1</div>
+  <h1>Annie Monday Fade &mdash; Strategy V1</h1>
+  <p class="sub">The <b>strategy()</b> version of the validated Monday fade &mdash; add it to a
+  <b>BTCUSDT perp 15m</b> chart and TradingView's <b>Strategy Tester</b> shows every trade:
+  entry/exit arrows on the candles, the trade list, win/loss and P&amp;L. Signal logic is
+  line-identical to the <a href="Annie%20Monday%20Fade%20Indicator.html">Monday Fade indicator</a>
+  (87/91 validated entries exact to the bar). Validated stats: IS +0.382R over 91 trades,
+  locked OOS +0.54R over 28.</p>
+</header>
+
+<h2>1 &middot; What the Tester shows &mdash; and what it doesn't</h2>
+<div class="callout"><b>Read this before judging the P&amp;L.</b> The winning Monday spike is only
+knowable once the early week closes (~Tue 17:00 NY). We measured the alternative on our 5-year
+data: a strategy that commits in real time to the running spike reproduces the validated trades
+<i>plus 147 phantom trades the validated system never took</i> &mdash; rejected. So this strategy
+locks at the early-window close:</p>
+<ul class="tight">
+  <li>Setups completing <b>after</b> the lock fill on the true next-bar open (20 of the 91 historical entries).</li>
+  <li>Setups completing <b>before</b> the lock fill at the first bar after the lock &mdash; historically ~22h
+      later than the engine's fill (71 of 91). Their stop/target LEVELS still use the original engine
+      geometry, and the &ldquo;engine bar&rdquo; label marks the true entry candle.</li>
+</ul>
+<p>Consequences: the Tester's trade LIST and levels mirror the validated system; the P&amp;L of the
+delayed fills does not. The authoritative economics are the site's backtest reports. TradingView also
+caps 15m history (~20k bars), so you'll see the recent months, not all of 2019&ndash;2024.</p>
+
+<h2>2 &middot; Inputs worth touching</h2>
+<table>
+  <tr><th>Input</th><th>What it does</th><th>Default</th></tr>
+  <tr><td>TP (R multiple)</td><td>The profit target. 1.9R = validated baseline. <b>Try 2.5</b> &mdash; the
+      Exit-RR-Sweep winner (+0.506R vs +0.382R on the same entries, the only variant to clear the
+      significance bar).</td><td class="n">1.9</td></tr>
+  <tr><td>Risk per trade (% of equity)</td><td>Position size so one stop-out costs this much.</td><td class="n">1.0</td></tr>
+  <tr><td>Monday-spike only</td><td>The validated edge. Leave ON.</td><td class="n">true</td></tr>
+  <tr><td>Everything under &ldquo;Detector knobs&rdquo;</td><td>Validated values &mdash; do not change to trade the edge.</td><td class="n">&mdash;</td></tr>
+</table>
+
+<h2>3 &middot; Install</h2>
+<ol class="steps">
+  <li>Open a <b>BTCUSDT perp</b> chart on <b>15m</b>.</li>
+  <li>Pine Editor &rarr; <b>Open</b> &rarr; <b>New blank strategy</b> (or blank indicator &mdash; the script declares itself).</li>
+  <li>Select all (<kbd>Cmd/Ctrl + A</kbd>), delete, paste the source below (button provided).</li>
+  <li><b>Save</b> as <code>Annie Monday Fade Strategy V1</code> &rarr; <b>Add to chart</b>.</li>
+  <li>Open the <b>Strategy Tester</b> panel (bottom) &rarr; &ldquo;List of trades&rdquo; to walk every trade;
+      click a row to jump the chart there.</li>
+  <li>Optional: keep the indicator version on the same chart &mdash; its arrows mark the engine's true entry bars.</li>
+</ol>
+
+<h2>4 &middot; Full source &mdash; copy &amp; paste</h2>
+<div class="copybar">
+  <span class="muted">Select all inside the box, or use the button, then paste into a blank Pine script.</span>
+  <button class="btn" id="copyBtn">Copy Pine source</button>
+</div>
+<pre class="src" id="pineSrc">//@version=6
+// =============================================================================
+// Annie Monday Fade — Strategy V1
+// -----------------------------------------------------------------------------
+// strategy() version of the validated Annie Monday fade so TradingView&#x27;s
+// Strategy Tester shows every trade: entry/exit arrows, trade list, P&amp;L.
+// Signal logic = IDENTICAL to &quot;Annie Monday Fade — LIVE&quot; (the indicator),
+// which matches the validated engine 87/91 entries exact-to-the-bar (95.6%).
+// Validated stats (our engine, 5y in-sample): 91 Monday trades, 54.9% WR,
+// +0.382R, PF 2.05 (t=2.98); locked OOS 2025-26: +0.54R over 28 trades.
+//
+// HOW FILLS WORK IN THIS STRATEGY (read before judging Tester P&amp;L):
+//   The winning Monday spike is only KNOWABLE once the early window closes
+//   (~Tue 17:00 NY). Design measured on 2026-07-13 (f10_streaming_mirror.py):
+//   committing to the running extreme in real time reproduces the validated
+//   trades BUT also takes 147 phantom trades the validated system never took
+//   -&gt; rejected. This strategy therefore LOCKS at the early-window close:
+//     • setups completing AFTER the lock fill on the true next-bar open
+//       (20 of the 91 historical entries);
+//     • setups completing BEFORE the lock fill at the first bar after the
+//       lock — historically ~22h later than the engine&#x27;s fill (71 of 91).
+//   Stop and target LEVELS always use the ORIGINAL engine geometry (computed
+//   from the true entry bar), so what you see on the chart is the validated
+//   trade plan; only the delayed fills&#x27; P&amp;L differs from the reports.
+//   The authoritative economics live in the backtest reports on the site —
+//   the Tester here is for SEEING the trades, not re-deriving the stats.
+//   Also: TradingView caps 15m history (~20k bars), so you will see the
+//   recent months of trades, not the whole 2019-2024 record.
+//
+// TP is an INPUT (default 1.9R = the validated baseline). Flip it to 2.5 to
+// see the Exit-RR-Sweep finding (+0.506R vs +0.382R on the frozen 91).
+//
+// PVSRA 200%-class vector: volume &gt;= 2.0x the average of the PRIOR 10 candle
+// volumes (ta.sma(volume[1],10)); green if close&gt;=open, red if close&lt;open.
+// Chart: BTCUSDT perp, 15m.
+// =============================================================================
+
+strategy(&quot;Annie Monday Fade — Strategy V1&quot;, overlay = true,
+     initial_capital = 100000, currency = currency.USD,
+     commission_type = strategy.commission.percent, commission_value = 0.05,
+     slippage = 2, max_lines_count = 500, max_labels_count = 500, max_boxes_count = 500)
+
+// ----------------------------- Inputs ----------------------------------------
+gA = &quot;Anchors (Igor&#x27;s weekly model)&quot;
+i_tz       = input.string(&quot;America/New_York&quot;, &quot;Anchor timezone&quot;, group = gA)
+i_openHour = input.int(17, &quot;Week open hour (Sunday, NY)&quot;, minval = 0, maxval = 23, group = gA)
+i_friHour  = input.int(8,  &quot;Friday hard-cutoff hour (NY)&quot;, minval = 0, maxval = 23, group = gA)
+i_earlyFrac= input.float(0.286, &quot;Early-window fraction of week (Sun/Mon/Tue)&quot;, minval = 0.1, maxval = 0.6, step = 0.001, group = gA)
+
+gD = &quot;Detector knobs (validated defaults — do not change to trade the edge)&quot;
+i_emaLen   = input.int(50, &quot;50-EMA length&quot;, minval = 2, group = gD)
+i_volLb    = input.int(10, &quot;PVSRA volume lookback (prior N)&quot;, minval = 2, group = gD)
+i_vecMult  = input.float(2.0, &quot;200%-class vector threshold (x vol avg)&quot;, minval = 1.0, step = 0.1, group = gD)
+i_minSpike = input.float(0.10, &quot;Min spike beyond box (%)&quot;, minval = 0.0, step = 0.01, group = gD)
+i_touchTol = input.float(0.15, &quot;50-EMA wick-touch tolerance (%)&quot;, minval = 0.0, step = 0.01, group = gD)
+i_crossTol = input.float(0.10, &quot;50-EMA body-cross tolerance (%)&quot;, minval = 0.0, step = 0.01, group = gD)
+i_span     = input.int(320, &quot;Max bars L1 -&gt; retest&quot;, minval = 1, group = gD)
+i_stopBuf  = input.float(0.05, &quot;Stop buffer beyond extreme (%)&quot;, minval = 0.0, step = 0.01, group = gD)
+i_rr       = input.float(1.9, &quot;TP (R multiple) — try 2.5 (Exit RR Sweep winner)&quot;, minval = 0.1, step = 0.1, group = gD)
+i_mondayOnly = input.bool(true, &quot;Monday-spike only (the validated edge)&quot;, group = gD)
+
+gR = &quot;Strategy sizing&quot;
+i_riskPct  = input.float(1.0, &quot;Risk per trade (% of equity)&quot;, minval = 0.01, maxval = 10.0, step = 0.1, group = gR)
+
+gV = &quot;Visuals&quot;
+i_showBox    = input.bool(true,  &quot;Weekend box&quot;, group = gV)
+i_showPeak   = input.bool(true,  &quot;Spike-peak marker&quot;, group = gV)
+i_showL1     = input.bool(true,  &quot;L1 vector highlight&quot;, group = gV)
+i_showRetest = input.bool(true,  &quot;Retest marker&quot;, group = gV)
+i_showEntry  = input.bool(true,  &quot;True-entry-bar arrow (engine timing)&quot;, group = gV)
+i_showStopTP = input.bool(true,  &quot;Stop / TP lines&quot;, group = gV)
+i_showEma    = input.bool(true,  &quot;50-EMA&quot;, group = gV)
+
+// derived tolerances (fractions)
+touchTol = i_touchTol / 100.0
+crossTol = i_crossTol / 100.0
+minSpike = i_minSpike / 100.0
+stopBuf  = i_stopBuf  / 100.0
+
+DAY_MS = 86400000
+
+// ----------------------------- Per-bar indicators ----------------------------
+ema50 = ta.ema(close, i_emaLen)
+avgVol   = ta.sma(volume[1], i_volLb)
+volRatio = na(avgVol) or avgVol == 0 ? 0.0 : volume / avgVol
+is200    = volRatio &gt;= i_vecMult
+isUp     = close &gt;= open
+
+plot(i_showEma ? ema50 : na, &quot;50 EMA&quot;, color = color.new(color.orange, 0), linewidth = 1)
+
+// ----------------------------- Week time anchors -----------------------------
+_dow  = dayofweek(time, i_tz)          // 1=Sunday .. 7=Saturday
+_yr   = year(time, i_tz)
+_mo   = month(time, i_tz)
+_dy   = dayofmonth(time, i_tz)
+_today0     = timestamp(i_tz, _yr, _mo, _dy, i_openHour, 0)
+_daysBack   = _dow - 1                  // Sun=0 .. Sat=6
+_approxSun  = _today0 - _daysBack * DAY_MS
+weekOpenTs  = timestamp(i_tz, year(_approxSun, i_tz), month(_approxSun, i_tz), dayofmonth(_approxSun, i_tz), i_openHour, 0)
+if time &lt; weekOpenTs
+    _approxSun2 = _today0 - (_daysBack + 7) * DAY_MS
+    weekOpenTs := timestamp(i_tz, year(_approxSun2, i_tz), month(_approxSun2, i_tz), dayofmonth(_approxSun2, i_tz), i_openHour, 0)
+
+weekEndTs  = weekOpenTs + 7 * DAY_MS
+earlyEndTs = weekOpenTs + int(i_earlyFrac * 7.0 * DAY_MS)
+_friApprox = weekOpenTs + 5 * DAY_MS
+friEndTs   = timestamp(i_tz, year(_friApprox, i_tz), month(_friApprox, i_tz), dayofmonth(_friApprox, i_tz), i_friHour, 0)
+
+newWeek = weekOpenTs != weekOpenTs[1]
+
+// ----------------------------- Persistent week state -------------------------
+var array&lt;float&gt; wkO = array.new_float()
+var array&lt;float&gt; wkH = array.new_float()
+var array&lt;float&gt; wkL = array.new_float()
+var array&lt;float&gt; wkC = array.new_float()
+var array&lt;float&gt; wkE = array.new_float()
+var array&lt;int&gt;   wkT = array.new_int()
+var array&lt;bool&gt;  wk2 = array.new_bool()
+var array&lt;bool&gt;  wkU = array.new_bool()
+
+var float boxTop = na
+var float boxBot = na
+var float pendTop = na
+var float pendBot = na
+
+var float runHigh = na
+var float runLow  = na
+var int   extHiWi = 0
+var int   extLoWi = 0
+
+var bool  locked   = false
+var bool  resolved = false
+var int   fadeDir  = 0          // 1 long, -1 short, 0 none
+var int   extWi    = 0
+var bool  l1Found  = false
+var int   l1Wi     = 0
+var float l1Low    = na
+var float l1High   = na
+var bool  c2latch  = false
+var int   scanWi   = 0
+
+entryFired = false
+
+// process only CONFIRMED bars -&gt; no repaint, deterministic
+if barstate.isconfirmed
+    // --- New week bootstrap ---
+    if newWeek
+        boxTop := pendTop
+        boxBot := pendBot
+        pendTop := na
+        pendBot := na
+        array.clear(wkO)
+        array.clear(wkH)
+        array.clear(wkL)
+        array.clear(wkC)
+        array.clear(wkE)
+        array.clear(wkT)
+        array.clear(wk2)
+        array.clear(wkU)
+        runHigh := na
+        runLow  := na
+        extHiWi := 0
+        extLoWi := 0
+        locked   := false
+        resolved := false
+        fadeDir  := 0
+        l1Found  := false
+        c2latch  := false
+        scanWi   := 0
+        if i_showBox and not na(boxTop) and not na(boxBot)
+            box.new(weekOpenTs - 2 * DAY_MS, boxTop, weekOpenTs, boxBot, xloc = xloc.bar_time,
+                 border_color = color.new(color.gray, 40), bgcolor = color.new(color.gray, 90))
+
+    array.push(wkO, open)
+    array.push(wkH, high)
+    array.push(wkL, low)
+    array.push(wkC, close)
+    array.push(wkE, ema50)
+    array.push(wkT, time)
+    array.push(wk2, is200)
+    array.push(wkU, isUp)
+    curWi = array.size(wkH) - 1
+
+    // --- weekend box accumulation (this week&#x27;s following weekend) ---
+    if time &gt;= weekOpenTs + 5 * DAY_MS and time &lt; weekEndTs
+        pendTop := na(pendTop) ? close : math.max(pendTop, close)
+        pendBot := na(pendBot) ? close : math.min(pendBot, close)
+
+    // --- early-window running extreme ---
+    if time &lt;= earlyEndTs
+        if na(runHigh) or high &gt; runHigh
+            runHigh := high
+            extHiWi := curWi
+        if na(runLow) or low &lt; runLow
+            runLow := low
+            extLoWi := curWi
+
+    // --- LOCK at the early-window close ---
+    if not locked and not resolved and time &gt; earlyEndTs
+        locked := true
+        if na(boxTop) or na(boxBot) or boxTop &lt;= boxBot or na(runHigh) or na(runLow)
+            resolved := true
+        else
+            upExc   = (runHigh - boxTop) / boxTop
+            downExc = (boxBot - runLow) / boxBot
+            if math.max(upExc, downExc) &lt; minSpike
+                resolved := true
+            else
+                if upExc &gt;= downExc
+                    fadeDir := -1
+                    extWi   := extHiWi
+                else
+                    fadeDir := 1
+                    extWi   := extLoWi
+                extT  = array.get(wkT, extWi)
+                extHr = hour(extT, i_tz)
+                extDw = dayofweek(extT, i_tz)
+                isMon = (extHr &lt; i_openHour and extDw == 2) or (extHr &gt;= i_openHour and extDw == 1)
+                if i_mondayOnly and not isMon
+                    resolved := true
+                else
+                    scanWi := extWi
+                    if i_showPeak
+                        pkPrice = fadeDir == -1 ? runHigh : runLow
+                        label.new(array.get(wkT, extWi), pkPrice,
+                             text = fadeDir == -1 ? &quot;▲ peak&quot; : &quot;▼ peak&quot;,
+                             xloc = xloc.bar_time, style = fadeDir == -1 ? label.style_label_down : label.style_label_up,
+                             color = color.new(color.gray, 20), textcolor = color.white, size = size.tiny)
+
+    // --- RESOLVE scan: L1 -&gt; retest -&gt; entry (causal, forward, c1&amp;c2) ---
+    if locked and not resolved and scanWi &lt;= curWi
+        for wi = scanWi to curWi
+            if resolved
+                break
+            H = array.get(wkH, wi)
+            L = array.get(wkL, wi)
+            O = array.get(wkO, wi)
+            C = array.get(wkC, wi)
+            E = array.get(wkE, wi)
+            V2 = array.get(wk2, wi)
+            UP = array.get(wkU, wi)
+            emaOk = not na(E) and E != 0
+            if not l1Found
+                brk = false
+                if emaOk and V2
+                    if fadeDir == 1 and UP and C &gt;= E and O &lt;= E * (1 + crossTol)
+                        brk := true
+                    if fadeDir == -1 and not UP and C &lt;= E and O &gt;= E * (1 - crossTol)
+                        brk := true
+                if brk
+                    l1Found := true
+                    l1Wi    := wi
+                    l1Low   := L
+                    l1High  := H
+                    c2latch := false
+                    if i_showL1
+                        box.new(array.get(wkT, wi), H, array.get(wkT, wi) + 15 * 60000, L,
+                             xloc = xloc.bar_time, border_color = color.new(color.yellow, 0),
+                             bgcolor = color.new(color.yellow, 80))
+            else if wi &gt; l1Wi
+                if wi &gt;= l1Wi + i_span
+                    resolved := true
+                else if emaOk
+                    if fadeDir == 1 and C &lt; E * (1 - crossTol)
+                        resolved := true
+                    else if fadeDir == -1 and C &gt; E * (1 + crossTol)
+                        resolved := true
+                    else
+                        if H &gt;= l1Low and L &lt;= l1High
+                            c2latch := true
+                        touched = fadeDir == 1 ? L &lt;= E * (1 + touchTol) : H &gt;= E * (1 - touchTol)
+                        bodyOk  = fadeDir == 1 ? math.min(O, C) &gt;= E * (1 - crossTol) : math.max(O, C) &lt;= E * (1 + crossTol)
+                        if touched and bodyOk and c2latch
+                            resolved := true
+                            entryWi   = wi + 1
+                            hasNext   = entryWi &lt; array.size(wkO)
+                            entT      = hasNext ? array.get(wkT, entryWi) : na
+                            entryRef  = hasNext ? array.get(wkO, entryWi) : na
+                            wick = fadeDir == -1 ? array.get(wkH, 0) : array.get(wkL, 0)
+                            for k = 0 to wi
+                                wick := fadeDir == -1 ? math.max(wick, array.get(wkH, k)) : math.min(wick, array.get(wkL, k))
+                            stopOk = hasNext and (fadeDir == -1 ? wick &gt; entryRef : wick &lt; entryRef)
+                            valid  = hasNext and entT &lt; friEndTs and stopOk
+                            if valid
+                                // ORIGINAL engine geometry (from the true entry bar)
+                                stopP  = fadeDir == -1 ? wick * (1 + stopBuf) : wick * (1 - stopBuf)
+                                sd     = math.abs(entryRef - stopP)
+                                tpP    = fadeDir == -1 ? entryRef - i_rr * sd : entryRef + i_rr * sd
+                                dirCol = fadeDir == -1 ? color.red : color.green
+                                if i_showRetest
+                                    label.new(array.get(wkT, wi), array.get(wkE, wi), text = &quot;retest&quot;,
+                                         xloc = xloc.bar_time, style = label.style_label_center,
+                                         color = color.new(color.blue, 30), textcolor = color.white, size = size.tiny)
+                                if i_showEntry
+                                    label.new(entT, entryRef, text = fadeDir == -1 ? &quot;SHORT (engine bar)&quot; : &quot;LONG (engine bar)&quot;,
+                                         xloc = xloc.bar_time, style = fadeDir == -1 ? label.style_label_down : label.style_label_up,
+                                         color = color.new(dirCol, 0), textcolor = color.white, size = size.small)
+                                if i_showStopTP
+                                    line.new(entT, stopP, friEndTs, stopP, xloc = xloc.bar_time,
+                                         color = color.new(color.red, 0), width = 1, style = line.style_dashed)
+                                    line.new(entT, tpP, friEndTs, tpP, xloc = xloc.bar_time,
+                                         color = color.new(color.green, 0), width = 1, style = line.style_dashed)
+                                    label.new(friEndTs, stopP, &quot;stop&quot;, xloc = xloc.bar_time, style = label.style_label_left,
+                                         color = color.new(color.red, 30), textcolor = color.white, size = size.tiny)
+                                    label.new(friEndTs, tpP, str.tostring(i_rr, &quot;#.#&quot;) + &quot;R TP&quot;, xloc = xloc.bar_time, style = label.style_label_left,
+                                         color = color.new(color.green, 30), textcolor = color.white, size = size.tiny)
+                                entryFired := true
+                                // ---- STRATEGY ORDERS (fill = next bar open) --
+                                // risk-normalized size: i_riskPct% of equity per 1R
+                                qty = strategy.equity * i_riskPct / 100.0 / sd
+                                if qty &gt; 0
+                                    strategy.entry(&quot;fade&quot;, fadeDir == 1 ? strategy.long : strategy.short, qty = qty,
+                                         comment = fadeDir == 1 ? &quot;fade LONG&quot; : &quot;fade SHORT&quot;)
+                                    strategy.exit(&quot;exit&quot;, &quot;fade&quot;, stop = stopP, limit = tpP)
+        scanWi := curWi + 1
+
+    // --- Friday hard cap: flat before the weekend, always ---
+    if strategy.position_size != 0 and time &gt;= friEndTs
+        strategy.close(&quot;fade&quot;, comment = &quot;friday cap&quot;)
+
+// ----------------------------- Alert -----------------------------------------
+alertcondition(entryFired, title = &quot;Annie Monday Fade — entry&quot;,
+     message = &quot;Annie Monday Fade Strategy V1 entry confirmed on BTCUSDT 15m ({{ticker}} @ {{time}})&quot;)
+
+plotshape(entryFired, title = &quot;entry (signal bar)&quot;, style = shape.diamond,
+     location = location.bottom, color = color.new(color.aqua, 0), size = size.tiny)
+</pre>
+
+<div class="foot">
+  Annie Trading &middot; <code>Annie_Monday_Fade_Strategy_V1.pine</code> &middot; built 2026-07-13.
+  Signal kernel line-identical to the Monday Fade indicator (87/91 exact-bar fidelity).
+  Tester P&amp;L &ne; validated stats for pre-lock setups (documented above). This page is self-contained.
+</div>
+
+</div>
+<script>
+(function(){
+  var btn=document.getElementById('themeToggle');
+  if(!btn)return;
+  var mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;
+  function stored(){try{var t=localStorage.getItem('codexTheme');return (t==='light'||t==='dark'||t==='system')?t:'system';}catch(e){return 'system';}}
+  function eff(m){return (m==='light'||m==='dark')?m:((mq&&mq.matches)?'dark':'light');}
+  function apply(){var m=stored();document.documentElement.setAttribute('data-theme',eff(m));btn.textContent=(m==='light')?'\u25D0 Light':(m==='dark')?'\u25D1 Dark':'\u25D3 Auto';}
+  apply();
+  btn.addEventListener('click',function(){var order={light:'dark',dark:'system',system:'light'};var n=order[stored()];try{localStorage.setItem('codexTheme',n);}catch(e){}apply();});
+  if(mq){var h=function(){if(stored()==='system')apply();};if(mq.addEventListener)mq.addEventListener('change',h);else if(mq.addListener)mq.addListener(h);}
+})();
+</script>
+</body>
+</html>
