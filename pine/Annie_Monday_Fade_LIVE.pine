@@ -282,8 +282,8 @@ if barstate.isconfirmed
                              xloc = xloc.bar_time, border_color = color.new(color.yellow, 0),
                              bgcolor = color.new(color.yellow, 80))
             else if wi > l1Wi
-                if wi > l1Wi + i_span
-                    resolved := true                  // no retest within span -> no trade
+                if wi >= l1Wi + i_span
+                    resolved := true                  // no retest within span -> no trade (== python range l1+1..l1+span)
                 else if emaOk
                     // abort: a bar closes back across the EMA (structure lost)
                     if fadeDir == 1 and C < E * (1 - crossTol)

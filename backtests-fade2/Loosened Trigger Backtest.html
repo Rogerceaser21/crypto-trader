@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loosened Trigger Backtest — Annie Monday Fade</title>
+<style>
+  :root{
+    --bg:#0e1117; --panel:#161b22; --panel2:#1c2230; --ink:#e6edf3; --muted:#9aa4b2;
+    --line:#2a3140; --accent:#6aa9ff; --up:#3fb950; --dn:#f85149; --warn:#e3b341;
+    --m3:#26a69a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  .wrap{max-width:980px;margin:0 auto;padding:34px 22px 90px;}
+  header{border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:8px}
+  .eyebrow{letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:var(--accent);font-weight:700}
+  h1{font-size:29px;margin:8px 0 6px;line-height:1.2}
+  h2{font-size:20px;margin:40px 0 12px;padding-top:8px;border-top:1px solid var(--line)}
+  h3{font-size:15.5px;margin:22px 0 8px;color:var(--ink)}
+  p{color:var(--ink)}
+  .sub{color:var(--muted);font-size:15px;max-width:78ch}
+  .small{font-size:12px}
+  .muted{color:var(--muted)}
+  .pos{color:var(--up);font-weight:700}
+  .neg{color:var(--dn);font-weight:700}
+  code{background:#0b0f16;border:1px solid var(--line);border-radius:5px;padding:1px 6px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px}
+  .verdict{border-radius:14px;padding:20px 22px;margin:18px 0 6px;border:1px solid var(--line);
+    background:linear-gradient(180deg,rgba(248,81,73,.10),rgba(248,81,73,.03))}
+  .verdict.warn{background:linear-gradient(180deg,rgba(227,179,65,.12),rgba(227,179,65,.03))}
+  .verdict.good{background:linear-gradient(180deg,rgba(63,185,80,.12),rgba(63,185,80,.03))}
+  .verdict .flag{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--dn)}
+  .verdict.warn .flag{color:var(--warn)} .verdict.good .flag{color:var(--up)}
+  .verdict h2{border:0;margin:6px 0 10px;padding:0;font-size:21px}
+  .verdict p{margin:0;color:var(--ink)}
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:14px 0}
+  @media(max-width:720px){.cards{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+  .card .k{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+  .card .v{font-size:23px;font-weight:800;margin-top:4px}
+  figure.tbl{margin:14px 0}
+  table{width:100%;border-collapse:collapse;margin:0;font-size:14px;overflow:hidden;border-radius:10px}
+  .tblscroll{overflow-x:auto}
+  th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:middle}
+  th{background:var(--panel2);color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+  tr.base td{background:rgba(106,169,255,.07)}
+  figcaption{color:var(--muted);font-size:12.5px;margin-top:8px;max-width:82ch}
+  .callout{border-left:4px solid var(--warn);background:rgba(227,179,65,.08);padding:12px 16px;border-radius:8px;margin:14px 0}
+  .callout.good{border-left-color:var(--m3);background:rgba(38,166,154,.09)}
+  .callout.bad{border-left-color:var(--dn);background:rgba(248,81,73,.09)}
+  .callout b{color:var(--ink)}
+  .pill{display:inline-block;font-size:11px;font-weight:800;border-radius:20px;padding:2px 10px;color:#0b0f16;background:var(--up)}
+  .pill.no{background:var(--dn);color:#fff}
+  ul.tight{margin:6px 0;padding-left:20px} ul.tight li{margin:5px 0}
+  .foot{color:var(--muted);font-size:12.5px;margin-top:50px;border-top:1px solid var(--line);padding-top:16px}
+
+  html[data-theme="light"]{
+    --bg:#f7f9fc; --panel:#ffffff; --panel2:#eef1f6; --ink:#1a2230; --muted:#5b6472;
+    --line:#d7dde6; --accent:#2f6fe0; --up:#1e7d34; --dn:#c92c22; --warn:#a6740b; --m3:#178f83;
+  }
+  html[data-theme="light"] code{background:#eef1f5;color:var(--ink)}
+  html[data-theme="light"] tr.base td{background:rgba(47,111,224,.07)}
+  .theme-toggle{position:fixed;top:16px;right:20px;z-index:100;background:var(--panel);
+    border:1px solid var(--line);color:var(--ink);border-radius:20px;padding:6px 14px;
+    font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.35);
+    font-family:inherit;letter-spacing:.02em}
+  html[data-theme="light"] .theme-toggle{box-shadow:0 2px 10px rgba(0,0,0,.10)}
+  .theme-toggle:active{transform:translateY(1px)}
+@media(max-width:560px){.theme-toggle{top:10px;right:12px;padding:6px 10px;font-size:12px}body{padding-top:44px}}
+</style>
+<script>(function(){try{var t=localStorage.getItem('codexTheme');var e=(t==='light'||t==='dark')?t:((window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light');document.documentElement.setAttribute('data-theme',e);}catch(e){}})();</script>
+</head><body>
+<button type="button" id="themeToggle" class="theme-toggle" aria-label="Cycle theme: light, dark, or system">&#9683; Auto</button>
+<div class="wrap">
+<header>
+<div class="eyebrow">Annie Trading &middot; Weekly / FMWB fade &middot; task F2</div>
+<h1>Loosened L1 Trigger — Backtest</h1>
+<p class="sub">Does Igor’s 2026-07-13 rule loosening — the L1 PVSRA vector no longer has to <b>body-cross the 15-minute 50&nbsp;EMA</b>, it only has to be a vector candle in the fade direction — help, hurt, or leave the validated Monday fade unchanged? The 50-EMA <b>retest</b> requirement and every other rule are held fixed. In-sample only (2019-10-20 → 2024-12-31, 62 months); the locked 2025-26 out-of-sample window is untouched.</p>
+</header>
+<div class="verdict bad">
+<div class="flag">Verdict</div>
+<h2>LOOSENING DILUTES THE EDGE — keep the EMA-cross requirement.</h2>
+<p>The validated Monday fade (baseline, EMA-cross required) is <b>91 trades, 54.9% WR, +0.382R</b> expectancy, PF 2.05, t=2.98. Dropping the 50-EMA body-cross requirement from the L1 vector (Igor's 2026-07-13 loosening) changes the headline to <b>+0.489R</b> at 200%-class (45 trades) and <b>+0.594R</b> at 150%-class (30 trades). The trades the loosening ADDS on top of the 91 — the marginal entries that are the whole point of the test — run <b>1 new @ -1.027R</b> (200%) and <b>2 new @ -0.009R</b> (150%). Those marginal trades are weaker than the anchor's own expectancy, so the wider net brings in lower-quality entries and pulls the average down: the EMA-cross gate was doing real filtering work, not just decorating the setup.</p>
+</div>
+<h2>1. Correctness gate — the baseline reproduces the validated anchor</h2>
+<p class="sub">Before trusting any loosened number, the baseline arm of this script must reproduce the validated Monday fade exactly. It does — the baseline’s full ledger is byte-for-byte identical to the archived <code>weekly_trades_a.csv</code>.</p>
+<div class="cards">
+<div class="card"><div class="k">Monday trades</div><div class="v">91 <span class="muted small">/ 91</span></div></div>
+<div class="card"><div class="k">Expectancy</div><div class="v pos">+0.382R</div><div class="muted small">target +0.382R</div></div>
+<div class="card"><div class="k">Gate</div><div class="v"><span class='pill'>PASS</span></div><div class="muted small">n=91 &amp; +0.382R</div></div>
+</div>
+<div class="callout good"><b>Anchor reproduction:</b> <span class='pill'>BYTE-IDENTICAL</span> — baseline full ledger md5 <code>731da8feb4def15e5a3c84be7cff4f1a</code> vs archived anchor md5 <code>731da8feb4def15e5a3c84be7cff4f1a</code>. WR 54.9%, PF 2.05, t=2.98 (matches the validated 54.9% / 2.05 / 2.98).</div>
+<h2>2. Headline — Monday slice (the edge)</h2>
+<p class="sub">Monday-spike weeks are the pre-registered edge (Igor’s manual log has FMWB weeks peaking Monday and reversing). This is the table that matters.</p>
+<div class="tblscroll">
+<figure class='tbl'><table><tr><th>Trigger variant</th><th>N</th><th>WR</th><th>Expectancy</th><th>Total R</th><th>PF</th><th>t-stat</th><th>Max DD (R)</th><th>Trades/mo</th></tr><tr class='base'><td><b>Baseline</b><div class='muted small'>200% vector <b>must</b> body-cross the 50&nbsp;EMA (validated anchor)</div></td><td>91</td><td>54.9%</td><td><span class='pos'>+0.382R</span></td><td>+34.76R</td><td>2.05</td><td>2.98</td><td>4.6</td><td>1.46</td></tr><tr><td><b>Loosened&nbsp;200</b><div class='muted small'>first 200% vector in fade direction, <b>no EMA cross</b></div></td><td>45</td><td>60.0%</td><td><span class='pos'>+0.489R</span></td><td>+22.02R</td><td>2.27</td><td>2.52</td><td>3.4</td><td>0.72</td></tr><tr><td><b>Loosened&nbsp;150</b><div class='muted small'>first 150%+ vector in fade direction, <b>no EMA cross</b></div></td><td>30</td><td>66.7%</td><td><span class='pos'>+0.594R</span></td><td>+17.82R</td><td>2.65</td><td>2.50</td><td>4.4</td><td>0.48</td></tr></table><figcaption>In-sample Monday-spike trades. Baseline row shaded. Expectancy green = positive, red = negative.</figcaption></figure>
+</div>
+<h2>3. What the loosening actually adds — marginal-trade analysis</h2>
+<p class="sub">The loosened triggers keep almost all of the anchor’s 91 and bolt on extra entries. The only honest question is whether those <b>extra</b> trades are any good — if the new entries are weaker than +0.382R they drag the average down.</p>
+<div class="tblscroll">
+<figure class='tbl'><table>{}</table><figcaption>Monday slice. “Identical” = same week, same entry bar &amp; price, same direction as one of the anchor’s 91. “New” = weeks the loosened trigger adds that the anchor never traded on Monday. The new-entry expectancy is the marginal edge the loosening buys.</figcaption></figure>
+</div>
+<h2>4. Full set (all spike-days, context only)</h2>
+<p class="sub">Same three variants across every weekday spike, not just Monday. The full set was always the weaker, marginal-significance slice (baseline t&lt;2); shown for completeness.</p>
+<div class="tblscroll">
+<figure class='tbl'><table><tr><th>Trigger variant</th><th>N</th><th>WR</th><th>Expectancy</th><th>Total R</th><th>PF</th><th>t-stat</th><th>Max DD (R)</th><th>Trades/mo</th></tr><tr class='base'><td><b>Baseline</b><div class='muted small'>200% vector <b>must</b> body-cross the 50&nbsp;EMA (validated anchor)</div></td><td>223</td><td>44.8%</td><td><span class='pos'>+0.099R</span></td><td>+22.05R</td><td>1.21</td><td>1.23</td><td>13.2</td><td>3.57</td></tr><tr><td><b>Loosened&nbsp;200</b><div class='muted small'>first 200% vector in fade direction, <b>no EMA cross</b></div></td><td>107</td><td>43.9%</td><td><span class='pos'>+0.121R</span></td><td>+13.00R</td><td>1.23</td><td>0.98</td><td>14.7</td><td>1.71</td></tr><tr><td><b>Loosened&nbsp;150</b><div class='muted small'>first 150%+ vector in fade direction, <b>no EMA cross</b></div></td><td>66</td><td>45.5%</td><td><span class='pos'>+0.138R</span></td><td>+9.14R</td><td>1.26</td><td>0.86</td><td>10.2</td><td>1.06</td></tr></table><figcaption>In-sample full set (all spike days).</figcaption></figure>
+</div>
+<h2>5. Method, invariants &amp; reproducibility</h2>
+<ul class='tight'>
+<li><b>Only the L1 line changed.</b> Direction (Sun/Mon spike-out of the weekend box), stop (beyond the running weekly extreme +0.05% buffer), TP (1.9R fixed), the refund rule, the Friday cap, fees 0.05%/side, slippage 0.02%/fill, and same-bar stop&amp;TP ambiguity resolved on 1m (unresolvable = loss) are all imported verbatim from <code>bt_weekly.py</code>.</li>
+<li><b>Retest unchanged.</b> Still the 2-of-3 confluence entry {50-EMA wick-touch, return into the L1-vector range, HL/LH structure}. The abort-on-close-back-across-EMA guard is kept byte-identical and, as in <code>bt_weekly</code>, keys the “wrong side” off the <b>fade direction</b> (short → a close above the EMA aborts) — it never referenced the L1 candle’s own cross, so “no cross required” leaves the abort semantics untouched.</li>
+<li><b>Loosened detector.</b> <code>find_vector_in_dir</code>: first candle after the spike extreme with <code>pv_class ≥ 200</code> (b) or <code>≥ 150</code> (c) whose direction matches the fade, using the same PVSRA columns (volume ≥ 2.0&times;/1.5&times; the prior-10 average) as the baseline detector. Same scan window as the baseline for a like-for-like test.</li>
+<li><b>In-sample only.</b> Week enumeration ends at 2025-01-01 (exclusive of 2025+); the locked 2025-26 OOS window is never enumerated in this file.</li>
+</ul>
+<figure class="tbl"><table>
+<tr><th>Deterministic double run</th><th>md5 (run 1)</th><th>md5 (run 2)</th><th>match</th></tr>
+<tr><td>variant a</td><td><code>731da8feb4def15e5a3c84be7cff4f1a</code></td><td><code>731da8feb4def15e5a3c84be7cff4f1a</code></td><td><span class='pill'>MATCH</span></td></tr><tr><td>variant b</td><td><code>09b4900cde91d85f0a59313e1cedc3d4</code></td><td><code>09b4900cde91d85f0a59313e1cedc3d4</code></td><td><span class='pill'>MATCH</span></td></tr><tr><td>variant c</td><td><code>839e57e466d7d4287e71fb541e1566c8</code></td><td><code>839e57e466d7d4287e71fb541e1566c8</code></td><td><span class='pill'>MATCH</span></td></tr>
+</table><figcaption>Each variant’s detect+build+execute pipeline was run twice and the trade-ledger md5s compared. Ledgers written to <code>backtests/bt2_ledger_{a,b,c}.csv</code>.</figcaption></figure>
+<div class="foot">Generated by <code>backtests/bt_weekly2.py</code> (copy-derived from <code>bt_weekly.py</code>; no validated file modified). BTC-USDT Binance USD-M perp, 15m entry timing / 1H structure. Sizing 1% of $10k, 1R = $100. In-sample 2019 → 2024 only. Not financial advice.</div>
+</div>
+<script>(function(){var btn=document.getElementById('themeToggle');if(!btn)return;var mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;function stored(){try{var t=localStorage.getItem('codexTheme');return (t==='light'||t==='dark'||t==='system')?t:'system';}catch(e){return 'system';}}function eff(m){return (m==='light'||m==='dark')?m:((mq&&mq.matches)?'dark':'light');}function apply(){var m=stored();document.documentElement.setAttribute('data-theme',eff(m));btn.textContent=(m==='light')?'\u25D0 Light':(m==='dark')?'\u25D1 Dark':'\u25D3 Auto';}apply();btn.addEventListener('click',function(){var order={light:'dark',dark:'system',system:'light'};var n=order[stored()];try{localStorage.setItem('codexTheme',n);}catch(e){}apply();});if(mq){var h=function(){if(stored()==='system')apply();};if(mq.addEventListener)mq.addEventListener('change',h);else if(mq.addListener)mq.addListener(h);}})();</script>
+</body></html>
