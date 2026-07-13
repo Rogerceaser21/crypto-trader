@@ -178,6 +178,7 @@ html[data-theme="dark"] .theme-toggle{box-shadow:0 2px 10px rgba(0,0,0,.35)}
  <nav class="toc"><h2>On this page</h2><ol>
   <li><a href="#verdict">1 &middot; The verdict in one screen</a></li>
   <li><a href="#winner">2 &middot; The winner, in detail</a></li>
+  <li><a href="#fade2round">&#8226; Fade improvement round (Jul 13)</a></li>
   <li><a href="#marginal">3 &middot; The one maybe: 3-Hits</a></li>
   <li><a href="#graveyard">4 &middot; The graveyard</a></li>
   <li><a href="#open">5 &middot; What's still open</a></li>
@@ -229,6 +230,18 @@ html[data-theme="dark"] .theme-toggle{box-shadow:0 2px 10px rgba(0,0,0,.35)}
     <li><b>Low frequency.</b> Roughly <b>1.5 signals a month</b>. This is a patient, once-a-week trade, not a turnover machine.</li>
     <li><b>Direction is still improvable.</b> The mechanical fade matches your discretionary M/W direction call only ~50% of the time. Mechanically forcing a regime flip made it <em>worse</em>. The missing half of the edge is the direction read &mdash; the judgement the geometry can't recover &mdash; which is exactly what the gallery + OI work is for.</li>
    </ul>
+  </div>
+ </section>
+
+ <section id="fade2round">
+  <p class="kicker">Follow-up &middot; Jul 13</p>
+  <h2>Fade improvement round (Jul 13)</h2>
+  <p>Four follow-up studies that tried to <b>improve</b> the validated Monday fade &mdash; loosen its trigger, widen its target, swap in Annie's discretionary midweek exit &mdash; plus the draft spec for the fuller &ldquo;Fade&nbsp;2&rdquo; system. Every entry set is the frozen validated 91 Monday-spike fades; the locked 2025&ndash;26 block stays untouched. One out-of-sample candidate emerged; the rest confirmed the baseline.</p>
+  <div class="vgrid">
+   <article class="vcard dead"><div class="vhead"><span class="vbadge dead">&#10060; BACKFIRES</span><span class="vname">Loosened L1 trigger</span></div><p class="vsent">Dropping the 50-EMA body-cross from the L1 vector does not add trades &mdash; it <b>halves</b> them (91 &rarr; 45). The looser condition fires earlier, while price is still on the wrong side of the EMA, and the unchanged abort rule then voids the week &mdash; 100% of the lost weeks die by that early abort. Baseline stands. <a href="backtests-fade2/Loosened Trigger Backtest.html">Read the report &rarr;</a></p><div class="vstats"><span class="chip">91 &rarr; 45 trades</span><span class="chip">+34.8R &rarr; +22.0R</span><span class="chip">t 2.98 &rarr; 2.52</span></div></article>
+   <article class="vcard marg"><div class="vhead"><span class="vbadge marg">&#128993; OOS CANDIDATE</span><span class="vname">2.5R exit target</span></div><p class="vsent">Widening the fixed target from 1.9R to 2.5R lifts expectancy <b>+0.382R &rarr; +0.506R</b> on the frozen 91 &mdash; the only variant clearing the pre-registered paired-t&nbsp;&ge;&nbsp;2.5 bar (t=2.56, Bonferroni-borderline; 3.0R books more at t=2.22, just under). Promote to the locked OOS run as challenger; <b>1.9R stays live</b> until it survives. <a href="backtests-fade2/Exit RR Sweep.html">Read the report &rarr;</a></p><div class="vstats"><span class="chip">+0.506R vs +0.382R</span><span class="chip">+46.0R total</span><span class="chip">paired t=2.56</span></div></article>
+   <article class="vcard dead"><div class="vhead"><span class="vbadge dead">&#10060; NO EDGE</span><span class="vname">Midweek-reversal exit</span></div><p class="vsent">Annie's discretionary midweek exit is a <b>real</b> event &mdash; 50&ndash;70 of the 91 fades do exit on a genuine opposite M/W/Final-Damage, firing Wed/Thu exactly as she describes &mdash; but as a <b>mechanical</b> rule it books winners too early and beats no fixed target (best paired-t &minus;0.09; 0 of 6 cells clear the +0.382R baseline). Keep the fixed exit. <a href="backtests-fade2/Midweek Reversal Exit Backtest.html">Read the report &rarr;</a></p><div class="vstats"><span class="chip">best paired t &minus;0.09</span><span class="chip">+0.292R&ndash;+0.372R</span><span class="chip">0 / 6 cells beat base</span></div></article>
+   <article class="vcard"><div class="vhead"><span class="vbadge" style="background:var(--qborder);color:#08283b">&#9203; AWAITING RULINGS</span><span class="vname">Fade 2 mechanical spec (draft)</span></div><p class="vsent">The full Fade&nbsp;2 weekly system written out with a source per rule &mdash; a crisp, codeable scaffold wrapped around a discretionary core. <b>No backtest was run;</b> it hands Igor a numbered list of the exact decisions that block a mechanical detector, each with a proposed default to approve or override. <a href="Fade 2 Spec (draft).html">Read the draft &rarr;</a></p><div class="vstats"><span class="chip">no backtest yet</span><span class="chip">crisp scaffold / discretionary core</span><span class="chip">open decisions for Igor</span></div></article>
   </div>
  </section>
 
