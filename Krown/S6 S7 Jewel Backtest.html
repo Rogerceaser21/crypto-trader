@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S6 / S7 — The Jewel Lite Backtest (PROXY)</title>
+<style>
+  :root{
+    --bg:#0e1117; --panel:#161b22; --panel2:#1c2230; --ink:#e6edf3; --muted:#9aa4b2;
+    --line:#2a3140; --accent:#6aa9ff; --up:#3fb950; --dn:#f85149; --warn:#e3b341; --m3:#26a69a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  .wrap{max-width:960px;margin:0 auto;padding:34px 22px 90px;}
+  header{border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:8px}
+  .eyebrow{letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:var(--accent);font-weight:700}
+  h1{font-size:29px;margin:8px 0 6px;line-height:1.2}
+  h2{font-size:21px;margin:38px 0 12px;padding-top:8px;border-top:1px solid var(--line)}
+  h3{font-size:16px;margin:22px 0 8px;color:var(--ink)}
+  p{color:var(--ink)}
+  .sub{color:var(--muted);font-size:15px;max-width:74ch}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:14px 0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:720px){.grid2{grid-template-columns:1fr}}
+  code,kbd{background:#0b0f16;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px}
+  .tablewrap{overflow-x:auto;margin:10px 0}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:520px}
+  th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+  th{background:var(--panel2);color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+  td.n{font-family:ui-monospace,Menlo,monospace;white-space:nowrap;text-align:right}
+  tr.base td{background:rgba(106,169,255,.08)}
+  .neg{color:var(--dn);font-weight:700} .pos{color:var(--up);font-weight:700}
+  .verdict{border-radius:14px;padding:20px 22px;margin:14px 0 8px;border:1px solid var(--line)}
+  .verdict.amber{background:linear-gradient(135deg,rgba(227,179,65,.16),rgba(227,179,65,.05));border-color:var(--warn)}
+  .verdict h2{border:0;margin:0 0 6px;padding:0;font-size:22px}
+  .vbadge{display:inline-block;font-size:12px;font-weight:800;border-radius:20px;padding:3px 12px;background:var(--warn);color:#0b0f16;letter-spacing:.03em}
+  .proxybanner{background:rgba(248,81,73,.10);border:1px solid var(--dn);border-left:5px solid var(--dn);
+    border-radius:10px;padding:14px 18px;margin:16px 0;color:var(--ink)}
+  .proxybanner b{color:var(--dn)}
+  .callout{border-left:4px solid var(--warn);background:rgba(227,179,65,.08);padding:12px 16px;border-radius:8px;margin:12px 0}
+  .callout.good{border-left-color:var(--m3);background:rgba(38,166,154,.08)}
+  .callout.bad{border-left-color:var(--dn);background:rgba(248,81,73,.09)}
+  pre.src{background:#0b0f16;border:1px solid var(--line);border-radius:10px;padding:16px;overflow:auto;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;line-height:1.5;color:#c9d3e0}
+  ul.tight{margin:6px 0 6px 0;padding-left:20px} ul.tight li{margin:5px 0}
+  ol.res{padding-left:20px} ol.res li{margin:7px 0}
+  .kpis{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0}
+  .kpi{flex:1 1 130px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+  .kpi .kl{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+  .kpi .kv{font-size:20px;font-weight:800;font-family:ui-monospace,Menlo,monospace;margin-top:2px}
+  .foot{color:var(--muted);font-size:12.5px;margin-top:50px;border-top:1px solid var(--line);padding-top:16px}
+  .muted{color:var(--muted)}
+  html[data-theme="light"]{
+    --bg:#f7f9fc; --panel:#ffffff; --panel2:#eef1f6; --ink:#1a2230; --muted:#5b6472;
+    --line:#d7dde6; --accent:#2f6fe0; --up:#1e7d34; --dn:#c92c22; --warn:#a6740b; --m3:#178f83;
+  }
+  html[data-theme="light"] code{background:#eef1f5;color:var(--ink)}
+  html[data-theme="light"] pre.src{background:#eef1f5;color:#1a2230}
+  html[data-theme="light"] .vbadge{color:#fff}
+  .theme-toggle{position:fixed;top:16px;right:20px;z-index:100;background:var(--panel);
+    border:1px solid var(--line);color:var(--ink);border-radius:20px;padding:6px 14px;
+    font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.35);
+    font-family:inherit;letter-spacing:.02em}
+  html[data-theme="light"] .theme-toggle{box-shadow:0 2px 10px rgba(0,0,0,.10)}
+  .theme-toggle:active{transform:translateY(1px)}
+  @media(max-width:560px){.theme-toggle{top:10px;right:12px;padding:6px 10px;font-size:12px}body{padding-top:44px}.wrap{padding-top:20px}}
+</style>
+<script>
+(function(){try{var t=localStorage.getItem('codexTheme');var e=(t==='light'||t==='dark')?t:((window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light');document.documentElement.setAttribute('data-theme',e);}catch(e){}})();
+</script>
+</head>
+<body>
+<button type="button" id="themeToggle" class="theme-toggle" aria-label="Cycle theme: light, dark, or system">&#9683; Auto</button>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Krown Trading &middot; S6 / S7 &middot; The Jewel Lite</div>
+  <h1>S6 &amp; S7 &mdash; Jewel Lite Scalps: crack attempt &amp; backtest</h1>
+  <p class="sub">Task KA4. Two questions: (A) can we rebuild the proprietary Krown &ldquo;VMP / Jewel Lite&rdquo;
+  <b>Fast</b> oscillator from candles? and (B) what do the S6 (long) / S7 (short) rules do when backtested on the
+  best line we can build? In-sample <b>2019-09-09 &rarr; 2024-12-31</b> only &mdash; the 2025&ndash;26 out-of-sample
+  window stays untouched.</p>
+</header>
+
+<div class="verdict amber">
+  <span class="vbadge">&#128993; INCONCLUSIVE &middot; PROXY</span>
+  <h2>No edge on the proxy &mdash; but the proxy isn&rsquo;t the real indicator.</h2>
+  <p style="margin:6px 0 0">The Jewel <b>Fast</b> line is <b>proprietary</b>; the crack attempt <b>failed the bar</b>
+  (best replica corr <b>0.973</b>, not 0.999, and it reproduces only <b>~1/3&ndash;1/2</b> of the true S6/S7 entries).
+  Backtested on that proxy, both S6 (<span class="neg">expR &minus;0.31, PF 0.57, t &minus;14</span>) and S7
+  (<span class="neg">expR &minus;0.52, PF 0.37, t &minus;40</span>) are decisively <b>negative in every grid cell</b> &mdash;
+  the average trade just bleeds the ~0.16% round-trip cost. <b>This cannot condemn the real strategy</b>: it is a
+  mechanical sanity check on a proxy, not a verdict on Krown&rsquo;s indicator. S6/S7 stay effectively
+  <b>blocked</b> until Igor exports the raw <code>Fast</code> line or its Pine source.</p>
+</div>
+
+<div class="proxybanner">
+  <b>&#9888; PROXY LINE (corr 0.973) &mdash; NOT the real strategy.</b> Every number, table and card below is computed
+  on a double-EMA-smoothed price stochastic that <i>approximates</i> the Jewel Fast oscillator. It is not bar-exact,
+  does not reproduce the indicator&rsquo;s warm-up, and mis-times more than half of the real entry signals. Treat the
+  results as &ldquo;the rules, run on the closest line we could build&rdquo; &mdash; nothing more.
+</div>
+
+<h2>A &middot; The crack attempt (Part A)</h2>
+<p>Attempt #1 (CALIBRATION.md &ldquo;V3&rdquo;) reached correlation <b>0.88</b> and declared the base oscillator a
+proprietary-smoother <b>MISMATCH</b>. This attempt went wider &mdash; exploiting every exported column
+(<code>Fast, JewelP, Percentile, DI-, DI+, ADX, White, Cyan, Blue</code>) and ~1,700 candidate constructions across
+10 smoother families.</p>
+
+<div class="card">
+  <h3 style="margin-top:2px">What we found</h3>
+  <ul class="tight">
+    <li><b>Best replica &mdash; corr 0.973</b> (a real lift over 0.88): a double-<b>EMA</b>-smoothed stochastic of close.
+      <pre class="src">Jewel-Fast PROXY = EMA( EMA( stoch(close, high, low, n=10), 5 ), 7 )
+    stoch = 100 &middot; (close &minus; lowest(low,10)) / (highest(high,10) &minus; lowest(low,10))</pre></li>
+    <li><b>Still not the indicator.</b> Two hard disproofs: (1) <b>warm-up mismatch</b> &mdash; the true Fast emits its
+      first value at bar&nbsp;34, but the corr-optimal fit emits at bar&nbsp;19; every construction that warms up at ~34
+      collapses to corr 0.79&ndash;0.95. (2) A 0.97-corr line still gets the <b>signals</b> mostly wrong (below).</li>
+    <li><b>DMI block:</b> exported <code>DI+/DI-</code> first-valid @14, <code>ADX</code> @27 &rarr; lengths pinned at
+      <b>14/14</b>, but standard Wilder DMI isn&rsquo;t bar-exact on the export (a &ldquo;DMI Factor 1&rdquo; internal variant).
+      Not on the S6/S7 path (the entry rides on <code>Fast</code>).</li>
+    <li><b>Colour decode</b> (bonus, values-only): every bar is exactly one of White/Cyan/Blue.
+      <b>Cyan = Fast rising</b> (99.4%), <b>Blue = Fast falling</b>, <b>White = a turning bar</b> (89% agreement).
+      &rArr; the rulebook&rsquo;s &ldquo;first tick that closes white&rdquo; entry = <b>the Fast line turning</b>.</li>
+  </ul>
+</div>
+
+<h3>Proxy quality vs the exported <code>Fast</code> (values only, both timeframes)</h3>
+<div class="tablewrap"><table>
+  <tr><th>TF</th><th>corr</th><th>MAE (pts)</th><th>S6 &lt;35 turn-up<br>recall / prec</th><th>S7 67&ndash;78 turn-down<br>recall / prec</th></tr>
+  <tr><td>15m</td><td class="n">0.9728</td><td class="n">3.26</td><td class="n">46.8% / 41.5%</td><td class="n">34.4% / 32.2%</td></tr>
+  <tr><td>5m</td><td class="n">0.9758</td><td class="n">3.44</td><td class="n">48.1% / 43.9%</td><td class="n">32.0% / 32.6%</td></tr>
+</table></div>
+<div class="callout bad"><b>The killer caveat.</b> Even at corr 0.97 / MAE 3.3 pts, only <b>32&ndash;48%</b> of the real
+entry signals are reproduced &mdash; over half are missed or false. That is why the backtest below is <i>not</i> the real
+strategy, and why the &ldquo;no edge&rdquo; result can neither confirm nor condemn Krown&rsquo;s S6/S7.</div>
+
+<h2>B &middot; The backtest (Part B)</h2>
+<p class="sub">Rules from the Krown System Rulebook &sect;S6/&sect;S7, run on the proxy line over Binance BTCUSDT-perp
+1m &rarr; 15m (S6) / 5m (S7). Costs 0.05%/side + 0.02% slippage; 1% risk; entries at next-bar open; ambiguous
+fills = losses. Deterministic (double-run md5 identical).</p>
+
+<div class="grid2">
+  <div class="card">
+    <h3 style="margin-top:2px">S6 &mdash; long scalp (15m) <span class="neg">&#10007; no edge (proxy)</span></h3>
+    <p class="muted" style="margin:0 0 8px">Fast&lt;35 + white turn-up &rarr; long; TP PMARP&gt;75; stop close&lt;range-low.</p>
+    <div class="kpis">
+      <div class="kpi"><div class="kl">Trades</div><div class="kv">4,235</div></div>
+      <div class="kpi"><div class="kl">Win rate</div><div class="kv">52.3%</div></div>
+      <div class="kpi"><div class="kl">Exp R</div><div class="kv neg">&minus;0.31</div></div>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><div class="kl">Profit factor</div><div class="kv neg">0.57</div></div>
+      <div class="kpi"><div class="kl">t-stat</div><div class="kv neg">&minus;14.2</div></div>
+      <div class="kpi"><div class="kl">Exp / trade</div><div class="kv neg">&minus;0.16%</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:2px">S7 &mdash; short scalp (5m) <span class="neg">&#10007; no edge (proxy)</span></h3>
+    <p class="muted" style="margin:0 0 8px">Fast&isin;[67,78) + white turn-down &rarr; short; TP PMARP&lt;20; stop close&gt;range-high.</p>
+    <div class="kpis">
+      <div class="kpi"><div class="kl">Trades</div><div class="kv">10,324</div></div>
+      <div class="kpi"><div class="kl">Win rate</div><div class="kv">44.1%</div></div>
+      <div class="kpi"><div class="kl">Exp R</div><div class="kv neg">&minus;0.52</div></div>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><div class="kl">Profit factor</div><div class="kv neg">0.37</div></div>
+      <div class="kpi"><div class="kl">t-stat</div><div class="kv neg">&minus;40.3</div></div>
+      <div class="kpi"><div class="kl">Exp / trade</div><div class="kv neg">&minus;0.16%</div></div>
+    </div>
+  </div>
+</div>
+
+<h3>Sensitivity grid (declared before running &mdash; every cell negative)</h3>
+<div class="tablewrap"><table>
+  <tr><th>Strat</th><th>range_lb</th><th>PMARP exit</th><th>N</th><th>WR</th><th>Exp R</th><th>PF</th><th>t</th><th>Exp %</th></tr>
+  <tr><td>S6</td><td class="n">10</td><td class="n">70</td><td class="n">4340</td><td class="n">52.1</td><td class="n neg">&minus;0.330</td><td class="n">0.52</td><td class="n">&minus;16.5</td><td class="n">&minus;0.171</td></tr>
+  <tr><td>S6</td><td class="n">10</td><td class="n">75</td><td class="n">4282</td><td class="n">51.8</td><td class="n neg">&minus;0.318</td><td class="n">0.57</td><td class="n">&minus;14.7</td><td class="n">&minus;0.163</td></tr>
+  <tr><td>S6</td><td class="n">10</td><td class="n">80</td><td class="n">4201</td><td class="n">50.3</td><td class="n neg">&minus;0.315</td><td class="n">0.61</td><td class="n">&minus;13.3</td><td class="n">&minus;0.166</td></tr>
+  <tr><td>S6</td><td class="n">20</td><td class="n">70</td><td class="n">4293</td><td class="n">52.4</td><td class="n neg">&minus;0.317</td><td class="n">0.53</td><td class="n">&minus;15.9</td><td class="n">&minus;0.173</td></tr>
+  <tr class="base"><td>S6 &#9733;</td><td class="n">20</td><td class="n">75</td><td class="n">4235</td><td class="n">52.3</td><td class="n neg">&minus;0.305</td><td class="n">0.57</td><td class="n">&minus;14.2</td><td class="n">&minus;0.165</td></tr>
+  <tr><td>S6</td><td class="n">20</td><td class="n">80</td><td class="n">4151</td><td class="n">50.9</td><td class="n neg">&minus;0.303</td><td class="n">0.61</td><td class="n">&minus;12.8</td><td class="n">&minus;0.168</td></tr>
+  <tr><td>S6</td><td class="n">30</td><td class="n">70</td><td class="n">4111</td><td class="n">53.6</td><td class="n neg">&minus;0.274</td><td class="n">0.53</td><td class="n">&minus;14.5</td><td class="n">&minus;0.175</td></tr>
+  <tr><td>S6</td><td class="n">30</td><td class="n">75</td><td class="n">4036</td><td class="n">53.7</td><td class="n neg">&minus;0.263</td><td class="n">0.58</td><td class="n">&minus;13.0</td><td class="n">&minus;0.166</td></tr>
+  <tr><td>S6</td><td class="n">30</td><td class="n">80</td><td class="n">3937</td><td class="n">53.0</td><td class="n neg">&minus;0.262</td><td class="n">0.62</td><td class="n">&minus;11.8</td><td class="n">&minus;0.169</td></tr>
+  <tr><td>S7</td><td class="n">10</td><td class="n">15</td><td class="n">10268</td><td class="n">43.2</td><td class="n neg">&minus;0.532</td><td class="n">0.42</td><td class="n">&minus;36.6</td><td class="n">&minus;0.158</td></tr>
+  <tr><td>S7</td><td class="n">10</td><td class="n">20</td><td class="n">10475</td><td class="n">43.6</td><td class="n neg">&minus;0.538</td><td class="n">0.37</td><td class="n">&minus;41.4</td><td class="n">&minus;0.160</td></tr>
+  <tr><td>S7</td><td class="n">10</td><td class="n">25</td><td class="n">10594</td><td class="n">42.1</td><td class="n neg">&minus;0.533</td><td class="n">0.32</td><td class="n">&minus;44.6</td><td class="n">&minus;0.159</td></tr>
+  <tr><td>S7</td><td class="n">20</td><td class="n">15</td><td class="n">10106</td><td class="n">43.9</td><td class="n neg">&minus;0.513</td><td class="n">0.42</td><td class="n">&minus;35.7</td><td class="n">&minus;0.158</td></tr>
+  <tr class="base"><td>S7 &#9733;</td><td class="n">20</td><td class="n">20</td><td class="n">10324</td><td class="n">44.1</td><td class="n neg">&minus;0.520</td><td class="n">0.37</td><td class="n">&minus;40.3</td><td class="n">&minus;0.160</td></tr>
+  <tr><td>S7</td><td class="n">20</td><td class="n">25</td><td class="n">10455</td><td class="n">42.5</td><td class="n neg">&minus;0.515</td><td class="n">0.33</td><td class="n">&minus;43.5</td><td class="n">&minus;0.159</td></tr>
+  <tr><td>S7</td><td class="n">30</td><td class="n">15</td><td class="n">9516</td><td class="n">46.4</td><td class="n neg">&minus;0.447</td><td class="n">0.43</td><td class="n">&minus;32.7</td><td class="n">&minus;0.159</td></tr>
+  <tr><td>S7</td><td class="n">30</td><td class="n">20</td><td class="n">9794</td><td class="n">45.8</td><td class="n neg">&minus;0.457</td><td class="n">0.37</td><td class="n">&minus;37.4</td><td class="n">&minus;0.163</td></tr>
+  <tr><td>S7</td><td class="n">30</td><td class="n">25</td><td class="n">9967</td><td class="n">43.7</td><td class="n neg">&minus;0.452</td><td class="n">0.32</td><td class="n">&minus;40.4</td><td class="n">&minus;0.160</td></tr>
+</table></div>
+<p class="muted">&#9733; = declared base case. Across all 18 cells expR runs &minus;0.26 to &minus;0.54; not one is positive.
+Win rate near 50% (S6) with a negative expectancy is the classic close-based-stop asymmetry: winners take the
+PMARP target (~+0.7R) while losers run past the range-low close (~&minus;1.7R).</p>
+
+<div class="card">
+  <h3 style="margin-top:2px">Exit breakdown (base cases)</h3>
+  <div class="tablewrap"><table>
+    <tr><th>Strat</th><th>TP (PMARP)</th><th>Range stop</th><th>Cat. stop</th><th>Max-bars</th><th>Mean R: TP / stop</th></tr>
+    <tr><td>S6</td><td class="n">2527</td><td class="n">1602</td><td class="n">105</td><td class="n">1</td><td class="n">+0.67 / &minus;1.72</td></tr>
+    <tr><td>S7</td><td class="n">5688</td><td class="n">4609</td><td class="n">27</td><td class="n">0</td><td class="n">+0.51 / &minus;1.78</td></tr>
+  </table></div>
+  <p class="muted" style="margin:8px 0 0">Median hold ~8 bars (S6 ~2h; S7 ~40m). The model behaves sanely &mdash; the
+  problem is edge, not plumbing.</p>
+</div>
+
+<h2>C &middot; Interpretations &amp; conventions (every judgement call, declared)</h2>
+<ol class="res">
+  <li><b>Jewel line = PROXY</b> (<code>jwl.jewel_fast_proxy</code>, corr ~0.973). Thresholds ride on the <b>Fast</b>
+    oscillator (task spec; the on-chart line is the 0&ndash;92 oscillator with guides 35.5 / 67.2 / 77.8). Attempt #1
+    mused the thresholds might ride on the <i>JewelP</i> percentile instead &mdash; unresolved, but immaterial since the
+    base line is proxy either way.</li>
+  <li><b>&ldquo;Closes white&rdquo; = the Fast line turns</b> on bar t (S6: turn up in the &lt;35 zone; S7: turn down in
+    the 67&ndash;78 zone). Decoded from the exported colour flags (89% agreement). Causal: uses t, t&minus;1, t&minus;2.</li>
+  <li><b>Entry</b> at the next bar&rsquo;s open + slippage (the signal is only known at the close of t). One position at a
+    time; new signals ignored while in a trade.</li>
+  <li><b>Stop</b> = close beyond the range extreme (lowest-low / highest-high of the prior <code>range_lb</code> bars) per
+    the rulebook&rsquo;s &ldquo;closed below range lows&rdquo;; realised loss may exceed the reference stop (a close can gap
+    past it). A 3% intrabar catastrophic backstop bounds tails (the rulebook&rsquo;s &ldquo;emergency wick&rdquo;).</li>
+  <li><b>TP</b> = PMARP crossing its threshold on close (S6 &gt;75, S7 &lt;20), frame-verified DEFAULT PMARP
+    (VWMA 20, lookback 350). Trade requires PMARP defined at entry.</li>
+  <li><b>Ambiguous = LOSS.</b> If a stop-close and a TP-close fire on the same bar, the stop (loss) wins.</li>
+  <li><b>Sizing</b> 1% risk of $10k, size = risk / stop-distance, stop-distance floored at 0.20% of price to avoid
+    div-by-tiny leverage when entry sits on the range edge. Per-trade stats are size-invariant.</li>
+</ol>
+
+<div class="callout"><b>Venue note.</b> The VMP indicator export is <b>Bybit</b> BTCUSDT.P; the backtest candles are
+<b>Binance</b> BTCUSDT-perp (the project&rsquo;s 3.6M-row 1m set). The proxy line is computed from Binance candles here.
+Because the crack failed on either venue (the base is proprietary), this cross-venue detail changes nothing material.
+The 2025&ndash;26 out-of-sample window was never loaded (asserted in code).</div>
+
+<div class="card">
+  <h3 style="margin-top:2px">Reproducibility</h3>
+  <ul class="tight">
+    <li>Backtest: <code>backtests/bt_ka4_s6s7_jewel.py</code> &middot; ledger <code>backtests/ka4_s6s7_ledger.csv</code>
+      md5 <code>7f25657a3bc37b303bb6949e6e9cbc2a</code> (identical across two fresh processes).</li>
+    <li>Detector (proxy): <code>detectors/krown/jwl.py</code> (<code>REPLICA_QUALITY = "PROXY"</code>).</li>
+    <li>Crack log: <code>Strategy Codex/Krown/research/VMP_CRACK_ATTEMPT_2.md</code>.</li>
+    <li>Grid: <code>backtests/ka4_s6s7_grid.csv</code>. IS window 2019-09-09 &rarr; 2024-12-31 (2025+ locked).</li>
+  </ul>
+</div>
+
+<div class="foot">
+  Krown Trading &middot; task KA4 &middot; The Jewel Lite (S6/S7). <b>PROXY backtest &mdash; not the real strategy.</b>
+  A real verdict needs Igor&rsquo;s raw <code>Fast</code> oscillator export (or its Pine source); until then S6/S7 remain
+  effectively blocked, now with a documented no-edge-on-proxy footnote. Generated 2026-07-13.
+</div>
+
+</div>
+<script>
+(function(){
+  var btn=document.getElementById('themeToggle');
+  if(!btn)return;
+  var mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;
+  function stored(){try{var t=localStorage.getItem('codexTheme');return (t==='light'||t==='dark'||t==='system')?t:'system';}catch(e){return 'system';}}
+  function eff(m){return (m==='light'||m==='dark')?m:((mq&&mq.matches)?'dark':'light');}
+  function apply(){var m=stored();document.documentElement.setAttribute('data-theme',eff(m));btn.textContent=(m==='light')?'◐ Light':(m==='dark')?'◑ Dark':'◓ Auto';}
+  apply();
+  btn.addEventListener('click',function(){var order={light:'dark',dark:'system',system:'light'};var n=order[stored()];try{localStorage.setItem('codexTheme',n);}catch(e){}apply();});
+  if(mq){var h=function(){if(stored()==='system')apply();};if(mq.addEventListener)mq.addEventListener('change',h);else if(mq.addListener)mq.addListener(h);}
+})();
+</script>
+</body>
+</html>

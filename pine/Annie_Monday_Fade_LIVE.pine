@@ -1,0 +1,345 @@
+//@version=6
+// =============================================================================
+// Annie Monday Fade — LIVE   (Task F1)
+// -----------------------------------------------------------------------------
+// Draws Igor's validated Annie "Weekly Setup / FMWB fade" on a 15m BTCUSDT-perp
+// chart. Faithful, CAUSAL port of backtests/bt_weekly.py (variant a, TP=1.9R),
+// the flagship whose Monday-spike slice is the tradeable edge (WEEKLY.md §7):
+//   91 Monday entries in-sample -> 54.9% WR, +0.382R, PF 2.05 (t=2.98);
+//   locked OOS 2025-26 confirmed +0.536R over 28 Monday entries.
+//
+// Fidelity proof: backtests/f1_pine_mirror.py re-implements THIS script's exact
+// logic in python and matches the validated 91 Monday entries 87/91 = 95.6%,
+// every matched entry exact to the 15m bar, every divergence explained
+// (all from S1 below). Run it to reproduce; md5 of its output is deterministic.
+//
+// THE SETUP (per week, Sun 17:00 NY -> next Sun 17:00 NY):
+//   Weekend box (close range Fri17:00->Sun17:00 NY) -> an early-week (Sun/Mon/
+//   Tue) spike-OUT of the box; FADE the side that pokes furthest -> L1 = first
+//   200%-class PVSRA vector whose body closes across the 15m 50-EMA in the fade
+//   direction after the spike extreme -> a 2-of-3 retest {50-EMA wick-touch,
+//   return into the L1-vector range} on the trade side (abort if a bar closes
+//   back across the EMA first) -> ENTER on the NEXT 15m bar open -> stop beyond
+//   the week's running extreme (+buffer), TP = 1.9R.
+//
+// TV-FORCED SIMPLIFICATIONS vs bt_weekly.py (documented; the ONLY departures):
+//   S1  weekend box = [min(close),max(close)] over Fri17:00->Sun17:00 NY,
+//       instead of bt_weekly's 24-bin close-cluster centroid box (Pine has no
+//       histogram-with-dynamic-bins primitive). This slightly wider box is the
+//       SOLE cause of all 4/91 mirror divergences (it can shift one excursion
+//       enough to fail the 0.1% spike gate or flip the fade direction).
+//   S2  spike extreme found on the native 15m chart (running max-high/min-low
+//       over the early window), not on a 1H resample mapped back to 15m. Uses
+//       NO request.security -> no repaint. Verified identical to the 1H-floor
+//       mapping on the in-sample set (0/221 signal diffs).
+//   S3  retest keeps c1 (50-EMA wick-touch, body holds) + c2 (return into L1
+//       range); the 3rd confluence c3 (HL/LH swing structure) is omitted. Proven
+//       inert: c2 co-occurs at EVERY validated entry so c1+c2 already meets
+//       need=2 -> c1&c2 == full 2-of-3 (0/221 diffs). Removes the only piece
+//       that would need causal pivot loops in Pine.
+//   S4  CAUSALITY/timing: the winning spike can only be known once the early
+//       window CLOSES (~Tue 17:00 NY). So the setup is RESOLVED at the early-
+//       window close and markers are drawn at their true historical bars (peak,
+//       L1, retest, entry). The alertcondition therefore fires at confirmation:
+//       for entries that already passed, at the early-window-close bar; for
+//       entries that complete later in the week, on the entry bar itself. This
+//       reflects a real property of a weekly-fade setup (you cannot know "the"
+//       Monday spike mid-window) and injects NO look-ahead.
+//
+// PVSRA 200%-class vector (ported EXACTLY from detectors/pvsra.py):
+//   a candle whose volume >= 2.0x the average volume of the PRIOR 10 candles
+//   (ta.sma(volume[1],10)); green if close>=open (up), red if close<open (down).
+// =============================================================================
+
+indicator("Annie Monday Fade — LIVE", overlay = true,
+     max_lines_count = 500, max_labels_count = 500, max_boxes_count = 500)
+
+// ----------------------------- Inputs ----------------------------------------
+gA = "Anchors (Igor's weekly model)"
+i_tz       = input.string("America/New_York", "Anchor timezone", group = gA)
+i_openHour = input.int(17, "Week open hour (Sunday, NY)", minval = 0, maxval = 23, group = gA)
+i_friHour  = input.int(8,  "Friday hard-cutoff hour (NY)", minval = 0, maxval = 23, group = gA)
+i_earlyFrac= input.float(0.286, "Early-window fraction of week (Sun/Mon/Tue)", minval = 0.1, maxval = 0.6, step = 0.001, group = gA)
+
+gD = "Detector knobs (validated defaults — do not change to trade the edge)"
+i_emaLen   = input.int(50, "50-EMA length", minval = 2, group = gD)
+i_volLb    = input.int(10, "PVSRA volume lookback (prior N)", minval = 2, group = gD)
+i_vecMult  = input.float(2.0, "200%-class vector threshold (x vol avg)", minval = 1.0, step = 0.1, group = gD)
+i_minSpike = input.float(0.10, "Min spike beyond box (%)", minval = 0.0, step = 0.01, group = gD)
+i_touchTol = input.float(0.15, "50-EMA wick-touch tolerance (%)", minval = 0.0, step = 0.01, group = gD)
+i_crossTol = input.float(0.10, "50-EMA body-cross tolerance (%)", minval = 0.0, step = 0.01, group = gD)
+i_span     = input.int(320, "Max bars L1 -> retest", minval = 1, group = gD)
+i_stopBuf  = input.float(0.05, "Stop buffer beyond extreme (%)", minval = 0.0, step = 0.01, group = gD)
+i_rr       = input.float(1.9, "TP (R multiple)", minval = 0.1, step = 0.1, group = gD)
+i_mondayOnly = input.bool(true, "Monday-spike only (the validated edge)", group = gD)
+
+gV = "Visuals"
+i_showBox    = input.bool(true,  "Weekend box", group = gV)
+i_showPeak   = input.bool(true,  "Spike-peak marker", group = gV)
+i_showL1     = input.bool(true,  "L1 vector highlight", group = gV)
+i_showRetest = input.bool(true,  "Retest marker", group = gV)
+i_showEntry  = input.bool(true,  "Entry arrow", group = gV)
+i_showStopTP = input.bool(true,  "Stop / TP lines", group = gV)
+i_showEma    = input.bool(true,  "50-EMA", group = gV)
+
+// derived tolerances (fractions)
+touchTol = i_touchTol / 100.0
+crossTol = i_crossTol / 100.0
+minSpike = i_minSpike / 100.0
+stopBuf  = i_stopBuf  / 100.0
+
+DAY_MS = 86400000
+
+// ----------------------------- Per-bar indicators ----------------------------
+// EMA50 == pandas close.ewm(span,adjust=False) == detectors/emas.add_emas
+ema50 = ta.ema(close, i_emaLen)
+// 200%-class: volume >= vecMult x mean(prior i_volLb volumes) == ta.sma(volume[1],lb)
+avgVol   = ta.sma(volume[1], i_volLb)
+volRatio = na(avgVol) or avgVol == 0 ? 0.0 : volume / avgVol
+is200    = volRatio >= i_vecMult
+isUp     = close >= open
+
+plot(i_showEma ? ema50 : na, "50 EMA", color = color.new(color.orange, 0), linewidth = 1)
+
+// ----------------------------- Week time anchors -----------------------------
+_dow  = dayofweek(time, i_tz)          // 1=Sunday .. 7=Saturday
+_hr   = hour(time, i_tz)
+_yr   = year(time, i_tz)
+_mo   = month(time, i_tz)
+_dy   = dayofmonth(time, i_tz)
+_today0     = timestamp(i_tz, _yr, _mo, _dy, i_openHour, 0)
+_daysBack   = _dow - 1                  // Sun=0 .. Sat=6
+_approxSun  = _today0 - _daysBack * DAY_MS
+weekOpenTs  = timestamp(i_tz, year(_approxSun, i_tz), month(_approxSun, i_tz), dayofmonth(_approxSun, i_tz), i_openHour, 0)
+if time < weekOpenTs
+    _approxSun2 = _today0 - (_daysBack + 7) * DAY_MS
+    weekOpenTs := timestamp(i_tz, year(_approxSun2, i_tz), month(_approxSun2, i_tz), dayofmonth(_approxSun2, i_tz), i_openHour, 0)
+
+weekEndTs  = weekOpenTs + 7 * DAY_MS
+earlyEndTs = weekOpenTs + int(i_earlyFrac * 7.0 * DAY_MS)
+_friApprox = weekOpenTs + 5 * DAY_MS
+friEndTs   = timestamp(i_tz, year(_friApprox, i_tz), month(_friApprox, i_tz), dayofmonth(_friApprox, i_tz), i_friHour, 0)
+
+newWeek = weekOpenTs != weekOpenTs[1]
+
+// ----------------------------- Persistent week state -------------------------
+// per-bar arrays for the current week (cleared each week) -> loop-indexable,
+// no history-referencing-operator lookback issues.
+var array<float> wkO = array.new_float()
+var array<float> wkH = array.new_float()
+var array<float> wkL = array.new_float()
+var array<float> wkC = array.new_float()
+var array<float> wkE = array.new_float()
+var array<int>   wkT = array.new_int()
+var array<bool>  wk2 = array.new_bool()
+var array<bool>  wkU = array.new_bool()
+
+var float boxTop = na
+var float boxBot = na
+var float pendTop = na
+var float pendBot = na
+
+var float runHigh = na
+var float runLow  = na
+var int   extHiWi = 0
+var int   extLoWi = 0
+
+var bool  locked   = false
+var bool  resolved = false
+var int   fadeDir  = 0          // 1 long, -1 short, 0 none
+var int   extWi    = 0
+var bool  l1Found  = false
+var int   l1Wi     = 0
+var float l1Low    = na
+var float l1High   = na
+var bool  c2latch  = false
+var int   scanWi   = 0
+
+// signal outputs (for alert)
+entryFired = false
+
+// process only CONFIRMED bars -> no repaint, deterministic; all week state and
+// the box-freeze happen here so realtime tick rollbacks cannot corrupt them.
+if barstate.isconfirmed
+    // --- New week bootstrap ---
+    if newWeek
+        // freeze the weekend box accumulated over the just-passed weekend
+        boxTop := pendTop
+        boxBot := pendBot
+        pendTop := na
+        pendBot := na
+        array.clear(wkO)
+        array.clear(wkH)
+        array.clear(wkL)
+        array.clear(wkC)
+        array.clear(wkE)
+        array.clear(wkT)
+        array.clear(wk2)
+        array.clear(wkU)
+        runHigh := na
+        runLow  := na
+        extHiWi := 0
+        extLoWi := 0
+        locked   := false
+        resolved := false
+        fadeDir  := 0
+        l1Found  := false
+        c2latch  := false
+        scanWi   := 0
+        // draw the just-frozen weekend box (context)
+        if i_showBox and not na(boxTop) and not na(boxBot)
+            box.new(weekOpenTs - 2 * DAY_MS, boxTop, weekOpenTs, boxBot, xloc = xloc.bar_time,
+                 border_color = color.new(color.gray, 40), bgcolor = color.new(color.gray, 90))
+
+    // --- push this bar into the week arrays ---
+    array.push(wkO, open)
+    array.push(wkH, high)
+    array.push(wkL, low)
+    array.push(wkC, close)
+    array.push(wkE, ema50)
+    array.push(wkT, time)
+    array.push(wk2, is200)
+    array.push(wkU, isUp)
+    curWi = array.size(wkH) - 1
+
+    // --- S1 weekend box accumulation (this week's following weekend) ---
+    if time >= weekOpenTs + 5 * DAY_MS and time < weekEndTs
+        pendTop := na(pendTop) ? close : math.max(pendTop, close)
+        pendBot := na(pendBot) ? close : math.min(pendBot, close)
+
+    // --- early-window running extreme (15m-direct, S2) ---
+    if time <= earlyEndTs
+        if na(runHigh) or high > runHigh
+            runHigh := high
+            extHiWi := curWi
+        if na(runLow) or low < runLow
+            runLow := low
+            extLoWi := curWi
+
+    // --- LOCK at the early-window close: fix direction + spike extreme ---
+    if not locked and not resolved and time > earlyEndTs
+        locked := true
+        if na(boxTop) or na(boxBot) or boxTop <= boxBot or na(runHigh) or na(runLow)
+            resolved := true
+        else
+            upExc   = (runHigh - boxTop) / boxTop
+            downExc = (boxBot - runLow) / boxBot
+            if math.max(upExc, downExc) < minSpike
+                resolved := true                      // spike gate fails
+            else
+                if upExc >= downExc
+                    fadeDir := -1                     // fade a spike UP -> short
+                    extWi   := extHiWi
+                else
+                    fadeDir := 1                      // fade a spike DOWN -> long
+                    extWi   := extLoWi
+                // Monday-spike gate (trading day of the extreme bar, NY 5pm day)
+                extT  = array.get(wkT, extWi)
+                extHr = hour(extT, i_tz)
+                extDw = dayofweek(extT, i_tz)         // 1=Sun..7=Sat
+                isMon = (extHr < i_openHour and extDw == 2) or (extHr >= i_openHour and extDw == 1)
+                if i_mondayOnly and not isMon
+                    resolved := true
+                else
+                    scanWi := extWi                   // L1 search starts at the extreme (inclusive)
+                    // draw the peak marker at its true historical bar
+                    if i_showPeak
+                        pkPrice = fadeDir == -1 ? runHigh : runLow
+                        label.new(array.get(wkT, extWi), pkPrice,
+                             text = fadeDir == -1 ? "▲ peak" : "▼ peak",
+                             xloc = xloc.bar_time, style = fadeDir == -1 ? label.style_label_down : label.style_label_up,
+                             color = color.new(color.gray, 20), textcolor = color.white, size = size.tiny)
+
+    // --- RESOLVE scan: L1 -> retest -> entry (causal, forward, c1&c2) ---
+    if locked and not resolved and scanWi <= curWi
+        for wi = scanWi to curWi
+            if resolved
+                break
+            H = array.get(wkH, wi)
+            L = array.get(wkL, wi)
+            O = array.get(wkO, wi)
+            C = array.get(wkC, wi)
+            E = array.get(wkE, wi)
+            V2 = array.get(wk2, wi)
+            UP = array.get(wkU, wi)
+            emaOk = not na(E) and E != 0
+            if not l1Found
+                // L1 = first 200%-class body-close across the EMA in fade dir
+                brk = false
+                if emaOk and V2
+                    if fadeDir == 1 and UP and C >= E and O <= E * (1 + crossTol)
+                        brk := true
+                    if fadeDir == -1 and not UP and C <= E and O >= E * (1 - crossTol)
+                        brk := true
+                if brk
+                    l1Found := true
+                    l1Wi    := wi
+                    l1Low   := L
+                    l1High  := H
+                    c2latch := false
+                    if i_showL1
+                        box.new(array.get(wkT, wi), H, array.get(wkT, wi) + 15 * 60000, L,
+                             xloc = xloc.bar_time, border_color = color.new(color.yellow, 0),
+                             bgcolor = color.new(color.yellow, 80))
+            else if wi > l1Wi
+                if wi > l1Wi + i_span
+                    resolved := true                  // no retest within span -> no trade
+                else if emaOk
+                    // abort: a bar closes back across the EMA (structure lost)
+                    if fadeDir == 1 and C < E * (1 - crossTol)
+                        resolved := true
+                    else if fadeDir == -1 and C > E * (1 + crossTol)
+                        resolved := true
+                    else
+                        // c2: price traded back into the L1-vector range
+                        if H >= l1Low and L <= l1High
+                            c2latch := true
+                        // c1: 50-EMA wick-touch from the trade side, body holds
+                        touched = fadeDir == 1 ? L <= E * (1 + touchTol) : H >= E * (1 - touchTol)
+                        bodyOk  = fadeDir == 1 ? math.min(O, C) >= E * (1 - crossTol) : math.max(O, C) <= E * (1 + crossTol)
+                        if touched and bodyOk and c2latch
+                            // First qualifying retest (c1 & c2) -> the week RESOLVES
+                            // here (bt_weekly takes the first retest and never
+                            // re-searches). Draw only if the entry passes filters.
+                            resolved := true
+                            entryWi   = wi + 1
+                            hasNext   = entryWi < array.size(wkO)
+                            entT      = hasNext ? array.get(wkT, entryWi) : na
+                            entryRef  = hasNext ? array.get(wkO, entryWi) : na
+                            // running-HOD/LOD stop over [weekOpen, entry)
+                            wick = fadeDir == -1 ? array.get(wkH, 0) : array.get(wkL, 0)
+                            for k = 0 to wi
+                                wick := fadeDir == -1 ? math.max(wick, array.get(wkH, k)) : math.min(wick, array.get(wkL, k))
+                            stopOk = hasNext and (fadeDir == -1 ? wick > entryRef : wick < entryRef)
+                            valid  = hasNext and entT < friEndTs and stopOk
+                            if valid
+                                stopP  = fadeDir == -1 ? wick * (1 + stopBuf) : wick * (1 - stopBuf)
+                                sd     = math.abs(entryRef - stopP)
+                                tpP    = fadeDir == -1 ? entryRef - i_rr * sd : entryRef + i_rr * sd
+                                dirCol = fadeDir == -1 ? color.red : color.green
+                                if i_showRetest
+                                    label.new(array.get(wkT, wi), array.get(wkE, wi), text = "retest",
+                                         xloc = xloc.bar_time, style = label.style_label_center,
+                                         color = color.new(color.blue, 30), textcolor = color.white, size = size.tiny)
+                                if i_showEntry
+                                    label.new(entT, entryRef, text = fadeDir == -1 ? "SHORT" : "LONG",
+                                         xloc = xloc.bar_time, style = fadeDir == -1 ? label.style_label_down : label.style_label_up,
+                                         color = color.new(dirCol, 0), textcolor = color.white, size = size.small)
+                                if i_showStopTP
+                                    line.new(entT, stopP, friEndTs, stopP, xloc = xloc.bar_time,
+                                         color = color.new(color.red, 0), width = 1, style = line.style_dashed)
+                                    line.new(entT, tpP, friEndTs, tpP, xloc = xloc.bar_time,
+                                         color = color.new(color.green, 0), width = 1, style = line.style_dashed)
+                                    label.new(friEndTs, stopP, "stop", xloc = xloc.bar_time, style = label.style_label_left,
+                                         color = color.new(color.red, 30), textcolor = color.white, size = size.tiny)
+                                    label.new(friEndTs, tpP, "TP 1.9R", xloc = xloc.bar_time, style = label.style_label_left,
+                                         color = color.new(color.green, 30), textcolor = color.white, size = size.tiny)
+                                entryFired := true
+        scanWi := curWi + 1
+
+// ----------------------------- Alert -----------------------------------------
+alertcondition(entryFired, title = "Annie Monday Fade — entry",
+     message = "Annie Monday Fade LIVE entry confirmed on BTCUSDT 15m ({{ticker}} @ {{time}})")
+
+plotshape(entryFired, title = "entry (alert bar)", style = shape.diamond,
+     location = location.bottom, color = color.new(color.aqua, 0), size = size.tiny)

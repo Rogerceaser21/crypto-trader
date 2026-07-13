@@ -110,6 +110,7 @@ code{background:var(--chip); border:1px solid var(--line); border-radius:5px; pa
 .b-que{background:var(--quebg); color:var(--queink)}
 .b-ready{background:var(--readybg); color:var(--readyink)}
 .b-block{background:var(--blockbg); color:var(--blockink)}
+.b-proxy{background:var(--warnbg); color:var(--warn)}
 
 /* ---- status board ---- */
 .board{display:grid; grid-template-columns:repeat(auto-fill,minmax(268px,1fr)); gap:15px; margin:20px 0 4px}
@@ -128,7 +129,7 @@ code{background:var(--chip); border:1px solid var(--line); border-radius:5px; pa
 .idcard .kn{font-size:21px; font-weight:800; line-height:1}
 .idcard .kl{font-size:12px; color:var(--soft)}
 .kn.win{color:var(--winink)} .kn.dead{color:var(--deadink)} .kn.run{color:var(--runink)}
-.kn.que{color:var(--queink)} .kn.ready{color:var(--readyink)} .kn.block{color:var(--blockink)}
+.kn.que{color:var(--queink)} .kn.ready{color:var(--readyink)} .kn.block{color:var(--blockink)} .kn.proxy{color:var(--warn)}
 .idcard .spark{margin-top:10px}
 .idcard .spark img{height:44px; width:100%; object-fit:contain; opacity:.95}
 .legend{display:flex; flex-wrap:wrap; gap:8px 12px; margin:2px 0 0; font-size:12.5px; color:var(--soft)}
@@ -204,7 +205,7 @@ footer{color:var(--soft); font-size:13.5px; text-align:center; padding:8px 0 20p
 .idcard .th{margin:7px 0 0}
 .blocked-spark{margin-top:10px; font-size:11.5px; color:var(--blockink); font-style:italic;
   border-top:1px dashed var(--line); padding-top:8px}
-.kn2{font-size:16px; font-weight:800} .kn2.dead{color:var(--deadink)} .kn2.block{color:var(--blockink)}
+.kn2{font-size:16px; font-weight:800} .kn2.dead{color:var(--deadink)} .kn2.block{color:var(--blockink)} .kn2.proxy{color:var(--warn)}
 .kv2{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin:2px 0 6px}
 .kl2{font-size:12.5px; color:var(--soft)}
 .cand.arow>.hd{padding:11px 16px} .cand.arow>.bd{padding:11px 16px 14px}
@@ -514,18 +515,18 @@ html[data-theme="dark"] .theme-toggle{box-shadow:0 2px 10px rgba(0,0,0,.35)}
       <div class="spark"><img src="data:image/png;base64,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" alt="S5 cumulative return bleeding below zero"></div>
     </a>
     <a class="idcard lc-block" href="#s6">
-      <div class="top"><span class="cid">S6 </span><span class="badge b-block">⏸ Blocked</span></div>
+      <div class="top"><span class="cid">S6 </span><span class="badge b-proxy">🟡 Proxy · no edge</span></div>
       <h3>JewelP / VMP momentum long</h3>
-      <div class="kv"><span class="kn block">BLOCKED</span></div>
-      <p class="th">proprietary base oscillator</p>
-      <div class="spark blocked-spark">proprietary base oscillator — not testable</div>
+      <div class="kv"><span class="kn proxy">PROXY</span></div>
+      <p class="th">no edge on proxy (corr 0.97, not real)</p>
+      <div class="spark blocked-spark">proxy backtest: expR −0.31, PF 0.57, t −14 · base line proprietary</div>
     </a>
     <a class="idcard lc-block" href="#s7">
-      <div class="top"><span class="cid">S7 </span><span class="badge b-block">⏸ Blocked</span></div>
+      <div class="top"><span class="cid">S7 </span><span class="badge b-proxy">🟡 Proxy · no edge</span></div>
       <h3>JewelP / VMP momentum short</h3>
-      <div class="kv"><span class="kn block">BLOCKED</span></div>
-      <p class="th">proprietary base oscillator</p>
-      <div class="spark blocked-spark">proprietary base oscillator — not testable</div>
+      <div class="kv"><span class="kn proxy">PROXY</span></div>
+      <p class="th">no edge on proxy (corr 0.97, not real)</p>
+      <div class="spark blocked-spark">proxy backtest: expR −0.52, PF 0.37, t −40 · base line proprietary</div>
     </a>
     <a class="idcard lc-block" href="#s8">
       <div class="top"><span class="cid">S8 </span><span class="badge b-block">⏸ Blocked</span></div>
@@ -948,17 +949,17 @@ html[data-theme="dark"] .theme-toggle{box-shadow:0 2px 10px rgba(0,0,0,.35)}
     </div>
   </div>
   <div class="cand block arow" id="s6">
-    <div class="hd"><span class="cid">S6</span><h3>JewelP / VMP momentum long</h3><span class="badge b-block">⏸ Blocked</span></div>
+    <div class="hd"><span class="cid">S6</span><h3>JewelP / VMP momentum long</h3><span class="badge b-proxy">🟡 Proxy · no edge</span></div>
     <div class="bd">
-      <div class="kv2"><span class="kn2 block">BLOCKED</span><span class="kl2">proprietary base oscillator</span></div>
-      <p>The JewelP percentile transform is validated bit-exact, but the VMP base “Fast” oscillator is proprietary — not recoverable from price. Untestable.</p>
+      <div class="kv2"><span class="kn2 proxy">PROXY</span><span class="kl2">expR −0.31 · PF 0.57 · t −14 · N 4,235</span></div>
+      <p>The base “Fast” oscillator is proprietary — attempt #2 lifted the replica to corr <b>0.97</b> (from 0.88) but it reproduces only ~1/3–1/2 of the true entries, so it is still a <b>PROXY</b>. Run on that proxy (15m, Fast&lt;35 + white turn-up, TP PMARP&gt;75), S6 is decisively negative in every grid cell — but this is a mechanical sanity check, <b>not a verdict on the real strategy</b>. See <a href="S6 S7 Jewel Backtest.html">S6/S7 Jewel Backtest</a>.</p>
     </div>
   </div>
   <div class="cand block arow" id="s7">
-    <div class="hd"><span class="cid">S7</span><h3>JewelP / VMP momentum short</h3><span class="badge b-block">⏸ Blocked</span></div>
+    <div class="hd"><span class="cid">S7</span><h3>JewelP / VMP momentum short</h3><span class="badge b-proxy">🟡 Proxy · no edge</span></div>
     <div class="bd">
-      <div class="kv2"><span class="kn2 block">BLOCKED</span><span class="kl2">proprietary base oscillator</span></div>
-      <p>Same block as S6 — the momentum base line cannot be rebuilt from OHLCV, so the short mirror can't be tested either.</p>
+      <div class="kv2"><span class="kn2 proxy">PROXY</span><span class="kl2">expR −0.52 · PF 0.37 · t −40 · N 10,324</span></div>
+      <p>Same proxy caveat as S6 — the momentum base line is proprietary (corr 0.97 replica, not real). Run on the proxy (5m, Fast∈[67,78) + white turn-down, TP PMARP&lt;20), S7 is negative across the whole grid, even harder than S6. A mechanical proxy check only, <b>not a verdict on the real strategy</b>. See <a href="S6 S7 Jewel Backtest.html">S6/S7 Jewel Backtest</a>.</p>
     </div>
   </div>
   <div class="cand block arow" id="s8">
