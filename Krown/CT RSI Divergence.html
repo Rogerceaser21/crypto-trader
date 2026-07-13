@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CT RSI Divergence — Indicator Reference</title>
+<style>
+  :root{
+    --bg:#0e1117; --panel:#161b22; --panel2:#1c2230; --ink:#e6edf3; --muted:#9aa4b2;
+    --line:#2a3140; --accent:#6aa9ff; --all:#9598a1; --m3:#26a69a; --m1:#ff9800;
+    --up:#3fb950; --dn:#f85149; --warn:#e3b341;
+    --regbull:#26a69a; --hidbull:#26c6da; --regbear:#ef5350; --hidbear:#ff9800;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  .wrap{max-width:940px;margin:0 auto;padding:34px 22px 90px;}
+  header{border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:8px}
+  .eyebrow{letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:var(--accent);font-weight:700}
+  h1{font-size:30px;margin:8px 0 6px;line-height:1.2}
+  h2{font-size:21px;margin:38px 0 12px;padding-top:8px;border-top:1px solid var(--line)}
+  h3{font-size:16px;margin:22px 0 8px;color:var(--ink)}
+  p{color:var(--ink)}
+  .sub{color:var(--muted);font-size:15px;max-width:70ch}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:14px 0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:720px){.grid2{grid-template-columns:1fr}}
+  code,kbd{background:#0b0f16;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px}
+  kbd{color:var(--accent)}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:14px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--panel2);color:var(--muted);font-weight:600;font-size:12.5px;text-transform:uppercase;letter-spacing:.04em}
+  td.n{font-family:ui-monospace,Menlo,monospace;white-space:nowrap}
+  .tag{display:inline-block;font-size:11px;font-weight:700;border-radius:20px;padding:2px 10px;color:#0b0f16}
+  .tag.all{background:var(--all)} .tag.m3{background:var(--m3)} .tag.m1{background:var(--m1)}
+  ol.steps{counter-reset:s;list-style:none;padding-left:0;margin:0}
+  ol.steps li{position:relative;padding:10px 0 10px 46px;border-bottom:1px solid var(--line)}
+  ol.steps li:last-child{border-bottom:0}
+  ol.steps li::before{counter-increment:s;content:counter(s);position:absolute;left:0;top:10px;
+    width:30px;height:30px;border-radius:50%;background:var(--accent);color:#0b0f16;font-weight:800;
+    display:flex;align-items:center;justify-content:center;font-size:14px}
+  .callout{border-left:4px solid var(--warn);background:rgba(227,179,65,.08);padding:12px 16px;border-radius:8px;margin:12px 0}
+  .callout.good{border-left-color:var(--m3);background:rgba(38,166,154,.08)}
+  .callout.bad{border-left-color:var(--dn);background:rgba(248,81,73,.09)}
+  .callout b{color:var(--ink)}
+  pre.src{background:#0b0f16;border:1px solid var(--line);border-radius:10px;padding:16px;overflow:auto;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.5;color:#c9d3e0;max-height:560px}
+  .copybar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:14px 0 6px}
+  .btn{background:var(--accent);color:#0b0f16;border:0;border-radius:8px;padding:9px 16px;font-weight:700;cursor:pointer;font-size:14px}
+  .btn:active{transform:translateY(1px)}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;margin:6px 0 2px;font-size:13px;color:var(--muted)}
+  .legend span{display:inline-flex;align-items:center;gap:7px}
+  .sw{width:26px;height:0;border-top-width:3px;border-top-style:solid;display:inline-block}
+  .sw.dash{border-top-style:dashed}
+  .foot{color:var(--muted);font-size:12.5px;margin-top:50px;border-top:1px solid var(--line);padding-top:16px}
+  .muted{color:var(--muted)}
+  ul.tight{margin:6px 0 6px 0;padding-left:20px} ul.tight li{margin:4px 0}
+  .pill{display:inline-block;font-size:11px;font-weight:700;border-radius:20px;padding:2px 10px;color:#0b0f16;background:var(--up)}
+  .pill.no{background:var(--dn);color:#fff}
+
+  /* ---- Theme toggle ---- */
+  html[data-theme="light"]{
+    --bg:#f7f9fc; --panel:#ffffff; --panel2:#eef1f6; --ink:#1a2230; --muted:#5b6472;
+    --line:#d7dde6; --accent:#2f6fe0; --all:#6b6f7a; --m3:#178f83; --m1:#c97400;
+    --up:#1e7d34; --dn:#c92c22; --warn:#a6740b;
+    --regbull:#178f83; --hidbull:#0e93a6; --regbear:#c92c22; --hidbear:#c97400;
+  }
+  html[data-theme="light"] code, html[data-theme="light"] kbd{background:#eef1f5;color:var(--ink)}
+  html[data-theme="light"] pre.src{background:#eef1f5;color:#1a2230}
+  html[data-theme="light"] .callout{background:rgba(166,116,11,.10)}
+  html[data-theme="light"] .callout.good{background:rgba(23,143,131,.10)}
+  html[data-theme="light"] .callout.bad{background:rgba(201,44,34,.09)}
+  html[data-theme="light"] .btn,
+  html[data-theme="light"] ol.steps li::before,
+  html[data-theme="light"] .tag{color:#fff}
+  html[data-theme="light"] .pill{color:#fff}
+  .theme-toggle{position:fixed;top:16px;right:20px;z-index:100;background:var(--panel);
+    border:1px solid var(--line);color:var(--ink);border-radius:20px;padding:6px 14px;
+    font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.35);
+    font-family:inherit;letter-spacing:.02em}
+  html[data-theme="light"] .theme-toggle{box-shadow:0 2px 10px rgba(0,0,0,.10)}
+  .theme-toggle:active{transform:translateY(1px)}
+@media(max-width:560px){.theme-toggle{top:10px;right:12px;padding:6px 10px;font-size:12px}body{padding-top:44px}}
+</style>
+<script>
+(function(){
+  try{
+    var t=localStorage.getItem('codexTheme');
+    if(t==='light'||t==='dark'){document.documentElement.setAttribute('data-theme',t);}
+  }catch(e){}
+})();
+</script>
+</head>
+<body>
+<button type="button" id="themeToggle" class="theme-toggle" aria-label="Toggle light/dark theme">&#9680; Light</button>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Krown Trading &middot; validated indicator</div>
+  <h1>CT RSI Divergence</h1>
+  <p class="sub">Reference copy + reinstall source for the <b>&ldquo;CT Rsi Div V6 &mdash; Replica&rdquo;</b> RSI-divergence
+  study &mdash; a bar-exact reconstruction of the Krown-course &ldquo;CT&rdquo; divergence indicator. Igor confirmed it
+  on his own charts (&ldquo;RSI is good&rdquo;) and it already lives in his TradingView library; this page is the copy of
+  record and the paste source if it ever needs reinstalling. <b>Honest note below:</b> as a discretionary confluence read it
+  is genuinely useful, but as a mechanical S1 entry filter our backtest found no measurable edge (Section&nbsp;4).</p>
+</header>
+
+<h2>1 &middot; What it draws</h2>
+<p>The indicator opens in <b>its own pane</b> (not on price). It plots a Wilder RSI, an optional smoothing signal line,
+marks confirmed RSI pivots, and flags the four classic divergence classes &mdash; <b>each toggleable and colour-coded</b>.
+Divergences are detected on the <b>RSI oscillator</b> (not on price); price is read at the RSI-pivot bar.</p>
+
+<div class="card">
+  <h3 style="margin-top:2px">The RSI pane</h3>
+  <ul class="tight">
+    <li><b>RSI line</b> (aqua, width 2) &mdash; Wilder RSI, default length <b>14</b>, source <code>close</code>.</li>
+    <li><b>Signal line</b> (white) &mdash; an SMA smoothing of the RSI, default length <b>9</b> (set to <b>0</b> to hide it).</li>
+    <li><b>Zone guides</b> &mdash; dotted line at <b>70</b> (green) and <b>30</b> (purple), a dashed midline at <b>50</b>,
+        with faint green/purple fills above 70 and below 30. Cosmetic, mirrors the CT pane look.</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:2px">The four divergence classes</h3>
+  <p class="muted" style="margin-top:0">Regular divergences draw a <b>solid</b> line; hidden divergences draw a
+  <b>dashed</b> line (The Caretaker&rsquo;s visual convention). Each class is a separate toggle with its own colour.</p>
+  <div class="legend" style="margin-bottom:10px">
+    <span><i class="sw" style="border-top-color:var(--regbull)"></i> Regular Bullish (solid)</span>
+    <span><i class="sw dash" style="border-top-color:var(--hidbull)"></i> Hidden Bullish (dashed)</span>
+    <span><i class="sw" style="border-top-color:var(--regbear)"></i> Regular Bearish (solid)</span>
+    <span><i class="sw dash" style="border-top-color:var(--hidbear)"></i> Hidden Bearish (dashed)</span>
+  </div>
+  <table>
+    <tr><th>Class</th><th>Line</th><th>Condition</th><th>Reads as</th><th>Colour (default)</th></tr>
+    <tr><td><b>Regular Bullish</b></td><td>solid</td><td class="n">price Lower-Low &amp; RSI Higher-Low</td><td>bottoming</td><td class="n">teal-green #26a69a</td></tr>
+    <tr><td><b>Hidden Bullish</b></td><td>dashed</td><td class="n">price Higher-Low &amp; RSI Lower-Low</td><td>uptrend continuation</td><td class="n">cyan #26c6da</td></tr>
+    <tr><td><b>Regular Bearish</b></td><td>solid</td><td class="n">price Higher-High &amp; RSI Lower-High</td><td>topping</td><td class="n">red #ef5350</td></tr>
+    <tr><td><b>Hidden Bearish</b></td><td>dashed</td><td class="n">price Lower-High &amp; RSI Higher-High</td><td>downtrend continuation</td><td class="n">orange #ff9800</td></tr>
+  </table>
+  <p class="muted" style="margin-bottom:0">Each confirmed divergence also drops a small <b>label</b> (&ldquo;Bull&rdquo;,
+  &ldquo;H Bull&rdquo;, &ldquo;Bear&rdquo;, &ldquo;H Bear&rdquo;) and a triangle marker &mdash; up-triangles at the pane
+  bottom for bullish, down-triangles at the top for bearish. Confirmed RSI pivots can also be dotted (lime = pivot low,
+  orange = pivot high). A divergence requires the two consecutive RSI pivots to sit <b>5&ndash;60 bars apart</b>
+  (<code>rangeLower</code>&hellip;<code>rangeUpper</code>).</p>
+</div>
+
+<div class="callout"><b>Confirmation lag &mdash; honest mode is the default.</b> An RSI pivot is only knowable
+<code>lbR</code> bars <i>after</i> it prints (you must see the bars to its right come in). So a divergence is only real at
+the <b>confirmation bar = pivot bar + lbR</b>, and by default the label and the alert fire there &mdash; exactly when the
+signal is actionable. An optional <b>&ldquo;Retro-draw&rdquo;</b> toggle draws the divergence line back to the two pivot bars
+for visual parity with Caretaker&rsquo;s chart; it places the mark <code>lbR</code> bars in the past, which makes the signal
+<i>look</i> earlier than it was tradable, so it is <b>OFF by default</b>. Nothing in the script uses future data.</div>
+
+<h3>Inputs (defaults)</h3>
+<table>
+  <tr><th>Input</th><th>What it does</th><th>Default</th></tr>
+  <tr><td>RSI Length</td><td>Wilder RSI period.</td><td class="n">14</td></tr>
+  <tr><td>RSI Source</td><td>Price series fed to the RSI.</td><td class="n">close</td></tr>
+  <tr><td>Signal MA Length</td><td>SMA smoothing of the RSI (white line); 0 hides it.</td><td class="n">9</td></tr>
+  <tr><td>Pivot Lookback Left (lbL)</td><td>Bars to the left required for an RSI pivot.</td><td class="n">5</td></tr>
+  <tr><td>Pivot Lookback Right (lbR)</td><td>Bars to the right &mdash; also the confirmation lag in bars.</td><td class="n">5</td></tr>
+  <tr><td>Min bars between pivots</td><td>rangeLower &mdash; closest two pivots may be.</td><td class="n">5</td></tr>
+  <tr><td>Max bars between pivots</td><td>rangeUpper &mdash; furthest two pivots may be.</td><td class="n">60</td></tr>
+  <tr><td>Class toggles</td><td>Show/hide each of the four classes independently.</td><td class="n">all on</td></tr>
+  <tr><td>Retro-draw line back to pivots</td><td>Reproduce Caretaker&rsquo;s back-drawn line (marks the past).</td><td class="n">false</td></tr>
+  <tr><td>Mark confirmed RSI pivots</td><td>Dots at each confirmed pivot bar.</td><td class="n">true</td></tr>
+  <tr><td>Show class labels</td><td>The Bull / H Bull / Bear / H Bear tags.</td><td class="n">true</td></tr>
+</table>
+<p class="muted">There is also an <b>alert</b> per class (&ldquo;Regular Bullish&rdquo;&hellip;&ldquo;Hidden Bearish&rdquo;) plus two
+convenience OR-alerts (&ldquo;Any Bullish&rdquo; / &ldquo;Any Bearish&rdquo;) &mdash; wire them from TradingView&rsquo;s alert dialog.
+Keeping <code>lbL = lbR</code> matches the Python replica; 5/5 is the TradingView default (cleaner), 3/3 finds more, shallower pivots.</p>
+
+<h2>2 &middot; Provenance &amp; trust</h2>
+<div class="card">
+  <ul class="tight">
+    <li><b>Bar-exact replica</b> of the Krown-course &ldquo;CT&rdquo; RSI-divergence indicator, built to the TradingView
+        built-in &ldquo;Divergence Indicator&rdquo; convention (the open-source root every community RSI-div script shares).</li>
+    <li><b>Reverse-engineered</b> from Igor&rsquo;s own TradingView chart exports &mdash; matched pivot-for-pivot against the
+        marks on his charts.</li>
+    <li><b>User-validated:</b> Igor confirmed it on his charts &mdash; <i>&ldquo;RSI is good&rdquo;</i>.</li>
+    <li><b>Already installed:</b> it sits in Igor&rsquo;s TradingView library today. This page is the <b>reference copy of
+        record</b> and the <b>paste source</b> if it ever needs reinstalling.</li>
+  </ul>
+  <p class="muted" style="margin-bottom:0">Written to Pine v6 built-ins only (<code>ta.rsi</code>, <code>ta.pivothigh/low</code>,
+  <code>line.new</code>, <code>label.new</code>, <code>plotshape</code>) to keep the paste low-risk. It is a faithful
+  <i>tool</i>, not an edge claim &mdash; see Section 4.</p>
+</div>
+
+<h2>3 &middot; Install / reinstall in TradingView</h2>
+<ol class="steps">
+  <li>Open your chart (this study works on any symbol/timeframe &mdash; it reads only the RSI).</li>
+  <li>If an older copy of the indicator is on the chart, <b>remove it</b> (hover its name &rarr; &times;).</li>
+  <li>Open the <b>Pine Editor</b> (bottom panel) &rarr; <b>Open</b> &rarr; <b>New blank indicator</b>.
+      (To overwrite your saved old script instead, open that script here.)</li>
+  <li>Select all existing code (<kbd>Cmd/Ctrl + A</kbd>) and delete it.</li>
+  <li><b>Copy the full source</b> from the block at the bottom of this page (button provided) and paste it in.</li>
+  <li>Click <b>Save</b>, name it e.g. <code>CT RsiDiv Replica</code>, then <b>Add to chart</b>.</li>
+  <li>It opens in <b>its own pane</b> below price. Tune colours and toggles in the indicator&rsquo;s <b>Settings</b> / <b>Style</b> tabs.</li>
+  <li>If you want visual parity with Caretaker&rsquo;s back-drawn lines, turn on <b>&ldquo;Retro-draw&rdquo;</b> in Settings
+      (remember it marks the past &mdash; see the note in Section 1).</li>
+</ol>
+
+<h2>4 &middot; As a trade filter &mdash; the honest verdict</h2>
+<div class="callout bad">
+  <b>Verdict: <span class="pill no">NO EDGE</span> RSI divergence does <u>not</u> add usable edge as a mechanical entry filter
+  on Strategy&nbsp;1.</b> Requiring a confirmed same-side divergence at the S1 entry does not turn the dead S1 baseline positive
+  on any timeframe or exit &mdash; <b>0 of 144</b> divergence-gated cells clear positive net expectancy with t&gt;2 raw, and
+  <b>0 of 144</b> survive Benjamini&ndash;Hochberg FDR correction (q=0.05). <b>Ship nothing.</b>
+</div>
+<p>We tested the replica (backtest <b>C7</b>) as an <b>entry gate</b> layered on the Strategy&nbsp;1 base: same-side
+Regular / Hidden / either divergence active in a causal 60-bar recency window, everything else (BBWP center gate,
+swing-20 stop, 9v21 trend exit) held fixed so only the entry requirement changed. BTCUSDT Binance perp, in-sample
+<b>2019-09-09 &rarr; 2024-12-31</b> (2025+ locked out). Grid: TF&nbsp;{15m, 1h} &times; exit&nbsp;{cross, pct} &times;
+div&nbsp;{none, reg, hid, either} &times; pivot&nbsp;{3/3, 5/5} &times; conf&nbsp;{div_alone, div_struct} &times;
+side&nbsp;{long, short, both}.</p>
+
+<h3>Headline ablation (15m, cross exit, 5/5 pivot &mdash; only the entry gate changes)</h3>
+<table>
+  <tr><th>Side</th><th>Variant</th><th>n</th><th>WR%</th><th>exp%net</th><th>t_ret</th><th>Usable?</th></tr>
+  <tr><td rowspan="4"><b>long</b></td><td>S1 baseline (no div)</td><td class="n">1706</td><td class="n">19.1</td><td class="n">-0.0680</td><td class="n">-1.80</td><td>baseline (dead)</td></tr>
+  <tr><td>+ regular same-side</td><td class="n">281</td><td class="n">17.8</td><td class="n">-0.1752</td><td class="n">-3.27</td><td>no</td></tr>
+  <tr><td>+ hidden same-side (Krown)</td><td class="n">863</td><td class="n">18.2</td><td class="n">-0.1215</td><td class="n">-2.51</td><td>no</td></tr>
+  <tr><td>+ either</td><td class="n">1036</td><td class="n">18.7</td><td class="n">-0.1161</td><td class="n">-2.74</td><td>no</td></tr>
+  <tr><td rowspan="4"><b>short</b></td><td>S1 baseline (no div)</td><td class="n">1493</td><td class="n">16.2</td><td class="n">-0.2229</td><td class="n">-9.32</td><td>baseline (dead)</td></tr>
+  <tr><td>+ regular same-side</td><td class="n">275</td><td class="n">15.6</td><td class="n">-0.1239</td><td class="n">-1.71</td><td>no</td></tr>
+  <tr><td>+ hidden same-side (Krown)</td><td class="n">717</td><td class="n">16.7</td><td class="n">-0.2328</td><td class="n">-7.00</td><td>no</td></tr>
+  <tr><td>+ either</td><td class="n">881</td><td class="n">16.3</td><td class="n">-0.2072</td><td class="n">-6.25</td><td>no</td></tr>
+  <tr><td rowspan="4"><b>both</b></td><td>S1 baseline (no div)</td><td class="n">3199</td><td class="n">17.7</td><td class="n">-0.1403</td><td class="n">-6.09</td><td>baseline (dead)</td></tr>
+  <tr><td>+ regular same-side</td><td class="n">556</td><td class="n">16.7</td><td class="n">-0.1498</td><td class="n">-3.34</td><td>no</td></tr>
+  <tr><td>+ hidden same-side (Krown)</td><td class="n">1580</td><td class="n">17.5</td><td class="n">-0.1720</td><td class="n">-5.65</td><td>no</td></tr>
+  <tr><td>+ either</td><td class="n">1917</td><td class="n">17.6</td><td class="n">-0.1580</td><td class="n">-5.74</td><td>no</td></tr>
+</table>
+
+<h3>What the grid says</h3>
+<ul class="tight">
+  <li><b>No positive edge.</b> The divergence requirement removes the vast majority of trades and the survivors do not cross
+      zero net-of-cost. The single strongest gated cell (1h / cross / hidden / 5-5 / div_alone / long, n=196, WR 25.5%) reaches
+      only exp%net +0.28% at <b>t_ret +1.22</b> &mdash; indistinguishable from zero, and it is one cherry from 144 cells.</li>
+  <li><b>The bumps are the trade-count trap.</b> Where a variant nudges win-rate or per-trade expectancy up, it does so by
+      amputating the sample &mdash; often down to double digits &mdash; so it is neither tradable nor trustworthy. That is
+      exactly the trap the research prior warned about.</li>
+  <li><b>FDR: nothing survives.</b> Of 144 gated cells, 24 have raw exp%net&gt;0, but <b>0</b> also reach t_ret&gt;2, and
+      <b>0</b> survive Benjamini&ndash;Hochberg correction at q=0.05. The sharpener is folklore for our use.</li>
+  <li><b>The confirmation is not doing hidden work.</b> Adding the EMA-structure sub-rule (div_struct) does not rescue a
+      positive edge either &mdash; there is simply no edge to find.</li>
+</ul>
+
+<div class="callout good"><b>So what is it good for?</b> The RSI-divergence tool is a <b>faithful, user-validated replica</b>
+&mdash; genuinely useful as a <b>discretionary confluence read</b> (hidden divergence on the trade side sharpening an entry,
+opposite-side regular divergence as a take-profit cue, the way Krown uses it). It just does <b>not</b> add measurable edge as a
+<i>mechanical</i> entry filter on S1 over our 5.3-year BTC tape. That settles the S1-with-RSI question: divergence is not the missing ceiling.</div>
+
+<h2>5 &middot; Full source &mdash; copy &amp; paste</h2>
+<div class="copybar">
+  <span class="muted">Select all inside the box, or use the button, then paste into a blank Pine indicator.</span>
+  <button class="btn" id="copyBtn">Copy Pine source</button>
+</div>
+<pre class="src" id="pineSrc">//@version=6
+// ============================================================================
+// CT Rsi Div V6 — Replica    (Krown research R2.2 · gift-grade tool for Igor)
+// ============================================================================
+// A faithful, open-source reconstruction of The_Caretaker&#x27;s &quot;CT Rsi Div V6&quot;
+// RSI-divergence study, built from the TradingView built-in &quot;Divergence
+// Indicator&quot; convention (the open-source root every community RSI-div script
+// shares). Plots Wilder RSI + a smoothing signal line, marks confirmed RSI
+// pivots, and flags the four classic divergence classes, each toggleable and
+// colour-coded, with an alertcondition() per class.
+//
+// WHY THIS EXISTS / WHAT IT IS NOT
+//   Krown uses divergence as OPTIONAL confluence for Strategy 1 (hidden
+//   divergence on the trade side sharpens entries; opposite-side regular
+//   divergence is a take-profit cue) and points at &quot;phantom/hidden&quot; divergences
+//   in his live short. The published literature finds NO isolated edge for RSI
+//   divergence in isolation (it needs structure/candle confirmation). So this
+//   is a faithful *tool*, NOT an edge claim. Treat the flags as confluence.
+//
+// CONFIRMATION LAG — READ THIS  (honest mode is the default)
+//   A pivot is only knowable `lbR` bars AFTER it prints (you must see the bars
+//   to its right come in higher/lower). So a divergence is only *real* at the
+//   CONFIRMATION bar = pivot bar + lbR. In the default (honest) mode the label
+//   and the alert fire AT the confirmation bar — exactly when the signal is
+//   actionable. The Caretaker-style look draws the divergence LINE back to the
+//   two pivot bars; that back-drawn line places a mark on history (it does not
+//   move afterwards, but it sits `lbR` bars in the past). Enable
+//   &quot;Retro-draw line back to pivots&quot; to reproduce that visual. Nothing here
+//   uses future data — but the retro line makes the signal LOOK earlier than it
+//   was tradable, hence it is OFF by default and clearly labelled.
+//
+// CONVENTIONS (locked to the TradingView built-in &quot;Divergence Indicator&quot;)
+//   * Pivots are detected on the OSCILLATOR (RSI), not on price. Price is read
+//     at the RSI-pivot bar: `low` at pivot lows (bullish family), `high` at
+//     pivot highs (bearish family).
+//   * Defaults: RSI 14, lbL 5, lbR 5, rangeLower 5, rangeUpper 60.
+//   * A divergence needs the two consecutive pivots `rangeLower`..`rangeUpper`
+//     bars apart. The previous-pivot reference always advances to the newest
+//     pivot regardless of that gate.
+//   * reg. bull = price Lower-Low  &amp; RSI Higher-Low   (bottoming)
+//     hid. bull = price Higher-Low &amp; RSI Lower-Low    (uptrend continuation)
+//     reg. bear = price Higher-High&amp; RSI Lower-High   (topping)
+//     hid. bear = price Lower-High &amp; RSI Higher-High  (downtrend continuation)
+//
+// USAGE
+//   Add to chart -&gt; opens in its own pane. Match the Python replica by keeping
+//   lbL=lbR (3/3 finds more, shallower pivots; 5/5 = TV default, cleaner). Turn
+//   on &quot;Retro-draw&quot; only for visual parity with Caretaker&#x27;s chart. Wire the
+//   per-class alertcondition()s from the alert dialog. This file is NOT compiled
+//   locally — paste into TradingView&#x27;s Pine editor; that is the compile check.
+//   It is deliberately kept to v6 built-ins (ta.rsi, ta.pivothigh/low, line.new,
+//   label.new, plotshape) to keep that paste low-risk.
+// ============================================================================
+
+indicator(title=&quot;CT Rsi Div V6 — Replica&quot;, shorttitle=&quot;CT RsiDiv Replica&quot;,
+     overlay=false, max_lines_count=500, max_labels_count=500)
+
+// ------------------------------- Inputs -------------------------------------
+grpR = &quot;RSI&quot;
+rsiLen = input.int(14, &quot;RSI Length&quot;, minval=1, group=grpR)
+src    = input.source(close, &quot;RSI Source&quot;, group=grpR)
+sigLen = input.int(9, &quot;Signal MA Length (0 = off)&quot;, minval=0, group=grpR,
+     tooltip=&quot;Smoothing of the RSI, drawn as the white signal line. 0 hides it.&quot;)
+
+grpP = &quot;Pivots / Range&quot;
+lbL      = input.int(5, &quot;Pivot Lookback Left (lbL)&quot;,  minval=1, group=grpP)
+lbR      = input.int(5, &quot;Pivot Lookback Right (lbR) — also the confirmation lag in bars&quot;,
+     minval=1, group=grpP)
+rangeMin = input.int(5,  &quot;Min bars between pivots (rangeLower)&quot;, minval=1, group=grpP)
+rangeMax = input.int(60, &quot;Max bars between pivots (rangeUpper)&quot;, minval=1, group=grpP)
+
+grpC = &quot;Classes (toggle)&quot;
+showRegBull = input.bool(true, &quot;Regular Bullish&quot;, group=grpC)
+showHidBull = input.bool(true, &quot;Hidden Bullish&quot;,  group=grpC)
+showRegBear = input.bool(true, &quot;Regular Bearish&quot;, group=grpC)
+showHidBear = input.bool(true, &quot;Hidden Bearish&quot;,  group=grpC)
+
+grpD = &quot;Display&quot;
+retro    = input.bool(false, &quot;Retro-draw line back to pivots (places marks in the past for visual parity)&quot;,
+     group=grpD)
+showPivs = input.bool(true, &quot;Mark confirmed RSI pivots (dots at pivot bar)&quot;, group=grpD)
+showLbl  = input.bool(true, &quot;Show class labels&quot;, group=grpD)
+
+grpK = &quot;Colours&quot;
+cRegBull = input.color(#26a69a, &quot;Regular Bullish&quot;, group=grpK)   // teal-green
+cHidBull = input.color(#26c6da, &quot;Hidden Bullish&quot;,  group=grpK)   // cyan
+cRegBear = input.color(#ef5350, &quot;Regular Bearish&quot;, group=grpK)   // red
+cHidBear = input.color(#ff9800, &quot;Hidden Bearish&quot;,  group=grpK)   // orange
+
+// -------------------------------- RSI ---------------------------------------
+osc = ta.rsi(src, rsiLen)                       // Wilder RSI (ta.rma internally)
+sig = sigLen &gt; 0 ? ta.sma(osc, sigLen) : na     // white signal line
+
+plot(osc, &quot;RSI&quot;, color=color.new(color.aqua, 0), linewidth=2)
+plot(sig, &quot;Signal&quot;, color=color.new(color.white, 0), linewidth=1)
+
+// zone guides (cosmetic, mirrors the CT pane look)
+hUp  = hline(70, &quot;Upper&quot;, color=color.new(color.green,  60), linestyle=hline.style_dotted)
+hMid = hline(50, &quot;Mid&quot;,   color=color.new(color.gray,   50), linestyle=hline.style_dashed)
+hDn  = hline(30, &quot;Lower&quot;, color=color.new(color.purple, 60), linestyle=hline.style_dotted)
+hTop = hline(100, &quot;&quot;, display=display.none)
+hBot = hline(0,   &quot;&quot;, display=display.none)
+fill(hUp, hTop, color=color.new(color.green,  92))
+fill(hDn, hBot, color=color.new(color.purple, 92))
+
+// ------------------------------- Pivots -------------------------------------
+pl = ta.pivotlow(osc, lbL, lbR)                 // NA unless a pivot low confirms
+ph = ta.pivothigh(osc, lbL, lbR)
+plFound = not na(pl)
+phFound = not na(ph)
+
+// persistent &quot;previous pivot&quot; trackers (self-consistent with the Python port)
+var int   plBar = na
+var float plOsc = na
+var float plLow = na
+var int   phBar = na
+var float phOsc = na
+var float phHigh = na
+
+// helper to draw a divergence line + label
+// hidden divergences draw DASHED (Caretaker&#x27;s visual convention); regular = solid
+drawDiv(int x1, float y1, int x2, float y2, color col, string txt, bool up, bool dashed) =&gt;
+    if retro
+        line.new(x1, y1, x2, y2, xloc=xloc.bar_index, color=col, width=2,
+             style=dashed ? line.style_dashed : line.style_solid)
+    if showLbl
+        // honest: label at the confirmation bar (bar_index); retro: at the pivot (x2)
+        lblX = retro ? x2 : bar_index
+        lblY = retro ? y2 : osc
+        style = up ? label.style_label_up : label.style_label_down
+        label.new(lblX, lblY, text=txt, xloc=xloc.bar_index, style=style,
+             color=col, textcolor=color.white, size=size.tiny)
+
+// class flags (global, for plotshape + alerts) --------------------------------
+bool regBull = false
+bool hidBull = false
+bool regBear = false
+bool hidBear = false
+
+// -------- bullish family: consecutive RSI pivot LOWS -------------------------
+if plFound
+    curBar = bar_index - lbR
+    curOsc = osc[lbR]
+    curLow = low[lbR]
+    if not na(plBar)
+        gap = curBar - plBar
+        inR = gap &gt;= rangeMin and gap &lt;= rangeMax
+        if inR
+            if curOsc &gt; plOsc and curLow &lt; plLow and showRegBull
+                regBull := true
+                drawDiv(plBar, plOsc, curBar, curOsc, cRegBull, &quot;Bull&quot;, true, false)
+            if curOsc &lt; plOsc and curLow &gt; plLow and showHidBull
+                hidBull := true
+                drawDiv(plBar, plOsc, curBar, curOsc, cHidBull, &quot;H Bull&quot;, true, true)
+    plBar := curBar
+    plOsc := curOsc
+    plLow := curLow
+
+// -------- bearish family: consecutive RSI pivot HIGHS ------------------------
+if phFound
+    curBar = bar_index - lbR
+    curOsc = osc[lbR]
+    curHigh = high[lbR]
+    if not na(phBar)
+        gap = curBar - phBar
+        inR = gap &gt;= rangeMin and gap &lt;= rangeMax
+        if inR
+            if curOsc &lt; phOsc and curHigh &gt; phHigh and showRegBear
+                regBear := true
+                drawDiv(phBar, phOsc, curBar, curOsc, cRegBear, &quot;Bear&quot;, false, false)
+            if curOsc &gt; phOsc and curHigh &lt; phHigh and showHidBear
+                hidBear := true
+                drawDiv(phBar, phOsc, curBar, curOsc, cHidBear, &quot;H Bear&quot;, false, true)
+    phBar := curBar
+    phOsc := curOsc
+    phHigh := curHigh
+
+// ------------------------- pivot dots (optional) ----------------------------
+// placed at the pivot bar (offset -lbR); they mark WHERE the pivot is, but only
+// become visible lbR bars later (confirmation). Purely cosmetic.
+plotshape(showPivs and plFound ? osc[lbR] : na, title=&quot;Pivot Low&quot;, offset=-lbR,
+     location=location.absolute, style=shape.circle, size=size.tiny,
+     color=color.new(color.lime, 0))
+plotshape(showPivs and phFound ? osc[lbR] : na, title=&quot;Pivot High&quot;, offset=-lbR,
+     location=location.absolute, style=shape.circle, size=size.tiny,
+     color=color.new(color.orange, 0))
+
+// -------------------- confirmation-bar shape markers ------------------------
+// honest markers at the confirmation bar (always at bar_index, no offset).
+plotshape(regBull, title=&quot;Regular Bullish (mark)&quot;, location=location.bottom,
+     style=shape.triangleup,   size=size.tiny, color=cRegBull)
+plotshape(hidBull, title=&quot;Hidden Bullish (mark)&quot;,  location=location.bottom,
+     style=shape.triangleup,   size=size.tiny, color=cHidBull)
+plotshape(regBear, title=&quot;Regular Bearish (mark)&quot;, location=location.top,
+     style=shape.triangledown, size=size.tiny, color=cRegBear)
+plotshape(hidBear, title=&quot;Hidden Bearish (mark)&quot;,  location=location.top,
+     style=shape.triangledown, size=size.tiny, color=cHidBear)
+
+// ------------------------------- Alerts -------------------------------------
+alertcondition(regBull, title=&quot;Regular Bullish divergence&quot;,
+     message=&quot;CT RsiDiv: Regular BULLISH divergence confirmed on {{ticker}} {{interval}}&quot;)
+alertcondition(hidBull, title=&quot;Hidden Bullish divergence&quot;,
+     message=&quot;CT RsiDiv: Hidden BULLISH divergence confirmed on {{ticker}} {{interval}}&quot;)
+alertcondition(regBear, title=&quot;Regular Bearish divergence&quot;,
+     message=&quot;CT RsiDiv: Regular BEARISH divergence confirmed on {{ticker}} {{interval}}&quot;)
+alertcondition(hidBear, title=&quot;Hidden Bearish divergence&quot;,
+     message=&quot;CT RsiDiv: Hidden BEARISH divergence confirmed on {{ticker}} {{interval}}&quot;)
+// convenience OR-alerts
+alertcondition(regBull or hidBull, title=&quot;Any Bullish divergence&quot;,
+     message=&quot;CT RsiDiv: BULLISH divergence (reg or hidden) on {{ticker}} {{interval}}&quot;)
+alertcondition(regBear or hidBear, title=&quot;Any Bearish divergence&quot;,
+     message=&quot;CT RsiDiv: BEARISH divergence (reg or hidden) on {{ticker}} {{interval}}&quot;)
+</pre>
+
+<div class="foot">
+  Krown Trading &middot; <code>CT_RsiDiv_Replica.pine</code> &middot; bar-exact replica of the Krown-course &ldquo;CT&rdquo;
+  RSI-divergence indicator, reverse-engineered from Igor&rsquo;s TradingView exports and user-validated
+  (&ldquo;RSI is good&rdquo;).<br>
+  Backtested as an S1 entry filter (C7): no usable mechanical edge &mdash; keep it as a discretionary confluence read.
+  This page is self-contained.
+</div>
+
+</div>
+<script>
+  (function(){
+    var btn=document.getElementById('copyBtn');
+    var pre=document.getElementById('pineSrc');
+    if(!btn||!pre)return;
+    btn.addEventListener('click',function(){
+      var txt=pre.innerText;
+      function done(){var o=btn.textContent;btn.textContent='Copied!';setTimeout(function(){btn.textContent=o;},1400);}
+      if(navigator.clipboard&&navigator.clipboard.writeText){
+        navigator.clipboard.writeText(txt).then(done,function(){fallback();});
+      }else{fallback();}
+      function fallback(){
+        var r=document.createRange();r.selectNodeContents(pre);
+        var s=window.getSelection();s.removeAllRanges();s.addRange(r);
+        try{document.execCommand('copy');done();}catch(e){}
+      }
+    });
+  })();
+</script>
+<script>
+  (function(){
+    var btn=document.getElementById('themeToggle');
+    if(!btn)return;
+    var NATIVE='dark'; // this doc's own default look when nothing is stored
+    function current(){return document.documentElement.getAttribute('data-theme')||NATIVE;}
+    function render(){
+      btn.textContent = current()==='light' ? '◑ Dark' : '◐ Light';
+    }
+    render();
+    btn.addEventListener('click',function(){
+      var next = current()==='light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', next);
+      try{localStorage.setItem('codexTheme', next);}catch(e){}
+      render();
+    });
+  })();
+</script>
+</body>
+</html>
