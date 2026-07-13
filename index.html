@@ -37,6 +37,40 @@
     --new-b:#3a2f0e; --new-i:#e6cf87;
   }
 }
+
+/* manual theme override (button) — explicit choice beats system preference */
+html[data-theme="light"]{
+  --bg:#f6f8fb; --panel:#ffffff; --panel-2:#f2f5f9;
+  --ink:#1a1e26; --soft:#5b6472; --line:#e3e8ee;
+  --accent:#2563eb; --accent-ink:#1d4ed8;
+  --shadow:0 1px 2px rgba(20,30,45,.06),0 8px 24px rgba(20,30,45,.06);
+  --card-hover:#f8fafd;
+  /* campaign tag colors (bg / ink) */
+  --t-annie-b:#e3edff; --t-annie-i:#1d4ed8;
+  --t-krown-b:#efe6ff; --t-krown-i:#6d28d9;
+  --t-david-b:#dcf5ee; --t-david-i:#0f7d6b;
+  --t-wsd-b:#fdeede;  --t-wsd-i:#b4551a;
+  --t-ind-b:#ffe4ef;  --t-ind-i:#be185d;
+  --new-b:#fde68a; --new-i:#7a5a10;
+}
+html[data-theme="dark"]{
+    --bg:#0e1117; --panel:#161b22; --panel-2:#1c2230;
+    --ink:#e6edf3; --soft:#9aa7b8; --line:#262d38;
+    --accent:#6aa9ff; --accent-ink:#93c1ff;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.4);
+    --card-hover:#1b2230;
+    --t-annie-b:#16233c; --t-annie-i:#8fb8ff;
+    --t-krown-b:#241a3a; --t-krown-i:#c4a8ff;
+    --t-david-b:#102b24; --t-david-i:#5fd6b3;
+    --t-wsd-b:#2a1d10;  --t-wsd-i:#f0a054;
+    --t-ind-b:#2c1420;  --t-ind-i:#f7a1c4;
+    --new-b:#3a2f0e; --new-i:#e6cf87;
+  }
+.theme-toggle{position:fixed;top:16px;right:16px;z-index:100;background:var(--panel);
+  color:var(--ink);border:1px solid var(--line);border-radius:20px;padding:8px 14px;
+  font-weight:700;font-size:13px;cursor:pointer;box-shadow:var(--shadow);font-family:inherit}
+.theme-toggle:active{transform:translateY(1px)}
+@media(max-width:560px){.theme-toggle{top:10px;right:12px;padding:6px 10px;font-size:12px}header.hero{padding-top:48px}}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{
@@ -153,8 +187,11 @@ footer .wrap{display:flex; flex-direction:column; gap:8px}
   .grid{grid-template-columns:1fr; gap:11px}
 }
 </style>
+<script>(function(){var t=localStorage.getItem("codexTheme");if(t)document.documentElement.dataset.theme=t;})();</script>
 </head>
 <body>
+<button type="button" id="themeToggle" class="theme-toggle" aria-label="Toggle light/dark theme"></button>
+
 
 <header class="hero">
   <div class="wrap">
@@ -324,5 +361,22 @@ footer .wrap{display:flex; flex-direction:column; gap:8px}
   </div>
 </footer>
 
+<script>
+(function(){
+  var btn=document.getElementById('themeToggle');
+  function effective(){
+    return document.documentElement.dataset.theme ||
+      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  }
+  function label(){ btn.innerHTML = effective()==='dark' ? '\u25D0 Light' : '\u25D1 Dark'; }
+  btn.addEventListener('click', function(){
+    var next = effective()==='dark' ? 'light' : 'dark';
+    document.documentElement.dataset.theme = next;
+    localStorage.setItem('codexTheme', next);
+    label();
+  });
+  label();
+})();
+</script>
 </body>
 </html>
