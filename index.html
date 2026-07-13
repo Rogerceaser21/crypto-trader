@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="color-scheme" content="dark light">
+<title>Crypto Trader</title>
+<style>
+/* ============ THEME ============ */
+:root{
+  --bg:#f6f8fb; --panel:#ffffff; --panel-2:#f2f5f9;
+  --ink:#1a1e26; --soft:#5b6472; --line:#e3e8ee;
+  --accent:#2563eb; --accent-ink:#1d4ed8;
+  --shadow:0 1px 2px rgba(20,30,45,.06),0 8px 24px rgba(20,30,45,.06);
+  --card-hover:#f8fafd;
+  /* campaign tag colors (bg / ink) */
+  --t-annie-b:#e3edff; --t-annie-i:#1d4ed8;
+  --t-krown-b:#efe6ff; --t-krown-i:#6d28d9;
+  --t-david-b:#dcf5ee; --t-david-i:#0f7d6b;
+  --t-wsd-b:#fdeede;  --t-wsd-i:#b4551a;
+  --t-ind-b:#ffe4ef;  --t-ind-i:#be185d;
+  --new-b:#fde68a; --new-i:#7a5a10;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#0e1117; --panel:#161b22; --panel-2:#1c2230;
+    --ink:#e6edf3; --soft:#9aa7b8; --line:#262d38;
+    --accent:#6aa9ff; --accent-ink:#93c1ff;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.4);
+    --card-hover:#1b2230;
+    --t-annie-b:#16233c; --t-annie-i:#8fb8ff;
+    --t-krown-b:#241a3a; --t-krown-i:#c4a8ff;
+    --t-david-b:#102b24; --t-david-i:#5fd6b3;
+    --t-wsd-b:#2a1d10;  --t-wsd-i:#f0a054;
+    --t-ind-b:#2c1420;  --t-ind-i:#f7a1c4;
+    --new-b:#3a2f0e; --new-i:#e6cf87;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji",sans-serif;
+  font-size:16px; line-height:1.55; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1080px; margin:0 auto; padding:0 18px}
+
+/* ============ HERO ============ */
+header.hero{
+  background:linear-gradient(135deg,var(--panel),var(--panel-2));
+  border-bottom:1px solid var(--line);
+  padding:34px 0 26px;
+}
+header.hero .wrap{display:flex; flex-direction:column; gap:10px}
+.brand{display:flex; align-items:center; gap:11px}
+.mark{
+  width:38px; height:38px; border-radius:11px; flex:0 0 auto;
+  background:linear-gradient(135deg,var(--accent),var(--accent-ink));
+  display:flex; align-items:center; justify-content:center;
+  color:#fff; font-weight:800; font-size:19px; letter-spacing:-.02em;
+  box-shadow:0 4px 12px rgba(37,99,235,.25);
+}
+h1{font-size:27px; line-height:1.1; margin:0; font-weight:800; letter-spacing:-.02em}
+.tagline{margin:0; color:var(--soft); font-size:15.5px; max-width:640px}
+.count{
+  margin-top:2px; font-size:12.5px; color:var(--soft);
+  display:inline-flex; align-items:center; gap:6px;
+}
+.count b{color:var(--ink); font-variant-numeric:tabular-nums}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--accent);display:inline-block}
+
+/* ============ SECTIONS ============ */
+main{padding:8px 0 40px}
+section{margin:26px 0 0}
+.sec-head{margin:0 0 4px}
+.sec-head h2{
+  font-size:19px; margin:0; font-weight:800; letter-spacing:-.01em;
+  display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;
+}
+.sec-head h2 .n{
+  font-size:12px; font-weight:800; color:var(--soft);
+  font-variant-numeric:tabular-nums; letter-spacing:.02em;
+}
+.sec-intro{margin:2px 0 14px; color:var(--soft); font-size:14.5px}
+
+/* ============ CARD GRID ============ */
+.grid{
+  display:grid; gap:13px;
+  grid-template-columns:repeat(auto-fill,minmax(258px,1fr));
+}
+a.card{
+  display:flex; flex-direction:column; text-decoration:none; color:inherit;
+  background:var(--panel); border:1px solid var(--line); border-radius:14px;
+  padding:15px 16px 13px; box-shadow:var(--shadow);
+  transition:transform .12s ease, border-color .12s ease, background .12s ease;
+  min-height:118px;
+}
+a.card:hover,a.card:focus-visible{
+  background:var(--card-hover); border-color:var(--accent);
+  transform:translateY(-2px); outline:none;
+}
+a.card:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.card .title{
+  font-size:16px; font-weight:750; line-height:1.28; letter-spacing:-.01em;
+  color:var(--ink); margin:0 0 6px; display:flex; align-items:flex-start; gap:8px;
+}
+.card .title .arrow{color:var(--accent); font-weight:700; flex:0 0 auto; opacity:.7}
+.card .desc{
+  font-size:13.5px; line-height:1.48; color:var(--soft); margin:0 0 12px; flex:1 1 auto;
+}
+.card .foot{
+  display:flex; align-items:center; justify-content:space-between; gap:8px;
+  margin-top:auto;
+}
+.date{font-size:12px; color:var(--soft); font-variant-numeric:tabular-nums; white-space:nowrap}
+.tag{
+  font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.04em;
+  border-radius:999px; padding:3px 10px; white-space:nowrap;
+}
+.tag.annie{background:var(--t-annie-b); color:var(--t-annie-i)}
+.tag.krown{background:var(--t-krown-b); color:var(--t-krown-i)}
+.tag.david{background:var(--t-david-b); color:var(--t-david-i)}
+.tag.wsd{background:var(--t-wsd-b); color:var(--t-wsd-i)}
+.tag.ind{background:var(--t-ind-b); color:var(--t-ind-i)}
+.badge-new{
+  font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.06em;
+  background:var(--new-b); color:var(--new-i); border-radius:6px; padding:2px 7px;
+  flex:0 0 auto;
+}
+.pending-note{
+  font-size:11.5px; color:var(--soft); margin:9px 0 0; font-style:italic;
+  border-top:1px dashed var(--line); padding-top:8px;
+}
+
+/* ============ FOOTER ============ */
+footer{
+  margin:36px 0 0; padding:22px 0 34px; border-top:1px solid var(--line);
+}
+footer .wrap{display:flex; flex-direction:column; gap:8px}
+.next{
+  font-size:14.5px; color:var(--ink); background:var(--panel); border:1px solid var(--line);
+  border-left:4px solid var(--accent); border-radius:10px; padding:12px 14px;
+}
+.next b{color:var(--accent-ink)}
+.sig{font-size:12.5px; color:var(--soft)}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width:430px){
+  .wrap{padding:0 14px}
+  header.hero{padding:26px 0 22px}
+  h1{font-size:24px}
+  .grid{grid-template-columns:1fr; gap:11px}
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="brand">
+      <div class="mark">C</div>
+      <h1>Crypto Trader</h1>
+    </div>
+    <p class="tagline">Every backtested strategy, decoded course, and indicator build in one place. Tap any card to open the full illustrated doc.</p>
+    <span class="count"><span class="dot"></span>&nbsp;<b>4</b>&nbsp;research campaigns &middot; <b>21</b> docs</span>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- 1. ANNIE -->
+  <section>
+    <div class="sec-head"><h2>Annie <span class="n">the flagship swing system</span></h2></div>
+    <p class="sec-intro">The complete Trading TTC course, extracted and validated end to end.</p>
+    <div class="grid">
+      <a class="card" href="Annie System Rulebook.html">
+        <div class="title"><span class="arrow">&rsaquo;</span><span>Annie System Rulebook</span></div>
+        <div class="desc">The complete Annie trading system, illustrated.</div>
+        <div class="foot"><span class="date">Jul 11</span><span class="tag annie">Annie</span></div>
+      </a>
+      <a class="card" href="Disagreement Gallery.html">
+        <div class="title"><span class="arrow">&rsaquo;</span><span>Disagreement Gallery</span></div>
+        <div class="desc">15 weeks where Igor's eye and the code disagreed on direction &mdash; awaiting his review.</div>
+        <div class="foot"><span class="date">Jul 11</span><span class="tag annie">Annie</span></div>
+      </a>
+      <a class="card" href="SCORECARD.html">
+        <div class="title"><span class="arrow">&rsaquo;</span><span>Scorecard</span></div>
+        <div class="desc">Verdicts on every Annie setup; Monday fade = the validated edge.</div>
+        <div class="foot"><span class="date">Jul 11</span><span class="tag annie">Annie</span></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- 2. KROWN -->
+  <section>
+    <div class="sec-head"><h2>Krown <span class="n">the Krown Quant Program</span></h2></div>
+    <p class="sec-intro">All 15 scalp strategies from the program, decoded, tested, and rescued where possible.</p>
+    <div class="grid">
+      <a class="card" href="Krown/Krown System Rulebook.html">
+        <div class="title"><span class="arrow">&rsaquo;</span><span>Krown System Rulebook</span></div>
+        <div class="desc">All 15 Krown scalp strategies decoded.</div>
+        <div class="foot"><span class="date">Jul 12</span><span class="tag krown">Krown</span></div>
+      </a>
+      <a class="card" href="Krown/SCORECARD.html">
+        <div class="title"><span class="arrow">&rsaquo;</span><span>Scorecard</span></div>
+        <div class="desc">Verdicts + the "$10k became" money table.</div>
+        <div class="foot"><span class="date">Jul 12</span><span class="tag krown">Krown</span></div>
+      </a>
+      <a class="card" href="Krown/Improvement Proposals.html">
+        <div class="title"><span class="arrow">&rsaquo;</span><span>Improvement Proposals</span></div>
+        <div class="desc">The rescue-and-improve campaign, including the trend system winner.</div>
+        <div class="foot"><span class="date">Jul 12</span><span class="tag krown">Krown</span></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- 3. DAVIDDTECH -->
+  <section>
+    <div class="sec-head"><h2>DaviddTech <span class="n">leaderboard strategies, our rigor</span></h2></div>
+    <p class="sec-intro">18 of his top strategies put through the same causal, out-of-sample testing.</p>
+    <div class="grid">
+      <a class="card" href="DaviddTech/Top 5 Candidates.html">
+        <div class="title"><span class="arrow">&rsaquo;</span><span>Top 5 Candidates</span></div>
+        <div class="desc">The screening shortlist.</div>
+        <div class="foot"><span class="date">Jul 12</span><span class="tag david">DaviddTech</span></div>
+      </a>
+      <a class="card" href="DaviddTech/SCORECARD.html">
+        <div class="title"><span class="arrow">&rsaquo;</span><span>Scorecard</span></div>
+        <div class="desc">18 cards, 5 validated engines, combined book projection.</div>
+        <div class="foot"><span class="date">Jul 12</span><span class="tag david">DaviddTech</span></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- 4. WEEKEND SD -->
+  <section>
+    <div class="sec-head"><h2>Weekend SD <span class="n">weekend &amp; Monday behaviour</span></h2></div>
+    <p class="sec-intro">Eleven reports mapping what weekends actually do and where the Monday fade edge lives.</p>
+    <div class="grid">
+      <a class="card" href="Weekend SD/Weekend SD Truth Report.html">
+        <div class="title"><span class="arrow">&rsaquo;</span><span>Weekend SD Truth Report</span></div>
+        <div class="desc">Igor's frozen SD constants audited: 5 of 6 wrong, corrected.</div>
+        <div class="foot"><span class="date">Jul 12</span><span class="tag wsd">Weekend SD</span></div>
+      </a>
+      <a class="card" href="Weekend SD/Monday Counter-Trade Backtest.html">
+        <div class="title"><span class="arrow">&rsaquo;</span><span>Monday Counter-Trade Backtest</span></div>
+        <div class="desc">Naked SD-level fade: no edge, 0/48.</div>
+        <div class="foot"><span class="date">Jul 12</span><span class="tag wsd">Weekend SD</span></div>
+      </a>
+      <a class="card" href="Weekend SD/Weekend Anatomy Report.html">
+        <div class="title"><span class="arrow">&rsaquo;</span><span>Weekend Anatomy Report</span></div>
+        <div class="desc">What weekends actually do: Monday-green myth busted, Sunday burst real.</div>
+        <div class="foot"><span class="date">Jul 12</span><span class="tag wsd">Weekend SD</span></div>
+      </a>
+      <a class="card" href="Weekend SD/Weekend Direction Bake-off.html">
+        <div class="title"><span class="arrow">&rsaquo;</span><span>Weekend Direction Bake-off</span></div>
+        <div class="desc">5 direction pickers vs always-long: none win.</div>
+        <div class="foot"><span class="date">Jul 12</span><span class="tag wsd">Weekend SD</span></div>
+      </a>
+      <a class="card" href="Weekend SD/Weekend Play Combined Backtest.html">
+        <div class="title"><span class="arrow">&rsaquo;</span><span>Weekend Play Combined Backtest</span></div>
+        <div class="desc">Ride weekend + flip at M/W: no robust value.</div>
+        <div class="foot"><span class="date">Jul 12</span><span class="tag wsd">Weekend SD</span></div>
+      </a>
+      <a class="card" href="Weekend SD/Weekend SD Playbook.html">
+        <div class="title"><span class="arrow">&rsaquo;</span><span>Weekend SD Playbook</span></div>
+        <div class="desc">The one-pager: all weekend verdicts on 11 cards.</div>
+        <div class="foot"><span class="date">Jul 12</span><span class="tag wsd">Weekend SD</span></div>
+      </a>
+      <a class="card" href="Weekend SD/Monday Fade x SD Levels Confluence.html">
+        <div class="title"><span class="arrow">&rsaquo;</span><span>Monday Fade &times; SD Levels Confluence</span></div>
+        <div class="desc">Igor's real question: SD levels as fade confluence &rarr; sizing rule.</div>
+        <div class="foot"><span class="date">Jul 12</span><span class="tag wsd">Weekend SD</span></div>
+      </a>
+      <a class="card" href="Weekend SD/Monday Breakout Continuation Backtest.html">
+        <div class="title"><span class="arrow">&rsaquo;</span><span>Monday Breakout Continuation Backtest</span></div>
+        <div class="desc">The honest flip of the dead fade: parked below the bar.</div>
+        <div class="foot"><span class="date">Jul 12</span><span class="tag wsd">Weekend SD</span></div>
+      </a>
+      <a class="card" href="Weekend SD/Why the Monday Fade Works.html">
+        <div class="title"><span class="arrow">&rsaquo;</span><span>Why the Monday Fade Works</span></div>
+        <div class="desc">The mechanism: CME-gap magnetism, 17 sources.</div>
+        <div class="foot"><span class="date">Jul 12</span><span class="tag wsd">Weekend SD</span></div>
+      </a>
+      <a class="card" href="Weekend SD/Monday Fade Trigger Bake-off 2.html">
+        <div class="title"><span class="arrow">&rsaquo;</span><span>Monday Fade Trigger Bake-off 2</span></div>
+        <div class="desc">15 challenger indicators vs the PVSRA trigger: trigger wins.</div>
+        <div class="foot"><span class="date">Jul 12</span><span class="tag wsd">Weekend SD</span></div>
+      </a>
+      <a class="card" href="Weekend SD/Monday Fade Exit Improvements.html">
+        <div class="title"><span class="arrow">&rsaquo;</span><span>Monday Fade Exit Improvements</span></div>
+        <div class="desc">No exit beats 1.9R; refund rule proven inert.</div>
+        <div class="foot"><span class="date">Jul 12</span><span class="tag wsd">Weekend SD</span></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- 5. INDICATORS -->
+  <section>
+    <div class="sec-head"><h2>Indicators <span class="n">TradingView builds</span></h2></div>
+    <p class="sec-intro">Live indicators that came out of the strategy work &mdash; install guide + source.</p>
+    <div class="grid">
+      <a class="card" href="Weekend SD/Dynamic Weekend Levels — Install Guide.html">
+        <div class="title"><span class="arrow">&rsaquo;</span><span>Dynamic Weekend Levels &mdash; Install Guide</span></div>
+        <div class="desc">Weekend + Monday SD Levels LIVE: install + source.</div>
+        <div class="foot"><span class="date">Jul 12 &middot; fixed Jul 13</span><span class="tag ind">Indicators</span></div>
+      </a>
+      <a class="card" href="Krown/CT RSI Divergence.html">
+        <div class="title"><span class="arrow">&rsaquo;</span><span>CT RSI Divergence</span><span class="badge-new">New</span></div>
+        <div class="desc">CT RSI Divergence replica: install + source.</div>
+        <div class="foot"><span class="date">Jul 13</span><span class="tag ind">Indicators</span></div>
+        <p class="pending-note">Page being built &mdash; link may 404 for a few hours.</p>
+      </a>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="next"><b>Next phase:</b> TradingView strategies + trade plans for everything that passed testing.</div>
+    <div class="sig">Crypto Trader &middot; built with Claude</div>
+  </div>
+</footer>
+
+</body>
+</html>
