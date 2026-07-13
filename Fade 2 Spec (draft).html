@@ -1,0 +1,631 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Annie's Monday Fade 2 — Mechanical Spec (draft)</title>
+<style>
+  :root{
+    --bg:#0e1117; --panel:#161b22; --panel2:#1c2230; --ink:#e6edf3; --muted:#9aa4b2;
+    --line:#2a3140; --accent:#6aa9ff; --up:#3fb950; --dn:#f85149; --warn:#e3b341;
+    --crisp:#26a69a; --fuzzy:#e3b341; --unknown:#9598a1;
+    --sourced:#3fb950; --inferred:#e3b341; --missing:#f85149;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.62 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  .wrap{max-width:980px;margin:0 auto;padding:34px 22px 90px;}
+  header{border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:8px}
+  .eyebrow{letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:var(--accent);font-weight:700}
+  h1{font-size:30px;margin:8px 0 6px;line-height:1.2}
+  h2{font-size:21px;margin:40px 0 12px;padding-top:8px;border-top:1px solid var(--line)}
+  h3{font-size:16.5px;margin:24px 0 8px;color:var(--ink)}
+  h4{font-size:14px;margin:16px 0 6px;color:var(--accent);text-transform:uppercase;letter-spacing:.05em}
+  p{color:var(--ink)}
+  .sub{color:var(--muted);font-size:15px;max-width:74ch}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:14px 0}
+  code{background:#0b0f16;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13.5px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--panel2);color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+  td.n{font-family:ui-monospace,Menlo,monospace;white-space:nowrap}
+  .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  /* tags */
+  .tag{display:inline-block;font-size:10.5px;font-weight:800;border-radius:20px;padding:2px 9px;color:#0b0f16;white-space:nowrap;letter-spacing:.03em}
+  .tag.sourced{background:var(--sourced)} .tag.inferred{background:var(--inferred)} .tag.missing{background:var(--missing);color:#fff}
+  .tag.crisp{background:var(--crisp)} .tag.fuzzy{background:var(--fuzzy)} .tag.unknown{background:var(--unknown)}
+  .src{color:var(--muted);font-size:12px;font-style:italic}
+  .callout{border-left:4px solid var(--warn);background:rgba(227,179,65,.08);padding:12px 16px;border-radius:8px;margin:14px 0}
+  .callout.good{border-left-color:var(--crisp);background:rgba(38,166,154,.08)}
+  .callout.bad{border-left-color:var(--dn);background:rgba(248,81,73,.09)}
+  .callout.q{border-left-color:var(--accent);background:rgba(106,169,255,.08)}
+  .callout b{color:var(--ink)}
+  .muted{color:var(--muted)}
+  ul.tight{margin:6px 0 6px 0;padding-left:20px} ul.tight li{margin:5px 0}
+  .steplead{display:inline-block;font-weight:800;color:var(--accent);margin-right:8px}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;margin:10px 0;font-size:12.5px;color:var(--muted);align-items:center}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  ol.q{counter-reset:qq;list-style:none;padding-left:0;margin:0}
+  ol.q>li{position:relative;padding:14px 0 14px 44px;border-bottom:1px solid var(--line)}
+  ol.q>li:last-child{border-bottom:0}
+  ol.q>li::before{counter-increment:qq;content:counter(qq);position:absolute;left:0;top:14px;
+    width:30px;height:30px;border-radius:50%;background:var(--accent);color:#0b0f16;font-weight:800;
+    display:flex;align-items:center;justify-content:center;font-size:14px}
+  .prop{display:block;margin-top:6px;padding:8px 12px;border-radius:8px;background:rgba(38,166,154,.09);border:1px solid rgba(38,166,154,.25);font-size:13.5px}
+  .prop b{color:var(--crisp)}
+  .foot{color:var(--muted);font-size:12.5px;margin-top:50px;border-top:1px solid var(--line);padding-top:16px}
+  .kv{font-size:12px;color:var(--muted)}
+  /* ---- Theme toggle ---- */
+  html[data-theme="light"]{
+    --bg:#f7f9fc; --panel:#ffffff; --panel2:#eef1f6; --ink:#1a2230; --muted:#5b6472;
+    --line:#d7dde6; --accent:#2f6fe0; --up:#1e7d34; --dn:#c92c22; --warn:#a6740b;
+    --crisp:#178f83; --fuzzy:#a6740b; --unknown:#6b6f7a;
+    --sourced:#1e7d34; --inferred:#a6740b; --missing:#c92c22;
+  }
+  html[data-theme="light"] code{background:#eef1f5;color:var(--ink)}
+  html[data-theme="light"] .callout{background:rgba(166,116,11,.10)}
+  html[data-theme="light"] .callout.good{background:rgba(23,143,131,.10)}
+  html[data-theme="light"] .callout.bad{background:rgba(201,44,34,.09)}
+  html[data-theme="light"] .callout.q{background:rgba(47,111,224,.08)}
+  html[data-theme="light"] .tag.sourced,html[data-theme="light"] .tag.crisp{color:#fff}
+  html[data-theme="light"] .tag.inferred,html[data-theme="light"] .tag.fuzzy,html[data-theme="light"] .tag.unknown{color:#fff}
+  html[data-theme="light"] ol.q>li::before{color:#fff}
+  .theme-toggle{position:fixed;top:16px;right:20px;z-index:100;background:var(--panel);
+    border:1px solid var(--line);color:var(--ink);border-radius:20px;padding:6px 14px;
+    font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.35);
+    font-family:inherit;letter-spacing:.02em}
+  html[data-theme="light"] .theme-toggle{box-shadow:0 2px 10px rgba(0,0,0,.10)}
+  .theme-toggle:active{transform:translateY(1px)}
+@media(max-width:560px){.theme-toggle{top:10px;right:12px;padding:6px 10px;font-size:12px}body{padding-top:44px}}
+</style>
+<script>
+(function(){try{var t=localStorage.getItem('codexTheme');var e=(t==='light'||t==='dark')?t:((window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light');document.documentElement.setAttribute('data-theme',e);}catch(e){}})();
+</script>
+</head>
+<body>
+<button type="button" id="themeToggle" class="theme-toggle" aria-label="Cycle theme: light, dark, or system">&#9683; Auto</button>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Annie Trading &middot; Task F4 &middot; mechanical spec DRAFT</div>
+  <h1>Annie's Monday Fade 2</h1>
+  <p class="sub">The full weekly system as Igor described it (2026-07-13), fleshed out from the course
+  material and his own hand-labelled backtests. This is a <b>research + writing draft</b> — no backtest was run.
+  Its job is to state every rule with a <b>source</b>, be honest about what is <b>crisp</b> versus <b>fuzzy</b>,
+  and hand Igor a numbered list of the exact decisions that block a mechanical detector, each with a proposed
+  default he can approve or override.</p>
+  <div class="legend">
+    <span><span class="tag sourced">SOURCED</span> explicit in the material</span>
+    <span><span class="tag inferred">INFERRED</span> reasonable reading &mdash; flagged</span>
+    <span><span class="tag missing">MISSING</span> not in the material</span>
+    <span style="margin-left:8px">&nbsp;</span>
+    <span><span class="tag crisp">CRISP</span></span>
+    <span><span class="tag fuzzy">FUZZY</span></span>
+    <span><span class="tag unknown">UNKNOWN</span></span>
+  </div>
+  <p class="kv" style="margin-top:12px">Sources: <code>Annie System Rulebook (source).md</code> v2.1 &middot; 24 video
+  transcripts (<code>transcripts/</code>) &middot; Igor's 7-tab backtest workbook (<code>data/tab_*.csv</code>) &middot;
+  <code>detectors/CALIBRATION_V2.md</code> &middot; Igor's 8 rulings (2026-07-11). Timestamps like <code>~[04:01]</code>
+  are the position in the named transcript, not a verified clock time.</p>
+</header>
+
+<h2>Verdict &mdash; how mechanizable is this, honestly?</h2>
+<div class="callout">
+  <b>Fade 2 is a crisp scaffold wrapped around a discretionary core.</b> Everything that is a <i>number</i> &mdash;
+  the session clock, PVSRA volume classes, the EMA stack, the SVC shape, the Friday exit &mdash; is codeable today and
+  already coded. Everything that is a <i>reading</i> &mdash; which move is the "fake" one, which wick is a valid M/W,
+  <b>which way it breaks</b>, and how many levels have printed &mdash; is where Annie herself says you will "feel confused
+  for a very long time," and it is where our detectors land near a coin-flip against Igor's own labels. A fully
+  deterministic Fade-2 detector is <b>not</b> achievable from the material as written; a <b>scaffold + calibrated-proxy
+  hybrid</b> (fire on the crisp gates, score the fuzzy core, let Igor's labels tune the thresholds) is.
+</div>
+
+<div class="scroll">
+<table>
+  <tr><th>#</th><th>Component (Igor's step)</th><th>Verdict</th><th>Why &mdash; and the hard evidence</th></tr>
+  <tr>
+    <td class="n">1</td><td><b>Time anchors + weekend box</b><br><span class="muted">Monday fake move, step&nbsp;1</span></td>
+    <td><span class="tag crisp">CRISP</span> clock<br><span class="tag fuzzy">FUZZY</span> "fake"</td>
+    <td>The 5pm-NY day/week and the Asia/UK/US sessions are fully mechanical (rulebook &sect;1). Detecting <i>which</i>
+    Monday move is the fake and drawing the weekend box "to close-clusters, not wicks" is parameterized, not exact.
+    Igor's data anchors it: FMWB weeks peak <b>Monday 14/17</b>.</td>
+  </tr>
+  <tr>
+    <td class="n">2</td><td><b>W / FDW on the 1H</b><br><span class="muted">step&nbsp;2</span></td>
+    <td><span class="tag fuzzy">FUZZY</span> <span class="muted">(weakest link)</span></td>
+    <td>Peak-2 only needs to be "in the vicinity" (no hard number; 25&ndash;35% is the extreme edge). Against Igor's
+    labels the <b>exact M/W/FD type agrees 33%</b> and the <b>trigger direction is a coin-flip (50%)</b>
+    (<code>CALIBRATION_V2</code>). The FD hammer-close is the one crisp part.</td>
+  </tr>
+  <tr>
+    <td class="n">3</td><td><b>Vector + 50-EMA cross + 15m retest</b><br><span class="muted">step&nbsp;3</span></td>
+    <td><span class="tag crisp">CRISP</span> gates<br><span class="tag fuzzy">FUZZY</span> "required?"</td>
+    <td>PVSRA 200% and the 50-EMA cross are numeric. The 2-of-4 retest menu is a clean rule and calibrates decently
+    (50EMA-retest-15m <b>65%</b>). The open snag: Igor says the cross is "preferred, NOT required" for the fade entry,
+    which conflicts with the rulebook's "L1 must break the 50 with a vector or it doesn't count" &mdash; see
+    <a href="#q1">Q1</a>.</td>
+  </tr>
+  <tr>
+    <td class="n">4</td><td><b>15m/5m PVSRA micro-anatomy</b><br><span class="muted">"MM shows up 3&times;", step&nbsp;4</span></td>
+    <td><span class="tag unknown">UNKNOWN</span></td>
+    <td>The rule is stated precisely (3 same-colour trap candles on the inside-right, entry = first opposite-colour
+    candle) and is <i>codeable</i>. But <b>no spreadsheet column labels it</b>, so we cannot yet measure whether our
+    detector matches Igor's eye. Ships as unverified confluence &mdash; see <a href="#q10">Q10</a>.</td>
+  </tr>
+  <tr>
+    <td class="n">5</td><td><b>L1 / L2 / L3 level count</b><br><span class="muted">"hold 3 levels", step&nbsp;5</span></td>
+    <td><span class="tag fuzzy">FUZZY</span></td>
+    <td>Annie: "counting levels is probably the most difficult part of the method." Detector agrees with Igor's
+    "3 levels" labels only <b>45&ndash;53%</b>. Cluster grouping (~4&ndash;6 bars = one level) and the "damage is done →
+    count on 15m" shortcut are both unquantified. The 100x/50x/25x liquidation story is narrative, not a mechanical input.</td>
+  </tr>
+  <tr>
+    <td class="n">6</td><td><b>Exit at L3 = midweek reversal</b><br><span class="muted">step&nbsp;6</span></td>
+    <td><span class="tag crisp">CRISP</span> shape<br><span class="tag fuzzy">FUZZY</span> "is it L3?"</td>
+    <td>The SVC shape is fixed and calibrates at <b>61%</b>; the MWR day-window (Wed/Thu, Igor's tab clusters Tue&ndash;Thu)
+    and the Friday-UK-close hard stop are crisp. But "we are at L3" inherits all the fuzz of step&nbsp;5, and Igor's own
+    warning &mdash; exit at the reversal, <i>not</i> inside a consolidating level &mdash; is a judgement call.</td>
+  </tr>
+</table>
+</div>
+
+<div class="callout good"><b>Bottom line for the build.</b> Code the scaffold as hard gates (clock, PVSRA, EMA cross,
+SVC shape, Friday close). Treat the M/W read, the direction, and the level count as <b>scored proxies</b> calibrated
+against Igor's 36 labelled weeks, not as ground truth. Ship Fade 2 as a <b>ranked-candidate detector</b> (it proposes
+setups with a confidence, Igor's labels grade it), and resolve the <a href="#opens">12 open questions</a> below before
+freezing thresholds.</div>
+
+<h2>The 6-step system, rule by rule</h2>
+<p class="muted">Each rule carries a source tag and a colour tag. <span class="tag sourced">SOURCED</span> = stated in the
+material; <span class="tag inferred">INFERRED</span> = our reading, flagged so Igor can veto; <span class="tag missing">MISSING</span>
+= genuinely absent and parked as an open question.</p>
+
+<!-- STEP 1 -->
+<h3><span class="steplead">Step 1</span> The Monday fake move (the fade itself)</h3>
+<p class="src">Primary sources: rulebook &sect;1 "weekly script"; "The Weekly Setup V2" ~[00:00&ndash;02:00]; "Weekly Setup (Week 1)"
+~[03:31&ndash;04:31]; "Week 3 Entries and Exits" ~[00:00&ndash;00:30]; sheet <code>tab_Weekends_Move</code>.</p>
+<div class="scroll">
+<table>
+  <tr><th>Rule</th><th>Tag</th><th>Source</th></tr>
+  <tr><td>The week opens with a <b>False Move Week Beginning (FMWB)</b> around 5pm-NY Sunday (CME open), but it can print
+    anywhere across Asia/UK/US on Monday; for crypto it is usually near the open.</td>
+    <td><span class="tag sourced">SOURCED</span></td><td class="src">"Weekly Setup V2" ~[00:00&ndash;01:00]; rulebook &sect;1</td></tr>
+  <tr><td>Purpose of the fake move: stop out / liquidate weekend holders and trigger breakout orders, then shift price
+    the other way. This is the direction Fade&nbsp;2 trades <i>against</i>.</td>
+    <td><span class="tag sourced">SOURCED</span></td><td class="src">"Weekly Setup V2" ~[00:30]</td></tr>
+  <tr><td>The fake move is spotted as a <b>spike out of the weekend box</b>; the box is drawn from the candle after
+    Friday US close to <b>close-clusters, not wicks</b>.</td>
+    <td><span class="tag sourced">SOURCED</span></td><td class="src">rulebook &sect;1 (&#10003;frames); "Weekly Setup (Week 1)" ~[03:31]</td></tr>
+  <tr><td>If there is <b>no</b> clean spike out of the box, look for a W or M <i>inside</i> the box instead &mdash;
+    that is the other way the trap is issued.</td>
+    <td><span class="tag sourced">SOURCED</span></td><td class="src">"Week 3" ~[00:00&ndash;00:30]</td></tr>
+  <tr><td><b>No weekend stop-hunt and no M/W = no FMWB trade that week.</b> Some weeks are just a range and are un-tradable.</td>
+    <td><span class="tag sourced">SOURCED</span></td><td class="src">rulebook &sect;1; "Week 2" ~[01:30]</td></tr>
+  <tr><td>Guard rail: if Asia runs a range wider than <b>2%</b>, a session shift is likely &mdash; sit the day out.</td>
+    <td><span class="tag sourced">SOURCED</span></td><td class="src">"Weekly Setup V2" ~[01:30]; rulebook &sect;2</td></tr>
+  <tr><td>Fade-2 direction convention: fade the false move &rarr; a Monday spike <b>down</b> (Igor's example) sets up a
+    <b>long</b> off a W at the LOW; a spike up sets up a short off an M at the HOW.</td>
+    <td><span class="tag inferred">INFERRED</span></td><td class="src">reading of &sect;1 + Igor's description; see <a href="#q2">Q2</a></td></tr>
+</table>
+</div>
+
+<!-- STEP 2 -->
+<h3><span class="steplead">Step 2</span> W formation (&plusmn; Final Damage W) on the 1H</h3>
+<p class="src">Primary sources: "M and W Multi Session V2" (whole); "v2 M and W's" ~[00:00&ndash;05:00]; "Final Damage M and W" (whole);
+rulebook &sect;2 "M/W pattern validity" + ruling #5.</p>
+<div class="scroll">
+<table>
+  <tr><th>Rule</th><th>Tag</th><th>Source</th></tr>
+  <tr><td>The reversal of the fake move is a <b>W</b> (long) or <b>M</b> (short), valid only at the weekly/daily extreme
+    (LOD/LOW for W, HOD/HOW for M). Finding it <b>on the 1H</b> means you have a weekly reversal.</td>
+    <td><span class="tag sourced">SOURCED</span></td><td class="src">"Multi Session" ~[04:32]; rulebook &sect;2</td></tr>
+  <tr><td><b>Multi-session M/W is the #1 weekly entry:</b> peak&nbsp;1 in one session, peak&nbsp;2 falls short in a later
+    session/day. Best case: peak&nbsp;1 in Asia, peak&nbsp;2 at UK open &mdash; "almost guaranteeing a three-level drop."</td>
+    <td><span class="tag sourced">SOURCED</span></td><td class="src">"Multi Session" ~[00:00],[03:02&ndash;03:32]</td></tr>
+  <tr><td>Peak&nbsp;2 is a <b>lower high</b> (M) / <b>higher low</b> (W) and must be "in the vicinity" of peak&nbsp;1;
+    the spike must pull away <b>fast</b>. No hard shortfall number.</td>
+    <td><span class="tag sourced">SOURCED</span></td><td class="src">"v2 M and W's" ~[04:02&ndash;04:32]; ruling #5</td></tr>
+  <tr><td>Calibrated peak-2 outer bound: a shortfall/overshoot beyond <b>35%</b> of the internal leg is a breakout, not an
+    M/W. (Grid-chosen on Igor's weeks; ties broke tighter.)</td>
+    <td><span class="tag inferred">INFERRED</span></td><td class="src"><code>CALIBRATION_V2</code> peak-2 grid; see <a href="#q4">Q4</a></td></tr>
+  <tr><td><b>Final Damage W/M</b> variant: peak&nbsp;2 <i>overshoots</i> peak&nbsp;1 (FDW second low below the first) at the
+    extreme, with a <b>mandatory 15m hammer / inverted-hammer close</b> on peak&nbsp;2. Higher failure rate, better R:R.</td>
+    <td><span class="tag sourced">SOURCED</span></td><td class="src">"Final Damage M and W" ~[01:00&ndash;01:30]; rulebook &sect;2</td></tr>
+  <tr><td>Validation on <b>candle close</b> as a hammer / inverted hammer "or other reversal candle." Wait for the close.</td>
+    <td><span class="tag sourced">SOURCED</span></td><td class="src">"Multi Session" ~[07:34]</td></tr>
+  <tr><td>Stop: below the <b>first spike's wick low / LOD</b> (W), mirror above the spike high / HOD (M). For a Final Damage
+    entry the stop goes <b>beyond the formation's extreme peak</b> (Igor ruling #3, corrects the slide).</td>
+    <td><span class="tag sourced">SOURCED</span></td><td class="src">"Multi Session" ~[07:34]; ruling #3</td></tr>
+  <tr><td>An M/W is <b>not confirmed until it retests</b> (step&nbsp;3). Invalidation is <b>only</b> a close beyond the
+    second peak &mdash; a no-volume L1 is not an exit.</td>
+    <td><span class="tag sourced">SOURCED</span></td><td class="src">"v2 M and W's" ~[05:02]; rulebook &sect;2</td></tr>
+</table>
+</div>
+
+<!-- STEP 3 -->
+<h3><span class="steplead">Step 3</span> PVSRA vector + 50-EMA cross + 15m retest</h3>
+<p class="src">Primary sources: rulebook &sect;1&ndash;2 + ruling #1; "The Weekly Setup V2" ~[04:01&ndash;07:33]; "Weekly Setup (Week 1)"
+~[01:00&ndash;02:00]; "Week 4" ~[02:31&ndash;03:31]; "v2-VSC and Volume".</p>
+<div class="scroll">
+<table>
+  <tr><th>Rule</th><th>Tag</th><th>Source</th></tr>
+  <tr><td>A <b>vector candle</b> = PVSRA red/green, volume &ge; <b>200%</b> of the prior-10-candle average
+    (blue/magenta = &ge;150%). Fully numeric.</td>
+    <td><span class="tag sourced">SOURCED</span></td><td class="src">"v2-VSC" ~[00:00&ndash;03:31]; rulebook &sect;2</td></tr>
+  <tr><td><b>Level 1 breaks the 50 EMA with a high-volume vector</b> (any timeframe). A 50-EMA break lacking volume "is
+    generally not counted as a level 1."</td>
+    <td><span class="tag sourced">SOURCED</span></td><td class="src">"Weekly Setup V2" ~[04:01&ndash;05:02]; rulebook &sect;1</td></tr>
+  <tr><td>Igor's "cross preferred, NOT required" for the fade entry reconciles like this: the <b>aggressive second-peak
+    M/W entry does not wait</b> for the vector-cross (you are in on the peak, invalidated only by a close beyond peak&nbsp;2);
+    the vector-cross is what lets you <b>count L1</b> for the 3-level hold and is the conservative confirmation.</td>
+    <td><span class="tag inferred">INFERRED</span></td><td class="src">reconciles Igor 2026-07-13 with "Week 4" ~[02:31&ndash;03:31]; see <a href="#q1">Q1</a></td></tr>
+  <tr><td>Drop to the <b>15m for the actual entry</b> (better R:R), then switch back to the 1H to count the three levels &mdash;
+    "if you stick to the 15m &hellip; three levels on 15m can equal only one level" on the weekly.</td>
+    <td><span class="tag sourced">SOURCED</span></td><td class="src">"Weekly Setup (Week 1)" ~[01:00&ndash;02:00]</td></tr>
+  <tr><td><b>Retest menu (ruling #1):</b> precondition = the 50 EMA broken by a 200%-class vector. Then a retest entry is
+    valid when <b>2 of 4</b> hold: &#9312; 50-EMA retest (wicks touch, bodies don't cross), &#9313; return into the L1-vector
+    range, &#9314; higher-low (up)/lower-high (down) structure, &#9315; heatmap/liquidation level.</td>
+    <td><span class="tag sourced">SOURCED</span></td><td class="src">ruling #1; "Weekly Setup V2" ~[06:02&ndash;07:33]</td></tr>
+  <tr><td>With no Hyblock/TradingLite, condition &#9315; is unavailable &rarr; run the menu as <b>2-of-3</b> over &#9312;&#9313;&#9314;
+    (free Coinalyze/Coinglass can restore 2-of-4 later).</td>
+    <td><span class="tag sourced">SOURCED</span></td><td class="src">ruling #1 &amp; #6; <code>CALIBRATION_V2</code>; see <a href="#q11">Q11</a></td></tr>
+  <tr><td>It is OK for price to cross back over the 50 EMA during the retest <b>as long as it does not break beyond the
+    second peak</b> of the M/W.</td>
+    <td><span class="tag sourced">SOURCED</span></td><td class="src">"Weekly Setup V2" ~[07:02]</td></tr>
+  <tr><td>BBWP&lt;35 appears as a confluence column in Igor's sheet but is not described as a hard gate in the videos &mdash;
+    treat as optional/A-B, not required.</td>
+    <td><span class="tag inferred">INFERRED</span></td><td class="src">sheet cols; <code>CALIBRATION_V2</code>; see <a href="#q12">Q12</a></td></tr>
+</table>
+</div>
+
+<!-- STEP 4 -->
+<h3><span class="steplead">Step 4</span> The 15m / 5m PVSRA micro-anatomy inside the M/W</h3>
+<p class="src">Primary sources: "v2 M and W's" ~[06:33&ndash;11:35] (the "perfect M/W" walk-through, including the drop to the 5m);
+rulebook &sect;2 "Perfect M" (&#10003;frames).</p>
+<div class="callout"><b>This is the part Igor pointed at</b> ("look through the literature and her videos&hellip; it's all there").
+Here is everything found. It is stated crisply enough to code, but has <b>no ground-truth column</b> in the workbook, so
+its accuracy is <span class="tag unknown">UNKNOWN</span> until we hand-label examples.</div>
+<div class="scroll">
+<table>
+  <tr><th>Micro-rule</th><th>Tag</th><th>Source</th></tr>
+  <tr><td>The market maker "shows up <b>three times</b>" to build an M/W: (1) the <b>SVC at peak&nbsp;1</b> stops the prior
+    momentum; (2) <b>three trap candles on the inside-right</b> of the formation; (3) the candle that finally <b>breaks the
+    50 EMA</b>.</td>
+    <td><span class="tag sourced">SOURCED</span></td><td class="src">"v2 M and W's" ~[10:35&ndash;11:35]</td></tr>
+  <tr><td>To see the three trap candles you <b>drop down one timeframe</b> from where the first peak was found: a 15m M &rarr;
+    read the inside-right on the <b>5m</b>; a 1H M/W &rarr; read it on the <b>15m</b>.</td>
+    <td><span class="tag sourced">SOURCED</span></td><td class="src">"v2 M and W's" ~[09:04&ndash;09:35],[12:35]</td></tr>
+  <tr><td>The three trap candles are <b>three consecutive same-colour</b> candles pushing into the level (green under an M
+    to trap longs; red under a W to trap shorts) &mdash; they mimic a bull/bear-flag breakout.</td>
+    <td><span class="tag sourced">SOURCED</span></td><td class="src">"v2 M and W's" ~[09:35&ndash;10:05],[13:06]; rulebook &sect;2</td></tr>
+  <tr><td>The third push ends in a <b>failed wick-spike into the SVC / trapped-trader box</b> (can't close back inside).
+    The wicks now point the way price will <i>not</i> go.</td>
+    <td><span class="tag sourced">SOURCED</span></td><td class="src">"v2 M and W's" ~[09:35&ndash;10:05]; rulebook &sect;2</td></tr>
+  <tr><td><b>Entry cue = the first opposite-colour candle</b> after the three trap candles (e.g. the red candle after two/three
+    green under an M).</td>
+    <td><span class="tag sourced">SOURCED</span></td><td class="src">"v2 M and W's" ~[10:05]; rulebook &sect;2 (&#10003;frames)</td></tr>
+  <tr><td>The SVC / trapped-trader box may be re-entered a little, but is only <b>invalidated by a solid close beyond its
+    far edge</b> (the SVC's extreme wick).</td>
+    <td><span class="tag sourced">SOURCED</span></td><td class="src">"v2 M and W's" ~[12:05&ndash;12:35]; rulebook &sect;2</td></tr>
+  <tr><td>A <b>board-meeting M/W</b> (one that forms inside a consolidation, not at L3) <b>does not</b> require this
+    inside-right 3-hit micro-structure &mdash; it is read from the wicks/spikes instead.</td>
+    <td><span class="tag sourced">SOURCED</span></td><td class="src">"v2 M and W's" ~[13:36&ndash;14:36]</td></tr>
+  <tr><td>Exact bar-count / max-gap tolerances for "three consecutive" on the 5m are not given.</td>
+    <td><span class="tag missing">MISSING</span></td><td class="src">not in material; see <a href="#q10">Q10</a></td></tr>
+</table>
+</div>
+
+<!-- STEP 5 -->
+<h2 id="anatomy">Level anatomy &mdash; L1 / L2 / L3 (step&nbsp;5 in depth)</h2>
+<p class="src">Primary sources: "The Weekly Setup V2" ~[03:31&ndash;10:35]; "v2 M and W's" ~[02:00&ndash;03:31]; "v2-VSC and Volume"
+~[01:31&ndash;04:02]; "v2-Board Meetings"; "Week 3" ~[04:03&ndash;05:03]; rulebook &sect;1&ndash;2 + rulings #2, #4.</p>
+
+<h4>What counts as "one level"</h4>
+<ul class="tight">
+  <li><span class="tag sourced">SOURCED</span> A level is <b>not one candle</b> &mdash; "a level can be three or four candles
+  &hellip; all of this is one level" because it happened around the same time; a lone spike is its own level.
+  <span class="src">"v2-VSC" ~[01:31]</span></li>
+  <li><span class="tag sourced">SOURCED</span> Read levels off the <b>volume sub-pane</b>: one contiguous burst of ~4&ndash;6
+  elevated coloured bars = one level. <span class="src">rulebook &sect;2 (&#10003;frames)</span></li>
+  <li><span class="tag sourced">SOURCED</span> Start the level count <b>from the last peak formation</b> (the M/W), not from an
+  arbitrary point. <span class="src">rulebook &sect;1; "S3"</span></li>
+  <li><span class="tag missing">MISSING</span> The exact "same time / same cluster" gap that merges bars into one level vs
+  starts the next is not numerically defined. <span class="src">see <a href="#q5">Q5</a></span></li>
+</ul>
+
+<h4>Level 1 &mdash; volume-spike cluster, then consolidation/channel</h4>
+<ul class="tight">
+  <li><span class="tag sourced">SOURCED</span> L1 = the vector cluster that <b>breaks the 50 EMA with volume</b>, then runs
+  toward the 200 EMA and either goes into a <b>board meeting</b> or a retracement. <span class="src">"Weekly Setup V2" ~[04:01&ndash;04:31]</span></li>
+  <li><span class="tag sourced">SOURCED</span> Initial take-profit = the <b>origin of the L1 vector</b> (order-flow logic;
+  cross-check with a Fixed-Range Volume Profile low-volume "crevice"). Your L1 target alone must already be a good R:R.
+  <span class="src">rulebook &sect;1&ndash;2; "Week 4" ~[04:02&ndash;04:32]</span></li>
+  <li><span class="tag sourced">SOURCED</span> <b>#1 prohibition:</b> never counter-trend after L1 &mdash; not even on a 200-EMA
+  reversal candle. That 200-EMA bounce after L1 is a retracement trap, not the "200-EMA rejection" setup.
+  <span class="src">"Weekly Setup V2" ~[05:02&ndash;05:32]; "Multi Session" ~[05:33&ndash;07:03]</span></li>
+</ul>
+
+<h4>Level 2 &mdash; break with PVSRA candles, then consolidation</h4>
+<ul class="tight">
+  <li><span class="tag sourced">SOURCED</span> L2 target = the <b>800 EMA</b>, or a <b>previous unrecovered vector</b> if the 800
+  is not in reach; both together = strong confluence. <span class="src">"Weekly Setup V2" ~[07:33&ndash;08:03]</span></li>
+  <li><span class="tag sourced">SOURCED</span> Between L1 and L2 (and L2&ndash;L3) you expect a <b>board meeting or a
+  retracement</b>; in a very strong trend these can be skipped entirely. <span class="src">"Weekly Setup V2" ~[07:33],[08:03]</span></li>
+  <li><span class="tag sourced">SOURCED</span> Retail breakout/pattern trades work at L1/L2 and <b>fail at L3</b>.
+  <span class="src">rulebook &sect;1</span></li>
+</ul>
+
+<h4>Level 3 &mdash; the strongest leg, "where most people get liquidated"</h4>
+<ul class="tight">
+  <li><span class="tag sourced">SOURCED</span> Explicit leverage-cascade story: "A level&nbsp;1 drop will generally liquidate
+  <b>100x</b> traders, level&nbsp;2 the <b>50x</b>, level&nbsp;3 the <b>25x</b>." Below 25x is "generally safe unless the move
+  is extremely extended." <span class="src">"Weekly Setup V2" ~[03:00&ndash;03:31]; "v2-Liquidation levels" ~[02:31&ndash;03:01]</span>
+  &mdash; this <i>is</i> Igor's "where most people get liquidated." <b>Note:</b> it is a rationale, not a mechanical input
+  (we have no per-trader leverage feed).</li>
+  <li><span class="tag sourced">SOURCED</span> L3 is often <b>less dramatic</b> than L1/L2 &mdash; "more like sideways price
+  action," patience-testing, and the <b>EMAs start to flatten</b> (fan-out gone). It leads into the accumulation/consolidation
+  before the reversal. <span class="src">"v2 M and W's" ~[02:00&ndash;03:31]</span></li>
+  <li><span class="tag sourced">SOURCED</span> At L3 the <b>candle wicks switch sides</b> (now trapping the other way) and you
+  <b>look for the SVC first</b> &mdash; that is the "levels are in, reversal coming" hint. <span class="src">"Weekly Setup V2" ~[10:04&ndash;10:35]; "v2 M and W's" ~[00:30&ndash;01:30]</span></li>
+  <li><span class="tag sourced">SOURCED</span> Best L3 target stacks: a higher-timeframe 200/800 EMA + an unrecovered vector +
+  a prior HOW/LOW/HOD/LOD + a liq level, all lined up. <span class="src">"Weekly Setup V2" ~[08:03&ndash;10:04]</span></li>
+  <li><span class="tag sourced">SOURCED</span> "Damage is done" shortcut: a near-<b>vertical</b> move + an <b>extended board
+  meeting</b> means no more levels are owed &mdash; the three levels may have completed on the <b>15m</b> instead of the 1H.
+  <span class="src">rulebook &sect;1; "Week 3" ~[04:03&ndash;05:03]</span></li>
+</ul>
+
+<h4>Board meeting / channel (the pause between levels)</h4>
+<ul class="tight">
+  <li><span class="tag sourced">SOURCED</span> A board meeting is just a <b>channel</b> (Igor ruling #4) &mdash; usually
+  sideways, can slope up/down, can retrace back to the breaking PVSRA candle. <b>No special boundary-drawing rules exist.</b>
+  <span class="src">ruling #4; "v2-Board Meetings"</span></li>
+  <li><span class="tag sourced">SOURCED</span> Consolidation = "a tick of approval &mdash; they just hurt someone and the move
+  is done for now." Read the <b>wicks</b> inside it: longer wicks on one side show who is being trapped (the stop-hunt board
+  meeting). <span class="src">"Multi Session" ~[08:34]; "Weekly Setup (Week 1)" ~[08:33&ndash;09:33]</span></li>
+  <li><span class="tag sourced">SOURCED</span> Management: take <b>partials at each board meeting</b>, move stop to breakeven
+  only <b>after L2 starts</b>, never trail below the initial TP. <span class="src">rulebook &sect;2 risk template</span></li>
+  <li><span class="tag missing">MISSING</span> No numeric definition of "sideways enough / long enough" to be a board meeting.
+  <span class="src">see <a href="#q7">Q7</a></span></li>
+</ul>
+
+<h4>SVC &mdash; the leg-ending signal (ruling #2)</h4>
+<ul class="tight">
+  <li><span class="tag sourced">SOURCED</span> Shape is fixed: <b>small body, long wick (either side), body smaller than the
+  wick, on a volume spike</b> &mdash; a "stopping volume candle." Size of the spike is subjective; its example SVCs are
+  150%(blue)-class, ~3&ndash;5&times; neighbouring volume. <span class="src">ruling #2; "v2-VSC" ~[04:02]; "v2 M and W's" ~[06:33&ndash;07:33]</span></li>
+  <li><span class="tag sourced">SOURCED</span> Under 1H, an <b>engulfing candle</b> (150%+ PVSRA) also qualifies as the stopping
+  signal &mdash; and this improves agreement with Igor's "Reversal SVC" labels by <b>+9pp (to 61%)</b>. <span class="src">ruling #2; <code>CALIBRATION_V2</code></span></li>
+  <li><span class="tag sourced">SOURCED</span> The tell that it is really L3 (not L2): after the SVC, <b>price fails to get back
+  into the SVC's week</b>. If price returns into it, "the damage hasn't been done yet." <span class="src">"v2-VSC" ~[02:31&ndash;03:01]</span></li>
+  <li><span class="tag sourced">SOURCED</span> A blue candle at the end of a rise is a <b>pause / guaranteed break, not a
+  guaranteed reversal.</b> <span class="src">"v2-VSC" ~[03:31&ndash;04:02]</span></li>
+</ul>
+
+<!-- STEP 6 -->
+<h2>Step 6 &mdash; the exit: L3 = midweek reversal (not a consolidation)</h2>
+<p class="src">Primary sources: "The Weekly Setup V2" ~[10:35&ndash;14:06]; "3 Hits to a Level"; "FRIDAY (WEEKEND TRAP)";
+"Week 4" ~[11:33&ndash;12:03]; rulebook &sect;1&ndash;2; sheet <code>tab_Trend_Start_MWR</code>, <code>tab_Fridays</code>, <code>tab_News_Events</code>.</p>
+<div class="scroll">
+<table>
+  <tr><th>Rule</th><th>Tag</th><th>Source</th></tr>
+  <tr><td>Exit sequence: at L3, <b>find the SVC first</b> &rarr; wait for price to shift away &rarr; wait for it to
+    <b>attempt to repeat the level and fall short</b> &rarr; that shortfall <b>is</b> the opposite M/W = the <b>midweek
+    reversal</b>, and your exit / backflip point.</td>
+    <td><span class="tag sourced">SOURCED</span></td><td class="src">"Weekly Setup V2" ~[10:35&ndash;11:05]</td></tr>
+  <tr><td>Expect the MWR around <b>Wednesday or Thursday</b> for crypto, usually lined up with a <b>news event</b>
+    (ForexFactory). Igor's own data clusters reversals <b>Tue&ndash;Thu</b>.</td>
+    <td><span class="tag sourced">SOURCED</span></td><td class="src">"Weekly Setup V2" ~[10:35&ndash;11:05]; rulebook &sect;1; <code>tab_Trend_Start_MWR</code></td></tr>
+  <tr><td>Exit at the reversal, <b>not inside a consolidating level</b>: an M/W that "was setting up to be a consolidating
+    level" with a poor target is a <b>skip</b> ("we don't get out of bed for" a 1.4:1).</td>
+    <td><span class="tag sourced">SOURCED</span></td><td class="src">"Week 4" ~[11:33&ndash;12:03]</td></tr>
+  <tr><td>Three failed tests of the HOW/LOW at L3 (across <b>&ge;2 sessions</b>, "a hit" = a wick tag with no close beyond) =
+    reversal imminent; a <b>4th</b> hit = continuation. Higher-low after hit&nbsp;3 &rarr; up next; lower-high &rarr; down next.</td>
+    <td><span class="tag sourced">SOURCED</span></td><td class="src">"3 Hits to a Level" (whole); rulebook &sect;3 (S5)</td></tr>
+  <tr><td><b>Friday = take-profit day, never an entry.</b> UK open issues an aggressive false move, runs a 4&ndash;6h trend,
+    then repeats the level near UK close (the weekend trap). If your 3 (even 2) levels are done, <b>take profit and close by
+    Friday UK end</b> rather than hold the weekend.</td>
+    <td><span class="tag sourced">SOURCED</span></td><td class="src">"FRIDAY (WEEKEND TRAP)"; "Weekly Setup V2" ~[12:36&ndash;14:06]; rulebook &sect;1</td></tr>
+  <tr><td>Hard risk overlays: never hold through scheduled news with 3 levels counted; skip an MWR whose news wick forces a
+    wide stop; minimum <b>R:R 1.9</b>; Asia range &gt;2% = don't trade that day.</td>
+    <td><span class="tag sourced">SOURCED</span></td><td class="src">rulebook &sect;2 risk template</td></tr>
+  <tr><td>Exit trigger when the level count is fuzzy (which SVC / which level is "L3") &mdash; not pinned down by the material.</td>
+    <td><span class="tag missing">MISSING</span></td><td class="src">see <a href="#q8">Q8</a></td></tr>
+</table>
+</div>
+
+<!-- GROUND TRUTH -->
+<h2>What Igor's spreadsheets give us as ground-truth labels</h2>
+<p>The workbook <code>data/annie_backtest.xlsx</code> is exported as 7 CSV tabs. Coverage is <b>~40 hand-labelled weeks</b>
+(Nov 2022&ndash;Oct 2023 + May&ndash;Aug 2025); <code>CALIBRATION_V2</code> scores <b>36</b> of them after excluding 4 rows with
+broken/ambiguous dates. Boolean cells are <code>1.0 / 0.0 / NA</code> &mdash; clean for training. The catch across every tab:
+the <b>Date column is messy</b> (mixed <code>DD/MM/YYYY</code>, <code>YYYY-MM-DD</code>, and live Excel formula refs like
+<code>=A25-7</code>), and some dates are genuinely ambiguous (May-7 vs Jul-5).</p>
+
+<div class="scroll">
+<table>
+  <tr><th>Tab (rows)</th><th>Label columns</th><th>Feeds which step</th><th>Usability as detector ground truth</th></tr>
+  <tr>
+    <td class="n"><b>tab_FMWB</b><br>(40 data rows &rarr; 36 scored)</td>
+    <td>FMWB/Trend/Range? &middot; Valid M/W/FD &middot; Move % &middot; Peak High/Low Day &middot; Session for opposite side &middot;
+      Valid 50EMA retest 15M &middot; BBWP&lt;35 15M &middot; 3 Levels 15M &middot; Valid 50EMA retest 1H &middot; BBWP&lt;35 1H &middot;
+      3 levels 1H &middot; Reversal SVC?</td>
+    <td>1,2,3,5,6</td>
+    <td><b>The primary label set</b> &mdash; every column maps 1:1 to a detector output and is what <code>calibrate.py</code>
+      already scores. High value.</td>
+  </tr>
+  <tr>
+    <td class="n"><b>tab_Trend_Start_MWR</b><br>(55 rows, ~2 per week)</td>
+    <td>New Trend or MWR &middot; <b>Reversal Day?</b> &middot; Which Session &middot; SVC Present? &middot; Valid M/W/FD &middot;
+      50EMA retest 15M/1H &middot; BBWP&lt;35 &times;2 &middot; 3 levels 1H &middot; % of move from reversal &middot; Did news reverse?</td>
+    <td>5,6</td>
+    <td><b>Ground truth for the exit/MWR leg.</b> "Reversal Day?" gives the Mon&ndash;Fri label to calibrate the MWR window;
+      "% of move" measures leg size; "Did news reverse" is a clean boolean. High value for step&nbsp;6.</td>
+  </tr>
+  <tr>
+    <td class="n"><b>tab_Weekends_Move</b><br>(39 data rows)</td>
+    <td>TV Link &middot; <b>Break of Friday's Low?</b> &middot; <b>Break of Friday's High?</b> &middot; Trend up/down &middot;
+      SVC Present? &middot; M/W/FD &middot; Weekend Move % &middot; Trend Reversal? &middot; M/W/FD for FMWB &middot; LIQ Levels
+      Short/Long (15M) &middot; MM PVSRA Short/Long Candles (1H)</td>
+    <td>1,2</td>
+    <td><b>Ground truth for the Monday fake move.</b> The Friday-low/high breaks give the fake-move direction. Note: the
+      <i>LIQ Levels</i> and <i>MM PVSRA candle counts</i> are hand-tallied but only for the older 2023 rows ("Not Avail from
+      this date" on the rest) &mdash; partial coverage. Has a TV-snapshot link per row.</td>
+  </tr>
+  <tr>
+    <td class="n"><b>tab_Fridays</b><br>(38 data rows)</td>
+    <td>Aggressive move Asia-end/UK-start? &middot; Opposite trend created? &middot; Repeat level of aggressive move? &middot;
+      What did US do? (text)</td>
+    <td>6</td>
+    <td>Ground truth for the <b>Friday weekend-trap</b> exit behaviour. Booleans + a free-text US outcome. Usable to validate
+      the Friday take-profit rule.</td>
+  </tr>
+  <tr>
+    <td class="n"><b>tab_News_Events</b><br>(100 data rows)</td>
+    <td>Break of ILOD? &middot; Break of IHOD? &middot; Trend before news? &middot; Continuation post-news? &middot; Reversal
+      post-news? &middot; US continued/reversed/ranged? &middot; News name</td>
+    <td>6</td>
+    <td>Per-news-event ground truth for the <b>news-driven MWR</b>. Good for testing "MWR lines up with news" and
+      "post-news reversal &gt;&gt; continuation." 100 rows.</td>
+  </tr>
+  <tr>
+    <td class="n"><b>tradingview_links</b><br>(41 rows)</td>
+    <td>tab &middot; cell &middot; row_date &middot; url (39 Weekends-Move snapshots, 2 News, 1 doc)</td>
+    <td>all (visual)</td>
+    <td>Igor's own charted <b>TradingView snapshots</b> &mdash; the visual ground truth for the disagreement gallery / manual
+      review. URLs are <code>tradingview.com/x/&hellip;</code>.</td>
+  </tr>
+  <tr>
+    <td class="n"><b>tab_BTC_Cycles</b><br>(1 data row)</td>
+    <td>Topic &middot; Date &middot; Link</td>
+    <td>&mdash;</td>
+    <td>Just a link to a narratives doc. <b>Not usable</b> as labels.</td>
+  </tr>
+</table>
+</div>
+
+<div class="callout bad"><b>The ground-truth gap that matters most.</b> There are labels for the <i>aggregate</i>
+("3 levels completed? y/n", "Valid M/W/FD", "Reversal SVC?") but <b>no column anywhere</b> for: the individual
+<b>L1/L2/L3 boundaries or timestamps</b>, the <b>board-meeting locations</b>, or the <b>5m/15m "3 trap candles"</b>
+micro-signal (step&nbsp;4). So the per-level anatomy and the micro-anatomy can only be validated by eye against the
+41 TradingView snapshots &mdash; not by a scored column. Any detector for steps&nbsp;4 and the internal structure of
+step&nbsp;5 starts <b>unlabelled</b>.</div>
+
+<h3>What already calibrates well vs poorly (from <code>CALIBRATION_V2</code>, 36 weeks)</h3>
+<div class="scroll">
+<table>
+  <tr><th>Detector column</th><th>Agreement w/ Igor</th><th>Read</th></tr>
+  <tr><td>Regime (FMWB/Trend/Range)</td><td class="n">67%</td><td><span class="tag crisp">OK</span></td></tr>
+  <tr><td>Reversal SVC</td><td class="n">61%</td><td><span class="tag crisp">OK</span> (engulfing variant on)</td></tr>
+  <tr><td>50-EMA retest 15m</td><td class="n">65%</td><td><span class="tag crisp">OK</span></td></tr>
+  <tr><td>50-EMA retest 1h</td><td class="n">59%</td><td><span class="tag fuzzy">weak</span></td></tr>
+  <tr><td>Peak high/low day</td><td class="n">60%</td><td><span class="tag fuzzy">weak</span></td></tr>
+  <tr><td>Second-peak session</td><td class="n">52%</td><td><span class="tag fuzzy">weak</span></td></tr>
+  <tr><td><b>3 levels completed 15m</b></td><td class="n">53%</td><td><span class="tag fuzzy">weak</span> &mdash; near coin-flip</td></tr>
+  <tr><td><b>3 levels completed 1h</b></td><td class="n">45%</td><td><span class="tag unknown">poor</span> &mdash; below coin-flip</td></tr>
+  <tr><td><b>Trigger exact (M/W/FDM/FDW)</b></td><td class="n">33%</td><td><span class="tag unknown">poor</span></td></tr>
+  <tr><td><b>Trigger direction (bull/bear)</b></td><td class="n">50%</td><td><span class="tag unknown">coin-flip</span> &mdash; the killer</td></tr>
+  <tr><td>Move % (|err|&le;2pp)</td><td class="n">34%</td><td><span class="tag unknown">poor</span></td></tr>
+</table>
+</div>
+<p class="muted">Pattern: the <b>scaffold</b> (regime, SVC, 15m retest) calibrates in the 60s; the <b>semantic core</b> of
+Fade&nbsp;2 (M/W type, direction, level count) sits at 33&ndash;53%. That is the honest ceiling to design around.</p>
+
+<!-- OPEN QUESTIONS -->
+<h2 id="opens">Open questions for Igor</h2>
+<p class="muted">Every ambiguity that blocks a mechanical detector, each with a concrete proposed default so a "yes" ships it
+and any other answer overrides it. (Question&nbsp;0, the abort rule, is tracked separately.)</p>
+
+<ol class="q">
+  <li id="q1"><b>Is the 50-EMA vector-cross required to ENTER, or only to COUNT L1?</b> Igor says "cross preferred, NOT
+    required"; the rulebook says "L1 must break the 50 with a vector or it doesn't count." These are reconcilable but the
+    detector needs one rule.
+    <span class="prop"><b>Proposed default:</b> the aggressive second-peak M/W entry does <b>not</b> wait for the cross
+    (enter on peak&nbsp;2, invalidate only on a close beyond peak&nbsp;2); the 200%-vector 50-EMA cross is required only to
+    <b>count L1</b> for the three-level hold and is the conservative-entry confirmation. Cross gates the <i>count</i>, not the
+    <i>entry</i>.</span></li>
+
+  <li id="q2"><b>Which direction(s) may Fade 2 fire?</b> Detector direction is a coin-flip (50%). Do we let it fire both
+    ways and let geometry decide, or constrain it?
+    <span class="prop"><b>Proposed default:</b> Fade&nbsp;2 <b>only</b> trades the reversal of the Monday false move, and the
+    M/W must sit at the <b>weekly extreme</b> &mdash; W at the LOW &rarr; long, M at the HOW &rarr; short. No naked
+    both-sides firing.</span></li>
+
+  <li id="q3"><b>How is the weekend box built, exactly, and what counts as a "spike out"?</b> "Close-clusters not wicks" is
+    descriptive.
+    <span class="prop"><b>Proposed default:</b> box = min/max of candle <b>closes</b> in the Fri-17:00-NY &rarr;
+    Sun-17:00-NY window; a fake move = a wick beyond the box that <b>closes back inside within 3 candles</b> (15m). If no
+    such spike, fall back to an M/W inside the box.</span></li>
+
+  <li id="q4"><b>Confirm the peak-2 "vicinity" bound at 35%?</b> Grid-chosen on your weeks (33% trigger-exact agreement;
+    ties broke tighter).
+    <span class="prop"><b>Proposed default:</b> peak-2 shortfall/overshoot up to <b>35%</b> of the internal leg is a valid
+    M/W; beyond 35% = breakout, not a fade. Keep 35% until a bigger labelled set moves it.</span></li>
+
+  <li id="q5"><b>What merges bars into "one level" vs starts the next?</b> Annie: 4&ndash;6 elevated bars can be one level;
+    a lone spike is its own.
+    <span class="prop"><b>Proposed default:</b> a contiguous run of PVSRA-coloured bars (200% or 150%) with <b>no gap of
+    &ge;6 below-average-volume bars</b> between them = one level; a &ge;6-bar quiet gap starts the next level's count.
+    Tune the <code>6</code> on the labelled weeks.</span></li>
+
+  <li id="q6"><b>When does the level count live on 15m instead of 1H (the "damage is done" shortcut)?</b>
+    <span class="prop"><b>Proposed default:</b> count on the <b>1H</b> by default; if a single 1H leg is "vertical"
+    (its range &ge; 3&times; the trailing-20 1H candle range) <b>and</b> is followed by a board meeting of &ge;8 bars,
+    switch the remaining count to the 15m. Confirm the 3&times; / 8-bar knobs.</span></li>
+
+  <li id="q7"><b>What numerically is a board meeting / channel?</b> Ruling #4 says "just a channel, no boundary rules,"
+    but the detector needs a trigger for partials.
+    <span class="prop"><b>Proposed default:</b> board meeting = &ge;6 bars whose high-low band stays &le;1.5% while the 50-EMA
+    slope flattens (|slope| below a small threshold). Take a partial + move management at each detected board meeting.</span></li>
+
+  <li id="q8"><b>What fires the exit when "is this L3?" is fuzzy?</b> The exit gates on L3, but the level count is the
+    weakest detector.
+    <span class="prop"><b>Proposed default:</b> exit on the <b>first</b> of &mdash; (a) an SVC after <b>&ge;2 counted levels</b>
+    at a weekly HOW/LOW/liq level, (b) a Wed/Thu-US MWR window with an opposite M/W, or (c) <b>Friday UK close</b>. Whichever
+    comes first wins.</span></li>
+
+  <li id="q9"><b>Keep the sub-1H engulfing candle as a valid SVC/stopping trigger?</b> Ruling #2 allows it; it lifted
+    Reversal-SVC agreement +9pp to 61%.
+    <span class="prop"><b>Proposed default:</b> <b>yes</b> &mdash; an engulfing candle with 150%+ PVSRA volume counts as an SVC
+    under 1H, alongside the small-body/long-wick shape.</span></li>
+
+  <li id="q10"><b>Is the 5m/15m "3 trap candles" micro-rule a hard gate or optional confluence?</b> It has no ground-truth
+    column, so we cannot yet measure it.
+    <span class="prop"><b>Proposed default:</b> implement as <b>optional confluence</b> that raises a candidate's confidence,
+    <b>not</b> a required gate, until we hand-label examples from the 41 TradingView snapshots; then A/B it.</span></li>
+
+  <li id="q11"><b>Run the retest menu as 2-of-3 (no liq data) or wait for a free feed to make it 2-of-4?</b>
+    <span class="prop"><b>Proposed default:</b> ship <b>2-of-3</b> over {50-EMA retest, origin-vector retest, HL/LH structure}
+    now, with a <code>liq_level</code> hook; wire free Coinalyze/Coinglass later to restore 2-of-4. (Per rulings #1, #6.)</span></li>
+
+  <li id="q12"><b>Is BBWP&lt;35 a required filter, optional confluence, or an A/B toggle?</b> It is a column in your sheet but
+    never a hard gate in the videos; agreement is 52&ndash;60%.
+    <span class="prop"><b>Proposed default:</b> <b>optional A/B toggle</b>, off in the baseline, tested as a confluence
+    booster &mdash; not a hard gate.</span></li>
+</ol>
+
+<div class="callout q"><b>Answer style:</b> a plain "yes to all" freezes every default above and I can move Fade&nbsp;2 from
+draft to a codeable spec. Override any number the way you ruled on the earlier eight &mdash; your ruling wins and gets recorded.</div>
+
+<div class="foot">
+  Annie Trading &middot; <code>Fade 2 Spec (draft).html</code> &middot; Task&nbsp;F4 research + writing draft (no backtest run).
+  Rules sourced from the rulebook v2.1, 24 video transcripts, Igor's 7-tab workbook, <code>CALIBRATION_V2</code>, and Igor's
+  8 rulings (2026-07-11) + his Fade&nbsp;2 description (2026-07-13). Timestamps are transcript positions, not verified clock
+  times. This page is self-contained.
+</div>
+
+</div>
+<script>
+(function(){
+  var btn=document.getElementById('themeToggle');
+  if(!btn)return;
+  var mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;
+  function stored(){try{var t=localStorage.getItem('codexTheme');return (t==='light'||t==='dark'||t==='system')?t:'system';}catch(e){return 'system';}}
+  function eff(m){return (m==='light'||m==='dark')?m:((mq&&mq.matches)?'dark':'light');}
+  function apply(){var m=stored();document.documentElement.setAttribute('data-theme',eff(m));btn.textContent=(m==='light')?'◐ Light':(m==='dark')?'◑ Dark':'◓ Auto';}
+  apply();
+  btn.addEventListener('click',function(){var order={light:'dark',dark:'system',system:'light'};var n=order[stored()];try{localStorage.setItem('codexTheme',n);}catch(e){}apply();});
+  if(mq){var h=function(){if(stored()==='system')apply();};if(mq.addEventListener)mq.addEventListener('change',h);else if(mq.addListener)mq.addListener(h);}
+})();
+</script>
+</body>
+</html>
