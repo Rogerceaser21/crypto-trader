@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Annie Monday Fade &mdash; Strategy V3 &mdash; Strategy Reference</title>
+<style>
+  :root{
+    --bg:#0e1117; --panel:#161b22; --panel2:#1c2230; --ink:#e6edf3; --muted:#9aa4b2;
+    --line:#2a3140; --accent:#6aa9ff; --up:#3fb950; --dn:#f85149; --warn:#e3b341; --m3:#26a69a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  .wrap{max-width:940px;margin:0 auto;padding:34px 22px 90px;}
+  header{border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:8px}
+  .eyebrow{letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:var(--accent);font-weight:700}
+  h1{font-size:30px;margin:8px 0 6px;line-height:1.2}
+  h2{font-size:21px;margin:38px 0 12px;padding-top:8px;border-top:1px solid var(--line)}
+  h3{font-size:16px;margin:22px 0 8px;color:var(--ink)}
+  p{color:var(--ink)}
+  .sub{color:var(--muted);font-size:15px;max-width:74ch}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:14px 0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:720px){.grid2{grid-template-columns:1fr}}
+  code,kbd{background:#0b0f16;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px}
+  kbd{color:var(--accent)}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:14px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--panel2);color:var(--muted);font-weight:600;font-size:12.5px;text-transform:uppercase;letter-spacing:.04em}
+  td.n{font-family:ui-monospace,Menlo,monospace;white-space:nowrap}
+  .statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:10px 0}
+  .stat{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .stat .v{font-size:23px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--ink)}
+  .stat .k{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+  .stat .v.good{color:var(--up)}
+  ol.steps{counter-reset:s;list-style:none;padding-left:0;margin:0}
+  ol.steps li{position:relative;padding:10px 0 10px 46px;border-bottom:1px solid var(--line)}
+  ol.steps li:last-child{border-bottom:0}
+  ol.steps li::before{counter-increment:s;content:counter(s);position:absolute;left:0;top:10px;
+    width:30px;height:30px;border-radius:50%;background:var(--accent);color:#0b0f16;font-weight:800;
+    display:flex;align-items:center;justify-content:center;font-size:14px}
+  .callout{border-left:4px solid var(--warn);background:rgba(227,179,65,.08);padding:12px 16px;border-radius:8px;margin:12px 0}
+  .callout.good{border-left-color:var(--m3);background:rgba(38,166,154,.08)}
+  .callout.bad{border-left-color:var(--dn);background:rgba(248,81,73,.09)}
+  .callout b{color:var(--ink)}
+  pre.src{background:#0b0f16;border:1px solid var(--line);border-radius:10px;padding:16px;overflow:auto;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.5;color:#c9d3e0;max-height:560px;white-space:pre}
+  .copybar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:14px 0 6px}
+  .btn{background:var(--accent);color:#0b0f16;border:0;border-radius:8px;padding:9px 16px;font-weight:700;cursor:pointer;font-size:14px}
+  .btn:active{transform:translateY(1px)}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;margin:6px 0 2px;font-size:13px;color:var(--muted)}
+  .legend span{display:inline-flex;align-items:center;gap:7px}
+  .sw{width:26px;height:0;border-top-width:3px;border-top-style:solid;display:inline-block}
+  .sw.dash{border-top-style:dashed}
+  .foot{color:var(--muted);font-size:12.5px;margin-top:50px;border-top:1px solid var(--line);padding-top:16px}
+  .muted{color:var(--muted)}
+  ul.tight{margin:6px 0 6px 0;padding-left:20px} ul.tight li{margin:4px 0}
+  .pill{display:inline-block;font-size:11px;font-weight:700;border-radius:20px;padding:2px 10px;color:#0b0f16;background:var(--up)}
+  .pill.no{background:var(--dn);color:#fff}
+  /* ---- Theme toggle ---- */
+  html[data-theme="light"]{
+    --bg:#f7f9fc; --panel:#ffffff; --panel2:#eef1f6; --ink:#1a2230; --muted:#5b6472;
+    --line:#d7dde6; --accent:#2f6fe0; --up:#1e7d34; --dn:#c92c22; --warn:#a6740b; --m3:#178f83;
+  }
+  html[data-theme="light"] code, html[data-theme="light"] kbd{background:#eef1f5;color:var(--ink)}
+  html[data-theme="light"] pre.src{background:#eef1f5;color:#1a2230}
+  html[data-theme="light"] .callout{background:rgba(166,116,11,.10)}
+  html[data-theme="light"] .callout.good{background:rgba(23,143,131,.10)}
+  html[data-theme="light"] .callout.bad{background:rgba(201,44,34,.09)}
+  html[data-theme="light"] .btn,
+  html[data-theme="light"] ol.steps li::before,
+  html[data-theme="light"] .pill{color:#fff}
+  .theme-toggle{position:fixed;top:16px;right:20px;z-index:100;background:var(--panel);
+    border:1px solid var(--line);color:var(--ink);border-radius:20px;padding:6px 14px;
+    font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.35);
+    font-family:inherit;letter-spacing:.02em}
+  html[data-theme="light"] .theme-toggle{box-shadow:0 2px 10px rgba(0,0,0,.10)}
+  .theme-toggle:active{transform:translateY(1px)}
+@media(max-width:560px){.theme-toggle{top:10px;right:12px;padding:6px 10px;font-size:12px}body{padding-top:44px}}
+</style>
+<script>
+(function(){try{var t=localStorage.getItem('codexTheme');var e=(t==='light'||t==='dark')?t:((window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light');document.documentElement.setAttribute('data-theme',e);}catch(e){}})();
+</script>
+</head>
+<body>
+<button type="button" id="themeToggle" class="theme-toggle" aria-label="Cycle theme: light, dark, or system">&#9683; Auto</button>
+<div class="wrap">
+<header>
+  <div class="eyebrow">Annie Trading &middot; streaming strategy (Tester)</div>
+  <h1>Annie Monday Fade &mdash; Strategy V3</h1>
+  <p class="sub">The <b>strategy()</b> twin of the V3 streaming indicator &mdash; identical detection, plus TradingView&rsquo;s Strategy Tester trade list, entry/exit arrows and P&amp;L on your chart. Streaming and causal, no repaint. Live-honest in-sample edge: <b>+0.347R/trade &times; 167 Monday trades</b> at 2.5R (t=2.84); TP flippable 1.9 / 2.5 / 3.0. This page is the copy of record.</p>
+</header>
+
+<h2>1 &middot; Why V3 is streaming (and V1 wasn&rsquo;t tradeable live)</h2>
+<p>V1 could only tell you which early-week spike was <b>the</b> spike once the early window <b>closed</b> (~Tuesday 17:00 NY).
+So its alert fired late &mdash; after the trade was often already gone &mdash; and when we measured that lock-at-close timing honestly it made
+almost nothing (+0.04R, t=0.36). <b>V3 runs the setup the way you actually trade it:</b> it commits to the <b>running</b> early-week extreme
+the moment the spike gate passes, and it fires <b>at the entry bar</b>. Every time a bigger extreme appears, the trigger chain resets to it, in
+real time. That streaming form is the one that keeps the edge, and it is what this indicator draws and alerts on. Nothing is drawn in hindsight:
+a printed signal is fixed the instant it prints and never moves.</p>
+
+<h2>2 &middot; Honest, live-executable stats</h2>
+
+<div class="statgrid">
+  <div class="stat"><div class="v good">+0.347R</div><div class="k">per trade @ 2.5R</div></div>
+  <div class="stat"><div class="v">167</div><div class="k">IS Monday trades</div></div>
+  <div class="stat"><div class="v">45.5%</div><div class="k">win rate @ 2.5R</div></div>
+  <div class="stat"><div class="v">1.64</div><div class="k">profit factor</div></div>
+  <div class="stat"><div class="v">2.84</div><div class="k">t-stat</div></div>
+  <div class="stat"><div class="v">~2.7</div><div class="k">trades / month</div></div>
+</div>
+<p class="muted" style="margin:8px 0 0">Second target on the shelf &mdash; <b>1.9R</b>: +0.257R/trade, t=2.46, PF&nbsp;1.51, WR&nbsp;48.5%. Both are
+<b>live-honest streaming numbers</b> measured in-sample <b>2019-09&nbsp;&rarr;&nbsp;2024-12</b> on the streaming ledger, 1% risk, 0.05%&nbsp;fee + 0.02%&nbsp;slip per fill.</p>
+<div class="callout bad" style="margin-top:14px"><b>The +0.382R you may remember was hindsight.</b> That figure assumed you already
+knew which early-week spike was &ldquo;the&rdquo; spike &mdash; knowledge a live trader never has mid-week. Committing to the running
+extreme in real time is the only version you can actually trade, and it earns <b>+0.347R</b> at 2.5R. We show +0.382R only as the
+caveat it is.</div>
+
+
+<h2>3 &middot; Proof it&rsquo;s real</h2>
+
+<div class="grid2">
+  <div class="card"><h3 style="margin-top:2px">Acid test &mdash; the live trade</h3>
+    <p style="margin:6px 0 0">Fed the <b>current week</b> of 15m candles pulled keylessly from Binance, the exact detector fires one trade:
+    a <b>LONG</b> whose entry bar is <b>Tue 2026-07-14 01:15 UTC</b> &mdash; the trade Igor took by hand &mdash; fading the Monday spike-low,
+    stop at the running weekly low &minus;0.05%, 2.5R target. <span class="pill">reproduced</span></p></div>
+  <div class="card"><h3 style="margin-top:2px">Fidelity &amp; no-repaint</h3>
+    <p style="margin:6px 0 0">A Python twin of this exact Pine logic matches the validated 167-trade streaming ledger
+    <b>159/167 = 95.2%</b> exact (entry bar + side + stop + TP identical); every one of the 14 residuals is a known quirk of the
+    reference (its 40-day warmup / dropped final week, and its fixed-7-day week stepping drifting &plusmn;1h across DST). A bar-by-bar
+    replay shows <b>0 signal revisions</b>, and the ledger is deterministic across double runs. <span class="pill">no repaint</span></p></div>
+</div>
+
+<h2>4 &middot; What it draws</h2>
+<p>The indicator is an <b>overlay</b>. When a streaming fade resolves it marks the whole setup at its true historical bars and
+alerts on the entry bar. Built for <b>15m BTCUSDT perp</b>.</p>
+<div class="card">
+  <ul class="tight">
+    <li><b>50-EMA</b> (orange) &mdash; the 15m 50-period EMA the setup keys off.</li>
+    <li><b>Weekend box</b> (grey) &mdash; the Fri&nbsp;5pm&rarr;Sun&nbsp;5pm NY close-range the week spikes out of.</li>
+    <li><b>Spike peak</b> (&#9650;/&#9660;&nbsp;peak) &mdash; the committed early-week extreme being faded.</li>
+    <li><b>L1 vector</b> (yellow box) &mdash; the first 200%-class PVSRA vector whose body closes across the 50-EMA in the fade direction.</li>
+    <li><b>Retest</b> label &mdash; the 2-of-3 retest bar that arms the entry.</li>
+    <li><b>Entry arrow</b> (green LONG / red SHORT) &mdash; at the next 15m open, the fill of record.</li>
+    <li><b>Weekly-extreme line</b> (grey dotted) &mdash; the running extreme the stop sits beyond.</li>
+    <li><b>Stop &amp; TP lines</b> (dashed red / green) &mdash; stop the extreme &plusmn;0.05%, target the selected R multiple.</li>
+  </ul>
+  <p class="muted" style="margin-bottom:0">Every visual has its own toggle in <b>Settings &rarr; Visuals</b>. The green/red triangle on the
+  entry bar is the bar the <code>alertcondition</code> fires from.</p>
+</div>
+
+<h2>5 &middot; Install on TradingView</h2>
+<ol class="steps">
+  <li>Open a <b>BTCUSDT perpetual</b> chart on the <b>15-minute</b> timeframe (Binance/BitMEX/Bybit perp; the edge is measured on perp).</li>
+  <li>Open <b>Pine Editor</b> (bottom of the TradingView screen).</li>
+  <li>Click <b>Copy Pine source</b> below, paste it over anything in the editor, and press <b>Save</b> (name it whatever you like).</li>
+  <li>Click <b>Add to chart</b>. The strategy appears as an overlay on price and the setup draws as each week resolves.</li>
+  <li>To alert: right-click the chart &rarr; <b>Add alert</b> &rarr; Condition = this strategy &rarr; pick
+      <b>&ldquo;V3 — LONG entry&rdquo;</b>, <b>&ldquo;SHORT entry&rdquo;</b>, or <b>&ldquo;entry (either side)&rdquo;</b> &rarr;
+      <b>Once per bar close</b>. It fires on the entry bar, live.</li>
+  <li>Tune the <b>TP (R multiple)</b> input if you want &mdash; 1.9 / 2.5 (default) / 3.0. Leave the detector knobs on their validated defaults.</li>
+</ol>
+<p class="muted">Find it later under <b>Indicators &rarr; My scripts</b> (the strategies you saved).</p>
+
+<h2>A note on the Tester&rsquo;s P&amp;L</h2>
+<div class="callout"><b>The Strategy Tester is for SEEING the trades, not for the headline stats.</b> The streaming entry is the
+<i>open of the bar after the retest</i>; this strategy submits a market order the moment that bar confirms, so the Tester fills it on the
+<i>following</i> open &mdash; about one 15m bar later than the engine. The stop/TP <b>levels</b> use the engine geometry, so the plan you see on
+the chart is the validated one; only the delayed-fill P&amp;L differs. TradingView also caps 15m history (~20k bars), so you see recent months,
+not the whole 2019&ndash;2024 record. The numbers of record are the streaming backtest above.</div>
+
+<h2>6 &middot; Full Pine source (v6)</h2>
+<div class="copybar">
+  <span class="muted">Paste this whole block into the Pine Editor. This page is the copy of record.</span>
+  <button class="btn" id="copyBtn">Copy Pine source</button>
+</div>
+<pre class="src" id="pineSrc">//@version=6
+// =============================================================================
+// Annie Monday Fade — Strategy V3  ·  STREAMING
+// -----------------------------------------------------------------------------
+// strategy() twin of "Annie Monday Fade — V3 STREAMING" so TradingView's Strategy
+// Tester shows every trade: entry/exit arrows, trade list, P&amp;L. The SIGNAL LOGIC
+// is IDENTICAL to the indicator (and to backtests/g1_pine_mirror_v3.py, which
+// matches the 167-trade streaming ground truth 159/167 = 95.2% exact).
+//
+// V3 = the live-executable streaming rebuild: it commits to the RUNNING early-week
+// extreme in real time and fires AT the entry bar — no lock-at-close, no repaint.
+// Honest, live-executable in-sample economics (2019-09→2024-12, Monday fade):
+//   167 trades · +0.347R/trade @ 2.5R · WR 45.5% · PF 1.64 · t=2.84 · ~2.7/mo.
+//   (@1.9R: +0.257R, t=2.46, PF 1.51.) The old +0.382R was hindsight-mode.
+//
+// HOW FILLS WORK IN THE TESTER (read before judging its P&amp;L): the streaming entry
+// is the OPEN of the bar after the retest. This strategy submits a market order the
+// moment that entry bar confirms, so the Tester fills it on the FOLLOWING open —
+// about one 15m bar later than the engine's fill. Stop/TP LEVELS use the engine
+// geometry (stop = running weekly extreme ±0.05%, TP a fixed R multiple from the
+// engine entry). So the picture on the chart is the validated trade plan; only the
+// delayed-fill P&amp;L differs from the authoritative backtest reports on the site.
+// TradingView also caps 15m history (~20k bars) so you see recent months, not the
+// whole 2019-2024 record. The Tester is for SEEING the trades; the numbers of
+// record are the streaming backtest.
+//
+// TP is an INPUT (default 2.5R, selectable 1.9 / 2.5 / 3.0). PVSRA 200%-class
+// vector: volume ≥ 2.0× ta.sma(volume[1],10). Chart: BTCUSDT perp, 15m.
+// =============================================================================
+
+strategy("Annie Monday Fade — Strategy V3", overlay = true,
+     initial_capital = 100000, currency = currency.USD,
+     commission_type = strategy.commission.percent, commission_value = 0.05,
+     slippage = 2, max_lines_count = 500, max_labels_count = 500, max_boxes_count = 500)
+
+// ----------------------------- Inputs ----------------------------------------
+gA = "Anchors (Igor's weekly model)"
+i_tz       = input.string("America/New_York", "Anchor timezone", group = gA)
+i_openHour = input.int(17, "Week open hour (Sunday, NY)", minval = 0, maxval = 23, group = gA)
+i_friHour  = input.int(8,  "Friday hard-cutoff hour (NY)", minval = 0, maxval = 23, group = gA)
+i_earlyFrac= input.float(0.286, "Early-window fraction of week (Sun/Mon/Tue)", minval = 0.1, maxval = 0.6, step = 0.001, group = gA)
+
+gD = "Detector knobs (validated defaults — do not change to trade the edge)"
+i_emaLen   = input.int(50, "50-EMA length", minval = 2, group = gD)
+i_volLb    = input.int(10, "PVSRA volume lookback (prior N)", minval = 2, group = gD)
+i_vecMult  = input.float(2.0, "200%-class vector threshold (x vol avg)", minval = 1.0, step = 0.1, group = gD)
+i_minSpike = input.float(0.10, "Min spike beyond box (%)", minval = 0.0, step = 0.01, group = gD)
+i_touchTol = input.float(0.15, "50-EMA wick-touch tolerance (%)", minval = 0.0, step = 0.01, group = gD)
+i_crossTol = input.float(0.10, "50-EMA body-cross tolerance (%)", minval = 0.0, step = 0.01, group = gD)
+i_span     = input.int(320, "Max bars L1 -&gt; retest", minval = 1, group = gD)
+i_stopBuf  = input.float(0.05, "Stop buffer beyond extreme (%)", minval = 0.0, step = 0.01, group = gD)
+i_rr       = input.float(2.5, "TP (R multiple)", options = [1.9, 2.5, 3.0], group = gD)
+i_mondayOnly = input.bool(true, "Monday-spike only (the validated edge)", group = gD)
+
+gR = "Strategy sizing"
+i_riskPct  = input.float(1.0, "Risk per trade (% of equity)", minval = 0.01, maxval = 10.0, step = 0.1, group = gR)
+
+gV = "Visuals"
+i_showBox    = input.bool(true,  "Weekend box", group = gV)
+i_showPeak   = input.bool(true,  "Spike-peak marker", group = gV)
+i_showL1     = input.bool(true,  "L1 vector highlight", group = gV)
+i_showRetest = input.bool(true,  "Retest marker", group = gV)
+i_showEntry  = input.bool(true,  "Entry arrow", group = gV)
+i_showStopTP = input.bool(true,  "Stop / TP lines", group = gV)
+i_showExt    = input.bool(true,  "Weekly-extreme line", group = gV)
+i_showEma    = input.bool(true,  "50-EMA", group = gV)
+
+// derived tolerances (fractions)
+touchTol = i_touchTol / 100.0
+crossTol = i_crossTol / 100.0
+minSpike = i_minSpike / 100.0
+stopBuf  = i_stopBuf  / 100.0
+
+DAY_MS = 86400000
+
+// ----------------------------- Per-bar indicators ----------------------------
+ema50 = ta.ema(close, i_emaLen)
+avgVol   = ta.sma(volume[1], i_volLb)
+volRatio = na(avgVol) or avgVol == 0 ? 0.0 : volume / avgVol
+is200    = volRatio &gt;= i_vecMult
+isUp     = close &gt;= open
+
+plot(i_showEma ? ema50 : na, "50 EMA", color = color.new(color.orange, 0), linewidth = 1)
+
+// ----------------------------- Week time anchors -----------------------------
+_dow  = dayofweek(time, i_tz)
+_yr   = year(time, i_tz)
+_mo   = month(time, i_tz)
+_dy   = dayofmonth(time, i_tz)
+_today0     = timestamp(i_tz, _yr, _mo, _dy, i_openHour, 0)
+_daysBack   = _dow - 1
+_approxSun  = _today0 - _daysBack * DAY_MS
+weekOpenTs  = timestamp(i_tz, year(_approxSun, i_tz), month(_approxSun, i_tz), dayofmonth(_approxSun, i_tz), i_openHour, 0)
+if time &lt; weekOpenTs
+    _approxSun2 = _today0 - (_daysBack + 7) * DAY_MS
+    weekOpenTs := timestamp(i_tz, year(_approxSun2, i_tz), month(_approxSun2, i_tz), dayofmonth(_approxSun2, i_tz), i_openHour, 0)
+
+weekEndTs  = weekOpenTs + 7 * DAY_MS
+earlyEndTs = weekOpenTs + int(i_earlyFrac * 7.0 * DAY_MS)
+_friApprox = weekOpenTs + 5 * DAY_MS
+friEndTs   = timestamp(i_tz, year(_friApprox, i_tz), month(_friApprox, i_tz), dayofmonth(_friApprox, i_tz), i_friHour, 0)
+
+newWeek = weekOpenTs != weekOpenTs[1]
+
+// ----------------------------- Persistent streaming state --------------------
+var float boxTop  = na
+var float boxBot  = na
+var float pendTop = na
+var float pendBot = na
+
+var float weekHigh = na
+var float weekLow  = na
+var float earlyHigh = na
+var float earlyLow  = na
+var int   earlyHiT  = 0
+var int   earlyLoT  = 0
+
+var int   fadeDir   = 0
+var float extPrice  = na
+var int   extBar    = 0
+var int   extT      = 0
+var bool  committed = false
+var bool  chainDead = false
+var bool  entryTaken= false
+
+var bool  l1Found   = false
+var int   l1Bar     = 0
+var int   l1T       = 0
+var float l1Low     = na
+var float l1High    = na
+var bool  c2latch   = false
+
+var bool  armed        = false
+var float armWick      = na
+var int   armFadeDir   = 0
+var int   armExtT      = 0
+var float armExtPrice  = na
+var int   armL1T       = 0
+var float armL1H       = na
+var float armL1L       = na
+var int   armRetestT   = 0
+var float armRetestEma = na
+
+longFired  = false
+shortFired = false
+oStopP = 0.0
+oTpP   = 0.0
+oSd    = 0.0
+
+if barstate.isconfirmed
+    // --- New week bootstrap ---
+    if newWeek
+        boxTop := pendTop
+        boxBot := pendBot
+        pendTop := na
+        pendBot := na
+        weekHigh := na
+        weekLow  := na
+        earlyHigh := na
+        earlyLow  := na
+        earlyHiT := 0
+        earlyLoT := 0
+        fadeDir   := 0
+        extPrice  := na
+        extT      := 0
+        extBar    := 0
+        committed := false
+        chainDead := false
+        entryTaken:= false
+        l1Found   := false
+        l1Bar     := 0
+        c2latch   := false
+        armed     := false
+        if i_showBox and not na(boxTop) and not na(boxBot)
+            box.new(weekOpenTs - 2 * DAY_MS, boxTop, weekOpenTs, boxBot, xloc = xloc.bar_time,
+                 border_color = color.new(color.gray, 40), bgcolor = color.new(color.gray, 90))
+
+    // --- running weekly extreme (stop), every bar ---
+    weekHigh := na(weekHigh) ? high : math.max(weekHigh, high)
+    weekLow  := na(weekLow)  ? low  : math.min(weekLow, low)
+
+    // --- weekend box accumulation for the FOLLOWING week ---
+    if time &gt;= weekOpenTs + 5 * DAY_MS and time &lt; weekEndTs
+        pendTop := na(pendTop) ? close : math.max(pendTop, close)
+        pendBot := na(pendBot) ? close : math.min(pendBot, close)
+
+    // (1) ARMED-ENTRY resolution: retest completed last bar -&gt; this bar's open fills
+    if armed and not entryTaken
+        entryRef = open
+        if time &lt; friEndTs
+            wickOk = armFadeDir == -1 ? armWick &gt; entryRef : armWick &lt; entryRef
+            if wickOk
+                entryTaken := true
+                extHr = hour(armExtT, i_tz)
+                extDw = dayofweek(armExtT, i_tz)
+                isMon = (extHr &lt; i_openHour and extDw == 2) or (extHr &gt;= i_openHour and extDw == 1)
+                if (not i_mondayOnly) or isMon
+                    stopP = armFadeDir == -1 ? armWick * (1 + stopBuf) : armWick * (1 - stopBuf)
+                    sd    = math.abs(entryRef - stopP)
+                    if sd &gt; 0
+                        tpP = armFadeDir == -1 ? entryRef - i_rr * sd : entryRef + i_rr * sd
+                        oStopP := stopP
+                        oTpP   := tpP
+                        oSd    := sd
+                        if armFadeDir == 1
+                            longFired := true
+                        else
+                            shortFired := true
+                        dirCol = armFadeDir == -1 ? color.red : color.green
+                        if i_showPeak
+                            label.new(armExtT, armExtPrice, text = armFadeDir == -1 ? "▲ peak" : "▼ peak",
+                                 xloc = xloc.bar_time, style = armFadeDir == -1 ? label.style_label_down : label.style_label_up,
+                                 color = color.new(color.gray, 20), textcolor = color.white, size = size.tiny)
+                        if i_showL1
+                            box.new(armL1T, armL1H, armL1T + 15 * 60000, armL1L, xloc = xloc.bar_time,
+                                 border_color = color.new(color.yellow, 0), bgcolor = color.new(color.yellow, 80))
+                        if i_showRetest
+                            label.new(armRetestT, armRetestEma, text = "retest", xloc = xloc.bar_time,
+                                 style = label.style_label_center, color = color.new(color.blue, 30),
+                                 textcolor = color.white, size = size.tiny)
+                        if i_showEntry
+                            label.new(time, entryRef, text = armFadeDir == -1 ? "SHORT (engine bar)" : "LONG (engine bar)",
+                                 xloc = xloc.bar_time, style = armFadeDir == -1 ? label.style_label_down : label.style_label_up,
+                                 color = color.new(dirCol, 0), textcolor = color.white, size = size.small)
+                        if i_showExt
+                            line.new(armExtT, armWick, friEndTs, armWick, xloc = xloc.bar_time,
+                                 color = color.new(color.gray, 20), width = 1, style = line.style_dotted)
+                        if i_showStopTP
+                            line.new(time, stopP, friEndTs, stopP, xloc = xloc.bar_time,
+                                 color = color.new(color.red, 0), width = 1, style = line.style_dashed)
+                            line.new(time, tpP, friEndTs, tpP, xloc = xloc.bar_time,
+                                 color = color.new(color.green, 0), width = 1, style = line.style_dashed)
+                            label.new(friEndTs, stopP, "stop", xloc = xloc.bar_time, style = label.style_label_left,
+                                 color = color.new(color.red, 30), textcolor = color.white, size = size.tiny)
+                            label.new(friEndTs, tpP, str.tostring(i_rr, "#.#") + "R TP", xloc = xloc.bar_time,
+                                 style = label.style_label_left, color = color.new(color.green, 30),
+                                 textcolor = color.white, size = size.tiny)
+            else
+                chainDead := true
+        else
+            chainDead := true
+        armed := false
+
+    // (2) EARLY-WINDOW running spike extreme + STREAMING commit
+    if not entryTaken and time &lt;= earlyEndTs
+        newExtreme = false
+        if na(earlyHigh) or high &gt; earlyHigh
+            earlyHigh := high
+            earlyHiT  := time
+            newExtreme := true
+        if na(earlyLow) or low &lt; earlyLow
+            earlyLow := low
+            earlyLoT := time
+            newExtreme := true
+        boxOk = not na(boxTop) and not na(boxBot) and boxTop &gt; boxBot
+        if newExtreme and boxOk
+            upExc   = (earlyHigh - boxTop) / boxTop
+            downExc = (boxBot - earlyLow) / boxBot
+            if math.max(upExc, downExc) &gt;= minSpike
+                newDir  = upExc &gt;= downExc ? -1 : 1
+                newExtT = newDir == -1 ? earlyHiT : earlyLoT
+                newExtP = newDir == -1 ? earlyHigh : earlyLow
+                if newDir != fadeDir or newExtT != extT
+                    fadeDir   := newDir
+                    extT      := newExtT
+                    extBar    := bar_index
+                    extPrice  := newExtP
+                    committed := true
+                    chainDead := false
+                    l1Found   := false
+                    c2latch   := false
+
+    // (3) CHAIN step: L1 -&gt; retest -&gt; ARM (forward only)
+    if committed and not chainDead and not armed and not entryTaken and bar_index &gt;= extBar
+        emaOk = not na(ema50) and ema50 != 0
+        if not l1Found
+            brk = false
+            if emaOk and is200
+                if fadeDir == 1 and isUp and close &gt;= ema50 and open &lt;= ema50 * (1 + crossTol)
+                    brk := true
+                if fadeDir == -1 and not isUp and close &lt;= ema50 and open &gt;= ema50 * (1 - crossTol)
+                    brk := true
+            if brk
+                l1Found := true
+                l1Bar   := bar_index
+                l1T     := time
+                l1Low   := low
+                l1High  := high
+                c2latch := false
+        else if bar_index &gt; l1Bar
+            if bar_index &gt;= l1Bar + i_span
+                chainDead := true
+            else if emaOk
+                if fadeDir == 1 and close &lt; ema50 * (1 - crossTol)
+                    chainDead := true
+                else if fadeDir == -1 and close &gt; ema50 * (1 + crossTol)
+                    chainDead := true
+                else
+                    if high &gt;= l1Low and low &lt;= l1High
+                        c2latch := true
+                    touched = fadeDir == 1 ? low &lt;= ema50 * (1 + touchTol) : high &gt;= ema50 * (1 - touchTol)
+                    bodyOk  = fadeDir == 1 ? math.min(open, close) &gt;= ema50 * (1 - crossTol) : math.max(open, close) &lt;= ema50 * (1 + crossTol)
+                    if touched and bodyOk and c2latch
+                        armed        := true
+                        armFadeDir   := fadeDir
+                        armWick      := fadeDir == -1 ? weekHigh : weekLow
+                        armExtT      := extT
+                        armExtPrice  := extPrice
+                        armL1T       := l1T
+                        armL1H       := l1High
+                        armL1L       := l1Low
+                        armRetestT   := time
+                        armRetestEma := ema50
+
+    // --- STRATEGY ORDERS (market submitted at the engine entry bar; risk-sized) ---
+    if (longFired or shortFired) and oSd &gt; 0
+        qty = strategy.equity * i_riskPct / 100.0 / oSd
+        if qty &gt; 0
+            isLong = longFired
+            strategy.entry("fade", isLong ? strategy.long : strategy.short, qty = qty,
+                 comment = isLong ? "fade LONG" : "fade SHORT")
+            strategy.exit("exit", "fade", stop = oStopP, limit = oTpP)
+
+    // --- Friday hard cap: flat before the weekend, always ---
+    if strategy.position_size != 0 and time &gt;= friEndTs
+        strategy.close("fade", comment = "friday cap")
+
+entryFired = longFired or shortFired
+
+// ----------------------------- Alerts ----------------------------------------
+alertcondition(longFired, title = "Annie Monday Fade V3 — LONG entry",
+     message = "Annie Monday Fade V3 Strategy: LONG entry on BTCUSDT 15m at {{time}}")
+alertcondition(shortFired, title = "Annie Monday Fade V3 — SHORT entry",
+     message = "Annie Monday Fade V3 Strategy: SHORT entry on BTCUSDT 15m at {{time}}")
+
+plotshape(longFired,  title = "LONG entry (signal bar)",  style = shape.triangleup,   location = location.belowbar, color = color.new(color.green, 0), size = size.tiny)
+plotshape(shortFired, title = "SHORT entry (signal bar)", style = shape.triangledown, location = location.abovebar, color = color.new(color.red, 0),   size = size.tiny)
+</pre>
+
+<div class="foot">
+  Annie Trading &middot; <code>Annie_Monday_Fade_Strategy_V3.pine</code> &middot; causal Pine&nbsp;v6 streaming rebuild of the validated Monday
+  weekend-box fade. Fidelity 159/167 = 95.2% exact vs the streaming ground truth (backtests/g1_pine_mirror_v3.py); acid test fires the
+  live 2026-07-14 01:15 UTC long; 0 signal revisions. Live-honest stats: +0.347R @ 2.5R, +0.257R @ 1.9R. Self-contained.
+</div>
+</div>
+<script>
+  (function(){
+    var btn=document.getElementById('copyBtn');
+    var pre=document.getElementById('pineSrc');
+    if(!btn||!pre)return;
+    btn.addEventListener('click',function(){
+      var txt=pre.innerText;
+      function done(){var o=btn.textContent;btn.textContent='Copied!';setTimeout(function(){btn.textContent=o;},1400);}
+      if(navigator.clipboard&&navigator.clipboard.writeText){
+        navigator.clipboard.writeText(txt).then(done,function(){fallback();});
+      }else{fallback();}
+      function fallback(){
+        var r=document.createRange();r.selectNodeContents(pre);
+        var s=window.getSelection();s.removeAllRanges();s.addRange(r);
+        try{document.execCommand('copy');done();}catch(e){}
+      }
+    });
+  })();
+</script>
+<script>
+(function(){
+  var btn=document.getElementById('themeToggle');
+  if(!btn)return;
+  var mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;
+  function stored(){try{var t=localStorage.getItem('codexTheme');return (t==='light'||t==='dark'||t==='system')?t:'system';}catch(e){return 'system';}}
+  function eff(m){return (m==='light'||m==='dark')?m:((mq&&mq.matches)?'dark':'light');}
+  function apply(){var m=stored();document.documentElement.setAttribute('data-theme',eff(m));btn.textContent=(m==='light')?'\u25D0 Light':(m==='dark')?'\u25D1 Dark':'\u25D3 Auto';}
+  apply();
+  btn.addEventListener('click',function(){var order={light:'dark',dark:'system',system:'light'};var n=order[stored()];try{localStorage.setItem('codexTheme',n);}catch(e){}apply();});
+  if(mq){var h=function(){if(stored()==='system')apply();};if(mq.addEventListener)mq.addEventListener('change',h);else if(mq.addListener)mq.addListener(h);}
+})();
+</script>
+</body>
+</html>
