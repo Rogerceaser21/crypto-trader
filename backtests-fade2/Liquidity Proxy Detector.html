@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Liquidity Proxy Detector — Annie Fade v2</title>
+<style>
+  :root{
+    --bg:#0e1117; --panel:#161b22; --panel2:#1c2230; --ink:#e6edf3; --muted:#9aa4b2;
+    --line:#2a3140; --accent:#6aa9ff; --m3:#26a69a; --m1:#ff9800;
+    --up:#3fb950; --dn:#f85149; --warn:#e3b341;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  .wrap{max-width:940px;margin:0 auto;padding:34px 22px 90px;}
+  header{border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:8px}
+  .eyebrow{letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:var(--accent);font-weight:700}
+  h1{font-size:30px;margin:8px 0 6px;line-height:1.2}
+  h2{font-size:21px;margin:38px 0 12px;padding-top:8px;border-top:1px solid var(--line)}
+  h3{font-size:16px;margin:22px 0 8px;color:var(--ink)}
+  p{color:var(--ink)}
+  .sub{color:var(--muted);font-size:15px;max-width:74ch}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:14px 0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+  @media(max-width:720px){.grid2,.grid3{grid-template-columns:1fr}}
+  code,kbd{background:#0b0f16;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px}
+  kbd{color:var(--accent)}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13.5px}
+  .scroll{overflow-x:auto}
+  th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+  th{background:var(--panel2);color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.03em}
+  td.n{font-family:ui-monospace,Menlo,monospace;white-space:nowrap;text-align:right}
+  .callout{border-left:4px solid var(--warn);background:rgba(227,179,65,.08);padding:12px 16px;border-radius:8px;margin:12px 0}
+  .callout.good{border-left-color:var(--m3);background:rgba(38,166,154,.08)}
+  .callout.bad{border-left-color:var(--dn);background:rgba(248,81,73,.09)}
+  .callout b{color:var(--ink)}
+  .verdict{border-radius:14px;padding:20px 22px;margin:16px 0 6px;border:1px solid var(--line)}
+  .verdict.mixed{background:linear-gradient(135deg,rgba(227,179,65,.14),rgba(248,81,73,.10));border-color:var(--warn)}
+  .verdict h2{border:0;margin:0 0 8px;padding:0;font-size:22px}
+  .stat{display:flex;flex-direction:column;gap:2px}
+  .stat .big{font-size:30px;font-weight:800;line-height:1;font-family:ui-monospace,Menlo,monospace}
+  .stat .lbl{font-size:12.5px;color:var(--muted)}
+  .good-t{color:var(--up)} .bad-t{color:var(--dn)} .warn-t{color:var(--warn)}
+  ul.tight{margin:6px 0 6px 0;padding-left:20px} ul.tight li{margin:5px 0}
+  ol.steps{counter-reset:s;list-style:none;padding-left:0;margin:0}
+  ol.steps li{position:relative;padding:10px 0 10px 46px;border-bottom:1px solid var(--line)}
+  ol.steps li:last-child{border-bottom:0}
+  ol.steps li::before{counter-increment:s;content:counter(s);position:absolute;left:0;top:10px;
+    width:30px;height:30px;border-radius:50%;background:var(--accent);color:#0b0f16;font-weight:800;
+    display:flex;align-items:center;justify-content:center;font-size:14px}
+  .pill{display:inline-block;font-size:11px;font-weight:700;border-radius:20px;padding:2px 9px;color:#0b0f16;background:var(--up)}
+  .pill.no{background:var(--dn);color:#fff}
+  .pill.a{background:var(--accent)} .pill.b{background:var(--m3)} .pill.tie{background:var(--muted)}
+  .foot{color:var(--muted);font-size:12.5px;margin-top:50px;border-top:1px solid var(--line);padding-top:16px}
+  .muted{color:var(--muted)}
+  html[data-theme="light"]{
+    --bg:#f7f9fc; --panel:#ffffff; --panel2:#eef1f6; --ink:#1a2230; --muted:#5b6472;
+    --line:#d7dde6; --accent:#2f6fe0; --m3:#178f83; --m1:#c97400;
+    --up:#1e7d34; --dn:#c92c22; --warn:#a6740b;
+  }
+  html[data-theme="light"] code, html[data-theme="light"] kbd{background:#eef1f5;color:var(--ink)}
+  html[data-theme="light"] .callout{background:rgba(166,116,11,.10)}
+  html[data-theme="light"] .callout.good{background:rgba(23,143,131,.10)}
+  html[data-theme="light"] .callout.bad{background:rgba(201,44,34,.09)}
+  html[data-theme="light"] .pill,html[data-theme="light"] ol.steps li::before{color:#fff}
+  html[data-theme="light"] .pill.tie{color:#fff}
+  .theme-toggle{position:fixed;top:16px;right:20px;z-index:100;background:var(--panel);
+    border:1px solid var(--line);color:var(--ink);border-radius:20px;padding:6px 14px;
+    font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.35);
+    font-family:inherit;letter-spacing:.02em}
+  html[data-theme="light"] .theme-toggle{box-shadow:0 2px 10px rgba(0,0,0,.10)}
+  .theme-toggle:active{transform:translateY(1px)}
+@media(max-width:560px){.theme-toggle{top:10px;right:12px;padding:6px 10px;font-size:12px}body{padding-top:44px}}
+</style>
+<script>
+(function(){try{var t=localStorage.getItem('codexTheme');var e=(t==='light'||t==='dark')?t:((window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light');document.documentElement.setAttribute('data-theme',e);}catch(e){}})();
+</script>
+</head>
+<body>
+<button type="button" id="themeToggle" class="theme-toggle" aria-label="Cycle theme: light, dark, or system">&#9683; Auto</button>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Annie Trading &middot; Fade v2 &middot; keyless detector</div>
+  <h1>Liquidity Proxy Detector</h1>
+  <p class="sub">A <b>keyless stand-in for a liquidation heat-map</b>, built only from candles per Igor&rsquo;s
+  ruling&nbsp;11. The idea: the market maker hunts <b>previous wicks</b> (where the crowd parks stops &rarr; where
+  liquidations cluster) and <b>previous unrecovered vectors</b> (fast PVSRA candles that were never rebalanced),
+  across the previous week and the current Monday spike-out leg. This page reports how well that proxy reproduces
+  Igor&rsquo;s own hand-drawn <b>LIQ Levels</b> labels, and whether the levels line up with the frozen 91 fade entries.</p>
+</header>
+
+<div class="verdict mixed">
+  <h2>Verdict — honest read</h2>
+  <p style="margin:0 0 12px"><b>The detector is built, fully causal, and deterministic — but it does NOT yet
+  reproduce Igor&rsquo;s LIQ-Levels labels, and its levels are too dense to act as a sharp confluence filter.</b>
+  Promising raw material, not a finished signal.</p>
+  <div class="grid3">
+    <div class="stat"><span class="big warn-t">33&ndash;60%</span><span class="lbl">direction agreement vs Igor&rsquo;s 15 labelled weeks (depends on an <b>undocumented</b> Short/Long side convention)</span></div>
+    <div class="stat"><span class="big warn-t">|r| 0.10&ndash;0.35</span><span class="lbl">magnitude correlation of proxy vs label imbalance — weak; his counts (up to 35) dwarf ours (~7)</span></div>
+    <div class="stat"><span class="big good-t">md5 match</span><span class="lbl">deterministic: two full passes produced byte-identical level dumps</span></div>
+  </div>
+  <p class="muted" style="margin:12px 0 0;font-size:13.5px">Usefulness preview: 84.6% of the 91 fade entries sit within
+  0.35% of an active level and 56.0% of the 1.9R targets do — <b>but</b> the proxy emits ~13&ndash;20 levels/week whose
+  0.35% bands already blanket <b>65.8%</b> of a &plusmn;5% window around price. So entry-coincidence is only ~19pp above
+  that saturation floor, and TP-coincidence is <b>below</b> it. The coincidence is mostly <b>density, not selectivity</b>.</p>
+</div>
+
+<h2>1 · What it detects (plain language)</h2>
+<p>Two families of level, both read <b>only from candles that closed before the query time</b> — no future data, no paid feed.</p>
+
+<div class="grid2">
+  <div class="card">
+    <h3 style="margin-top:2px">(a) Wick levels — 1H chart</h3>
+    <ul class="tight">
+      <li>Find <b>swing-wick extremes</b> with k=3 fractal pivots (the exact <code>patterns.find_pivots</code> convention: a bar higher/lower than the 3 bars on each side).</li>
+      <li>Source window: the <b>previous week + the current week so far</b>.</li>
+      <li>A wick <b>stays active</b> until price trades <em>cleanly</em> through it.</li>
+      <li><b>Clean-break rule (declared):</b> a later 1H candle <b>closes</b> beyond the wick — <code>close &gt; swing-high</code> or <code>close &lt; swing-low</code>. A pierce that closes back inside does <em>not</em> kill the level.</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:2px">(b) Unrecovered vector zones — 15m chart</h3>
+    <ul class="tight">
+      <li>Take PVSRA <b>vector candles</b> (200% and 150% volume classes, via <code>pvsra.compute_pvsra</code>) inside the <b>Monday spike-out leg + previous week</b>.</li>
+      <li>A zone is a target while it is <b>unrecovered</b>.</li>
+      <li><b>Recovery rule (declared):</b> price has <em>not</em> traded back through <b>50% of the vector&rsquo;s body</b> (<code>body_mid = (open+close)/2</code>) since it printed. A bull vector recovers when a later <b>low ≤ body-mid</b>; a bear vector when a later <b>high ≥ body-mid</b>. On recovery the zone deactivates.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="callout">
+  <b>Week anchor.</b> The task pins evaluation to <b>Monday 00:00 UTC</b>, so the module uses a plain UTC-Monday week
+  (Mon 00:00 → next Mon 00:00), not Annie&rsquo;s 5pm-NY trading week. At Monday 00:00 the current week is empty, so the
+  active set is the previous week&rsquo;s inventory. <b>Side</b> is measured against the reference price (last 15m close
+  before <code>t</code>): levels <b>above</b> = one liquidity pool, levels <b>below</b> = the other.
+  Module: <code>detectors/liq_proxy.py</code> · API: <code>liq_levels(t, df_1h, df_15m)</code>.
+</div>
+
+<h2>2 · Validation vs Igor&rsquo;s own labels</h2>
+<p>Ground truth = the <code>LIQ Levels Short (15M)</code> / <code>LIQ Levels Long (15M)</code> columns in
+<code>tab_Weekends_Move.csv</code>. <b>What those columns actually contain: integer COUNTS, not prices</b>
+(e.g. Short=7, Long=35), and only <b>15 weeks in early-2023</b> are populated (the 2025 rows are blank; the pre-Jan-2023
+rows say &ldquo;Not Avail from this date&rdquo;). Because they are counts, the score is a <b>count-direction</b> test:
+does the proxy agree on <b>which side holds more liquidity</b> at Monday 00:00 UTC?</p>
+
+<div class="callout bad">
+  <b>The side-convention is undocumented — this halves-or-doubles the score.</b> Igor&rsquo;s columns don&rsquo;t say whether
+  &ldquo;Short&rdquo; liquidity sits <em>above</em> price (where shorts get liquidated) or <em>below</em> it (a short trade&rsquo;s
+  take-profit target). Under <b>Mapping A</b> (Short=above) the proxy agrees on only <b>27&ndash;33%</b> of weeks — worse than a
+  coin flip, which itself is the tell. Flip to <b>Mapping B</b> (Short=below / the trade-target reading) and agreement rises to
+  <b>60%</b>. The data leans toward Mapping B, but 60% is still a <b>weak</b> match, and the raw counts never line up
+  (his max 35 vs our max ~18). <b>Needs a one-line ruling from Igor on what the column means.</b>
+</div>
+
+<div class="scroll">
+<table>
+  <thead><tr>
+    <th>Weekend label</th><th>Reversal Mon (UTC)</th><th class="n">Ref px</th>
+    <th class="n">Igor S / L</th><th class="n">Proxy full S / L</th><th class="n">Proxy 15m-vec S / L</th>
+    <th>Side agrees?</th>
+  </tr></thead>
+  <tbody>
+    <tr><td>2023-06-05</td><td>2023-06-05</td><td class="n">27,102</td><td class="n">5 / 3</td><td class="n">9 / 9</td><td class="n">2 / 1</td><td><span class="pill a">A ✓</span></td></tr>
+    <tr><td>2023-04-29</td><td>2023-05-01</td><td class="n">29,223</td><td class="n">1 / 4</td><td class="n">4 / 12</td><td class="n">1 / 1</td><td><span class="pill tie">tie</span></td></tr>
+    <tr><td>2023-04-22</td><td>2023-04-24</td><td class="n">27,576</td><td class="n">0 / 1</td><td class="n">15 / 5</td><td class="n">2 / 1</td><td><span class="pill b">B ✓</span></td></tr>
+    <tr><td>2023-04-15</td><td>2023-04-17</td><td class="n">30,287</td><td class="n">1 / 0</td><td class="n">8 / 15</td><td class="n">2 / 3</td><td><span class="pill b">B ✓</span></td></tr>
+    <tr><td>2023-08-04</td><td>2023-08-07</td><td class="n">29,076</td><td class="n">0 / 8</td><td class="n">7 / 6</td><td class="n">1 / 0</td><td><span class="pill b">B ✓</span></td></tr>
+    <tr><td>2023-04-01</td><td>2023-04-03</td><td class="n">28,161</td><td class="n">5 / 2</td><td class="n">9 / 11</td><td class="n">2 / 5</td><td><span class="pill b">B ✓</span></td></tr>
+    <tr><td>2023-03-25</td><td>2023-03-27</td><td class="n">27,954</td><td class="n">0 / 11</td><td class="n">7 / 7</td><td class="n">0 / 2</td><td><span class="pill a">A ✓</span></td></tr>
+    <tr><td>2023-03-18</td><td>2023-03-20</td><td class="n">27,956</td><td class="n">8 / 18</td><td class="n">2 / 18</td><td class="n">1 / 7</td><td><span class="pill a">A ✓</span></td></tr>
+    <tr><td>2023-03-11</td><td>2023-03-13</td><td class="n">21,986</td><td class="n">7 / 35</td><td class="n">6 / 11</td><td class="n">0 / 5</td><td><span class="pill a">A ✓</span></td></tr>
+    <tr><td>2023-03-04</td><td>2023-03-06</td><td class="n">22,419</td><td class="n">0 / 2</td><td class="n">8 / 6</td><td class="n">1 / 0</td><td><span class="pill b">B ✓</span></td></tr>
+    <tr><td>2023-02-25</td><td>2023-02-27</td><td class="n">23,545</td><td class="n">3 / 8</td><td class="n">13 / 8</td><td class="n">2 / 1</td><td><span class="pill b">B ✓</span></td></tr>
+    <tr><td>2023-02-18</td><td>2023-02-20</td><td class="n">24,266</td><td class="n">6 / 4</td><td class="n">8 / 16</td><td class="n">5 / 6</td><td><span class="pill b">B ✓</span></td></tr>
+    <tr><td>2023-02-11</td><td>2023-02-13</td><td class="n">21,771</td><td class="n">0 / 9</td><td class="n">13 / 4</td><td class="n">7 / 0</td><td><span class="pill b">B ✓</span></td></tr>
+    <tr><td>2023-02-04</td><td>2023-02-06</td><td class="n">22,929</td><td class="n">4 / 0</td><td class="n">13 / 6</td><td class="n">7 / 0</td><td><span class="pill a">A ✓</span></td></tr>
+    <tr><td>2023-01-28</td><td>2023-01-30</td><td class="n">23,740</td><td class="n">2 / 1</td><td class="n">1 / 12</td><td class="n">0 / 3</td><td><span class="pill b">B ✓</span></td></tr>
+  </tbody>
+  <tfoot><tr>
+    <th colspan="6">Direction agreement (15m-vector cut)</th>
+    <th><span class="pill a">A 5/15 = 33%</span> <span class="pill b">B 9/15 = 60%</span></th>
+  </tr></tfoot>
+</table>
+</div>
+<p class="muted" style="font-size:13px">S / L = Short / Long count. &ldquo;A ✓&rdquo; = agrees only if Short=above; &ldquo;B ✓&rdquo; = agrees only if Short=below. Full-set direction (wicks+vectors) scores 27% (A) / 60% (B); the 15m-vector cut, which matches Igor&rsquo;s &ldquo;(15M)&rdquo; label, scores 33% (A) / 60% (B). Magnitude correlation: full <b>r=0.10</b>, 15m-vector <b>r=0.35</b> — both weak.</p>
+
+<div class="callout">
+  <b>Why the counts never match in size.</b> Igor&rsquo;s labels run 0&ndash;35 with a strong long-side skew in the March-2023
+  uptrend; the proxy&rsquo;s prev-week window tops out near 18 and is more balanced. His hand-count almost certainly scans a
+  wider lookback (multiple weeks / the whole visible chart) and applies a discretionary filter the mechanical rule doesn&rsquo;t.
+  The proxy captures the <b>idea</b>, not his exact bookkeeping.
+</div>
+
+<h2>3 · Usefulness preview — frozen 91 fade entries</h2>
+<p>Against <code>backtests/f3_exits_ledger_a.csv</code>, evaluated causally at each real entry time (2019&ndash;2024).
+Two numbers, no optimization — plus one honest control.</p>
+
+<div class="grid3">
+  <div class="card"><div class="stat"><span class="big">84.6%</span><span class="lbl">of entries (77/91) had an active liq level within <b>0.35%</b> — the would-be 4th-retest confluence</span></div></div>
+  <div class="card"><div class="stat"><span class="big">56.0%</span><span class="lbl">of 1.9R take-profit levels (51/91) sit within 0.35% of an active liq level — target alignment</span></div></div>
+  <div class="card"><div class="stat"><span class="big warn-t">65.8%</span><span class="lbl">saturation floor: mean share of a &plusmn;5% window around price already covered by the levels&rsquo; 0.35% bands</span></div></div>
+</div>
+
+<div class="callout bad">
+  <b>Read these against the floor.</b> Because the proxy prints ~13&ndash;20 levels a week, their 0.35% bands already blanket
+  <b>~66%</b> of the price neighbourhood. So the 84.6% entry-coincidence is only <b>~19 points above chance</b>, and the 56.0%
+  TP-coincidence is actually <b>below</b> the floor. Net: the proxy levels are <b>dense, not selective</b> — coincidence with
+  entries/targets is largely saturation. To become a real confluence gate the set must be <b>pruned</b> to a handful of
+  high-conviction levels (e.g. 200%-only vectors, twice-tested wicks) and re-validated.
+</div>
+
+<h2>4 · Worked example — week of 2023-03-13</h2>
+<div class="card">
+  <p style="margin-top:2px">Weekend label <b>2023-03-11</b> → reversal Monday <b>2023-03-13 00:00 UTC</b>, reference price
+  <b>$21,986</b> (last 15m close of Sunday). This was a violent risk-on week (SVB / USDC de-peg reversal); BTC ran from
+  ~$20k toward ~$28k.</p>
+  <ul class="tight">
+    <li><b>Active set at Monday 00:00:</b> 17 levels — 12 from 1H wicks, 5 from unrecovered 15m vectors.</li>
+    <li><b>Proxy imbalance:</b> full 6 above / 11 below; 15m-vectors 0 above / <b>5 below</b> — a clean long-side (below-price) lean, because the prior week left a stack of unrecovered <b>up-vectors</b> underneath as price began to rip higher.</li>
+    <li><b>Igor&rsquo;s label:</b> Short 7 / Long <b>35</b> — an overwhelming long-side lean.</li>
+    <li><b>Result:</b> the proxy and Igor <b>agree on the dominant side</b> (both long-heavy under Mapping&nbsp;A). The direction is right; the <b>magnitude</b> is not — his 35 vs the proxy&rsquo;s 11 below — exactly the scope gap described above.</li>
+  </ul>
+  <p class="muted" style="margin-bottom:2px">This is the best-case week: a strong one-directional move leaves an unambiguous vector stack, and the proxy reads it correctly. The misses cluster on quiet/range weeks where the imbalance is small and noise flips the sign.</p>
+</div>
+
+<h2>5 · Proof &amp; reproducibility</h2>
+<div class="card">
+  <ul class="tight">
+    <li><b>Module:</b> <code>detectors/liq_proxy.py</code> — reuses <code>detectors/pvsra</code> (vector classes) and <code>detectors/patterns.find_pivots</code> (k=3 fractals). <code>python -m py_compile</code> clean.</li>
+    <li><b>Causal:</b> every path slices candles to <code>index &lt; t</code>; fractal pivots are only returned once their k confirming bars have closed, so no look-ahead.</li>
+    <li><b>Deterministic:</b> two independent full passes wrote byte-identical active-level dumps — <code>md5 = 29c2a2cef9639027ee67b876a9f5edd8</code> (both runs).</li>
+    <li><b>Data:</b> cached perp candles (2023 era for validation; full 2019&ndash;2024 15m + 1H-resampled-from-1m for the usefulness preview). Keyless throughout — no paid liquidation feed.</li>
+  </ul>
+</div>
+
+<div class="callout good">
+  <b>Bottom line for Igor.</b> The keyless wick + unrecovered-vector idea is sound and now exists as a causal, deterministic
+  module. As tuned it&rsquo;s <b>too dense</b> to match your sparse hand-counts or to gate entries. Two unblockers: (1) tell me
+  what your <b>&ldquo;LIQ Levels Short/Long&rdquo;</b> columns mean — above price, or a short&rsquo;s target below? (2) say how many
+  levels you actually want per week, so I can prune to the high-conviction few and re-score.
+</div>
+
+<div class="foot">
+  Annie Trading · Fade v2 · Liquidity Proxy Detector · built from <code>detectors/liq_proxy.py</code> ·
+  validation vs <code>tab_Weekends_Move.csv</code> (15 populated 2023 weeks) · usefulness vs
+  <code>f3_exits_ledger_a.csv</code> (91 entries) · causal, keyless, deterministic.
+</div>
+
+</div>
+<script>
+(function(){
+  var btn=document.getElementById('themeToggle');
+  if(!btn)return;
+  var mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;
+  function stored(){try{var t=localStorage.getItem('codexTheme');return (t==='light'||t==='dark'||t==='system')?t:'system';}catch(e){return 'system';}}
+  function eff(m){return (m==='light'||m==='dark')?m:((mq&&mq.matches)?'dark':'light');}
+  function apply(){var m=stored();document.documentElement.setAttribute('data-theme',eff(m));btn.textContent=(m==='light')?'◐ Light':(m==='dark')?'◑ Dark':'◓ Auto';}
+  apply();
+  btn.addEventListener('click',function(){var order={light:'dark',dark:'system',system:'light'};var n=order[stored()];try{localStorage.setItem('codexTheme',n);}catch(e){}apply();});
+  if(mq){var h=function(){if(stored()==='system')apply();};if(mq.addEventListener)mq.addEventListener('change',h);else if(mq.addListener)mq.addListener(h);}
+})();
+</script>
+</body>
+</html>
