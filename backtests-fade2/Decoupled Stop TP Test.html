@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Decoupled Stop / TP Test — Monday Fade</title>
+<style>
+  :root{
+    --bg:#0e1117; --panel:#161b22; --panel2:#1c2230; --ink:#e6edf3; --muted:#9aa4b2;
+    --line:#2a3140; --accent:#6aa9ff; --all:#9598a1; --m3:#26a69a; --m1:#ff9800;
+    --up:#3fb950; --dn:#f85149; --warn:#e3b341;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  .wrap{max-width:980px;margin:0 auto;padding:34px 22px 90px;}
+  header{border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:8px}
+  .eyebrow{letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:var(--accent);font-weight:700}
+  h1{font-size:30px;margin:8px 0 6px;line-height:1.2}
+  h2{font-size:21px;margin:38px 0 12px;padding-top:8px;border-top:1px solid var(--line)}
+  h3{font-size:16px;margin:22px 0 8px;color:var(--ink)}
+  p{color:var(--ink)}
+  .sub{color:var(--muted);font-size:15px;max-width:74ch}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:14px 0}
+  code,kbd{background:#0b0f16;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px}
+  kbd{color:var(--accent)}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13.5px}
+  th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+  th{background:var(--panel2);color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+  td.n,th.n{font-family:ui-monospace,Menlo,monospace;white-space:nowrap;text-align:right}
+  tr.anchor td{background:rgba(106,169,255,.08)}
+  tr.best td{background:rgba(63,185,80,.10)}
+  .good{color:var(--up);font-weight:700}
+  .bad{color:var(--dn);font-weight:700}
+  .warnc{color:var(--warn);font-weight:700}
+  .callout{border-left:4px solid var(--warn);background:rgba(227,179,65,.08);padding:12px 16px;border-radius:8px;margin:12px 0}
+  .callout.good{border-left-color:var(--m3);background:rgba(38,166,154,.08)}
+  .callout.bad{border-left-color:var(--dn);background:rgba(248,81,73,.09)}
+  .callout b{color:var(--ink)}
+  .verdict{border:1px solid var(--line);border-left:6px solid var(--warn);border-radius:12px;
+    background:linear-gradient(180deg,rgba(227,179,65,.10),rgba(227,179,65,.03));padding:20px 22px;margin:18px 0 6px}
+  .verdict.no{border-left-color:var(--dn);background:linear-gradient(180deg,rgba(248,81,73,.12),rgba(248,81,73,.03))}
+  .verdict .lead{font-size:19px;font-weight:800;line-height:1.35;margin:0 0 10px}
+  .verdict ul{margin:8px 0 2px;padding-left:20px}
+  .verdict li{margin:6px 0}
+  .foot{color:var(--muted);font-size:12.5px;margin-top:50px;border-top:1px solid var(--line);padding-top:16px}
+  .muted{color:var(--muted)}
+  ul.tight{margin:6px 0 6px 0;padding-left:20px} ul.tight li{margin:4px 0}
+  .pill{display:inline-block;font-size:11px;font-weight:700;border-radius:20px;padding:2px 10px;color:#0b0f16;background:var(--up)}
+  .pill.no{background:var(--dn);color:#fff}
+  .pill.mid{background:var(--warn);color:#0b0f16}
+  .scrollx{overflow-x:auto}
+  .kv{display:grid;grid-template-columns:auto 1fr;gap:4px 16px;font-size:13.5px}
+  .kv .k{color:var(--muted)} .kv .v{font-family:ui-monospace,Menlo,monospace}
+  .flow{display:flex;flex-wrap:wrap;gap:10px;align-items:stretch;margin:14px 0}
+  .flow .box{flex:1 1 210px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .flow .box h4{margin:0 0 6px;font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+  .flow .box .big{font-family:ui-monospace,Menlo,monospace;font-size:15px;color:var(--ink)}
+  .arrow{align-self:center;color:var(--muted);font-size:20px;font-weight:700}
+
+  html[data-theme="light"]{
+    --bg:#f7f9fc; --panel:#ffffff; --panel2:#eef1f6; --ink:#1a2230; --muted:#5b6472;
+    --line:#d7dde6; --accent:#2f6fe0; --all:#6b6f7a; --m3:#178f83; --m1:#c97400;
+    --up:#1e7d34; --dn:#c92c22; --warn:#a6740b;
+  }
+  html[data-theme="light"] code, html[data-theme="light"] kbd{background:#eef1f5;color:var(--ink)}
+  html[data-theme="light"] .callout{background:rgba(166,116,11,.10)}
+  html[data-theme="light"] .callout.good{background:rgba(23,143,131,.10)}
+  html[data-theme="light"] .callout.bad{background:rgba(201,44,34,.09)}
+  html[data-theme="light"] .pill{color:#fff}
+  .theme-toggle{position:fixed;top:16px;right:20px;z-index:100;background:var(--panel);
+    border:1px solid var(--line);color:var(--ink);border-radius:20px;padding:6px 14px;
+    font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.35);
+    font-family:inherit;letter-spacing:.02em}
+  html[data-theme="light"] .theme-toggle{box-shadow:0 2px 10px rgba(0,0,0,.10)}
+  .theme-toggle:active{transform:translateY(1px)}
+@media(max-width:560px){.theme-toggle{top:10px;right:12px;padding:6px 10px;font-size:12px}body{padding-top:44px}}
+</style>
+<script>
+(function(){try{var t=localStorage.getItem('codexTheme');var e=(t==='light'||t==='dark')?t:((window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light');document.documentElement.setAttribute('data-theme',e);}catch(e){}})();
+</script>
+</head>
+<body>
+<button type="button" id="themeToggle" class="theme-toggle" aria-label="Cycle theme: light, dark, or system">&#9683; Auto</button>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Annie Trading &middot; Monday Fade V1 &middot; Task F15</div>
+  <h1>Decoupled Stop / TP Test</h1>
+  <p class="sub">F11 (<a style="color:var(--accent)" href="Stop Buffer Research.html">Stop Buffer Research</a>) found that a
+  wider stop rescues about half the baseline stop-outs &mdash; the genuine MM wick-raids &mdash; worth roughly <b>+12R</b>
+  on that subset, but the rescue evaporated because the fixed-R target <i>scaled with</i> the wider stop and moved out of
+  reach. This is the fix that finding pointed at: <b>back the hard stop off for raid protection, but keep the take-profit
+  LEVEL nailed to the original tight risk unit.</b> Same 91 frozen entries, in-sample 2019&rarr;2024. The only question:
+  once the target stays put, does the raid rescue finally pay?</p>
+</header>
+
+<div class="verdict no">
+  <p class="lead">No. Decoupling does <span class="bad">not</span> rescue the fade. <span class="pill no">answer: NO</span>
+  Holding the TP on the baseline geometry, <b>every one of the 6 cells finishes below its matched baseline</b> &mdash;
+  full-book R falls in all six. The raid rescue is real (the wider stop <i>does</i> save the wick-hunts, +10.4R on the
+  15-trade raid subset at 0.75%), but sizing honestly on the wider stop <b>shrinks the reward per winner across the whole
+  book</b>, and that cost on the other 76 trades (&minus;15.2R) more than eats the rescue.</p>
+  <ul>
+    <li><b>Best (least-bad) cell:</b> <kbd>0.75% stop + 1.9R</kbd> &mdash; expectancy 0.382&rarr;<b>0.330R</b>, stop-outs
+      29&rarr;<b>13</b>, drawdown 4.6&rarr;<b>3.7R</b>, but total R 34.8&rarr;<b>30.0</b> and paired&nbsp;t vs the 0.05%
+      baseline is <b>&minus;0.89</b>. It is a calmer equity curve that <i>gives up ~5R of edge</i> &mdash; comfort, not profit.</li>
+    <li><b>Highest raw expectancy of the six:</b> <kbd>0.75% stop + 2.5R</kbd> at <b>0.415R</b> &mdash; still short of its
+      own 2.5R baseline (0.506R, paired&nbsp;t &minus;1.44). No cell beats the target it is measured against.</li>
+    <li><b>Two cells lose significantly</b> against the 2.5R baseline: <kbd>0.50%+1.9R</kbd> (paired&nbsp;t
+      <span class="bad">&minus;3.03</span>) and <kbd>0.50%+2.5R</kbd> (<span class="bad">&minus;2.91</span>). None wins significantly.</li>
+    <li><b>The mechanism, isolated:</b> F11 blamed the moving target. F15 removes it &mdash; and the strategy <i>still</i>
+      loses R. So the price of raid protection is <b>structural</b>: a wider risk unit shrinks every winner&rsquo;s
+      reward-to-realized-risk ratio. The tight baseline stop is genuinely optimal here; the raids are the cost of the edge.</li>
+  </ul>
+</div>
+<p class="muted" style="margin-top:4px">Anchor &mdash; the two baselines are the frozen, validated ledger itself
+(<code>f3_exits_ledger_a.csv</code>): 0.05%+1.9R mean <b>+0.381994R</b> (tot 34.76), 0.05%+2.5R mean <b>+0.505594R</b>
+(tot 46.01). Wick recovered two ways agrees to <b>7.3&times;10<sup>&minus;12</sup></b> on all 91. Both determinism runs md5-identical.</p>
+
+<h2>1 &middot; What &ldquo;decouple&rdquo; changes</h2>
+<p class="muted">The baseline fade sizes and targets off <b>one</b> distance: the tight stop 5bp beyond the wick. F11 varied that
+distance and let <i>both</i> the size and the fixed-R target move with it. F15 splits them: the <b>stop</b> is a wide raid
+guard, but the <b>target level</b> is frozen to the baseline risk unit <code>stop_dist_0 = |entry &minus; stop<sub>0.05%</sub>|</code>.</p>
+<div class="flow">
+  <div class="box"><h4>Hard stop (widened)</h4><div class="big">wick &times; (1 &plusmn; buf)</div>
+    <div class="muted" style="font-size:12.5px;margin-top:6px">buf &isin; {0.5%, 0.75%, 1.0%}. Dodges the intrabar wick-raid.</div></div>
+  <div class="arrow">&rarr;</div>
+  <div class="box"><h4>Size (on the REAL stop)</h4><div class="big">$100 / wide_stop_dist</div>
+    <div class="muted" style="font-size:12.5px;margin-top:6px">Honest: a stop-out is &minus;1R on the wide stop.</div></div>
+  <div class="arrow">&rarr;</div>
+  <div class="box"><h4>Target LEVEL (frozen)</h4><div class="big">entry &pm; k &times; stop_dist<sub>0</sub></div>
+    <div class="muted" style="font-size:12.5px;margin-top:6px">k &isin; {1.9, 2.5}. Anchored to the <i>baseline</i> geometry &mdash; does not move with the stop.</div></div>
+</div>
+<div class="callout"><b>The honest price, stated up front.</b> Because size is on the wider stop, a TP hit now pays only
+<code>TP_dist / wide_stop_dist = k &times; (stop_dist<sub>0</sub> / wide_stop_dist)</code> R &mdash; strictly <i>less</i>
+than k. The reward-to-realized-risk ratio shrinks with every basis point of extra stop. That shrink, spread across all 91
+trades, is what the rescue has to beat. It doesn&rsquo;t.</div>
+
+<h2>2 &middot; The 6-cell grid</h2>
+<p class="muted">N = 91 for every cell. Refund on a close through the <b>raw</b> wick and the Friday UK hard-close are
+identical to baseline; fills verbatim from <code>bt_weekly.execute()</code> (fee 0.05%/side, slippage 0.02%/fill, 1m
+intrabar, same-bar stop&amp;target = loss). Two paired-t columns: vs the <b>0.05%+1.9R</b> baseline (+0.382R) and vs the
+<b>0.05%+2.5R</b> baseline (+0.506R). The significance bar is |t|&nbsp;&ge;&nbsp;2.5; <span class="bad">red</span> = a
+significant <i>loss</i>. No cell reaches the bar on the winning side.</p>
+<div class="scrollx">
+<table>
+  <tr><th>Cell (stop + target)</th><th class="n">WR%</th><th class="n">exp R</th><th class="n">med R</th><th class="n">total R</th>
+      <th class="n">PF</th><th class="n">t vs 0</th><th class="n">maxDD R</th>
+      <th class="n">paired t<br>vs +0.382</th><th class="n">paired t<br>vs +0.506</th>
+      <th>exit mix (tp / fri / refund / stop)</th></tr>
+  <tr class="anchor"><td><b>0.05% + 1.9R</b> <span class="pill mid">baseline A</span></td><td class="n">54.9</td><td class="n">0.382</td><td class="n">0.164</td><td class="n">34.8</td><td class="n">2.05</td><td class="n">2.98</td><td class="n">4.6</td><td class="n">&mdash;</td><td class="n">&mdash;</td><td class="n">32 / 30 / 0 / 29</td></tr>
+  <tr class="anchor"><td><b>0.05% + 2.5R</b> <span class="pill mid">baseline B</span></td><td class="n">53.8</td><td class="n">0.506</td><td class="n">0.094</td><td class="n">46.0</td><td class="n">2.34</td><td class="n">3.35</td><td class="n">6.1</td><td class="n">&mdash;</td><td class="n">&mdash;</td><td class="n">27 / 34 / 0 / 30</td></tr>
+  <tr><td colspan="11" style="background:var(--panel2);color:var(--muted);font-size:12px;letter-spacing:.05em">DECOUPLED &mdash; wide stop, target held on baseline geometry</td></tr>
+  <tr><td>0.50% + 1.9R</td><td class="n">56.0</td><td class="n">0.304</td><td class="n">0.153</td><td class="n">27.7</td><td class="n">1.94</td><td class="n">2.78</td><td class="n">4.0</td><td class="n">&minus;2.10</td><td class="n bad">&minus;3.03</td><td class="n">33 / 31 / 7 / 20</td></tr>
+  <tr class="best"><td><b>0.75% + 1.9R</b> <span class="pill">least-bad</span></td><td class="n">58.2</td><td class="n">0.330</td><td class="n">0.307</td><td class="n">30.0</td><td class="n">2.21</td><td class="n">3.31</td><td class="n">3.7</td><td class="n">&minus;0.89</td><td class="n">&minus;2.11</td><td class="n">35 / 32 / 11 / 13</td></tr>
+  <tr><td>1.00% + 1.9R</td><td class="n">58.2</td><td class="n">0.302</td><td class="n">0.293</td><td class="n">27.5</td><td class="n">2.20</td><td class="n">3.28</td><td class="n">3.4</td><td class="n">&minus;1.30</td><td class="n">&minus;2.34</td><td class="n">35 / 32 / 15 / 9</td></tr>
+  <tr><td>0.50% + 2.5R</td><td class="n">54.9</td><td class="n">0.396</td><td class="n">0.151</td><td class="n">36.1</td><td class="n">2.18</td><td class="n">3.13</td><td class="n">5.8</td><td class="n">+0.31</td><td class="n bad">&minus;2.91</td><td class="n">27 / 36 / 7 / 21</td></tr>
+  <tr><td>0.75% + 2.5R <span class="muted" style="font-size:12px">(top exp R)</span></td><td class="n">57.1</td><td class="n">0.415</td><td class="n">0.305</td><td class="n">37.8</td><td class="n">2.46</td><td class="n">3.61</td><td class="n">3.7</td><td class="n">+0.53</td><td class="n">&minus;1.44</td><td class="n">28 / 38 / 11 / 14</td></tr>
+  <tr><td>1.00% + 2.5R</td><td class="n">57.1</td><td class="n">0.383</td><td class="n">0.293</td><td class="n">34.9</td><td class="n">2.48</td><td class="n">3.62</td><td class="n">3.4</td><td class="n">+0.02</td><td class="n">&minus;1.80</td><td class="n">28 / 38 / 16 / 9</td></tr>
+</table>
+</div>
+<p class="muted">The trap is in the exit mix. Widen to 0.75%+1.9R and you get <b>more</b> TP hits than the baseline
+(35 vs 32) and less than half the stop-outs (13 vs 29) &mdash; a nicer-looking book by every count except the one that
+matters. Total R still <i>falls</i> 34.8&rarr;30.0, because every one of those 35 winners is paid at a shrunk R, and 11
+raid survivors settle for near-breakeven <b>refund</b> exits instead of a clean target. More winners, less money.</p>
+
+<h2>3 &middot; Rescue carryover &mdash; the raid subset vs the cost on the rest</h2>
+<p class="muted">The 15 raid-signature stop-outs (from F11&rsquo;s classification &mdash; stop bar poked the stop then closed
+back inside the raw wick) carry <b class="bad">&minus;15.93R</b> at the baseline. Below: for each cell, how many of those 15
+now reach the <i>kept</i> baseline target, the net R won back on the subset, and the R it costs the other 76 trades whose
+winners are now sized on the wider stop. <b>bookΔ</b> is the honest bottom line &mdash; the full 91-trade R vs the matched baseline.</p>
+<div class="scrollx">
+<table>
+  <tr><th>Cell</th><th class="n">of 15 raids: &rarr; TP</th><th class="n">survived (not re-stopped)</th><th class="n">net winners</th>
+      <th class="n">raid subset R</th><th class="n">raid &Delta; vs base</th><th class="n">cost on other 76</th><th class="n">full-book &Delta;</th></tr>
+  <tr class="anchor"><td><b>baseline</b> (raid subset)</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">&minus;15.93</td><td class="n">&mdash;</td><td class="n">&mdash;</td><td class="n">&mdash;</td></tr>
+  <tr><td>0.50% + 1.9R</td><td class="n">1</td><td class="n">4</td><td class="n">1</td><td class="n">&minus;12.02</td><td class="n">+3.91</td><td class="n bad">&minus;11.02</td><td class="n bad">&minus;7.11</td></tr>
+  <tr class="best"><td><b>0.75% + 1.9R</b></td><td class="n">3</td><td class="n">10</td><td class="n">3</td><td class="n">&minus;5.53</td><td class="n good">+10.40</td><td class="n bad">&minus;15.15</td><td class="n bad">&minus;4.75</td></tr>
+  <tr><td>1.00% + 1.9R</td><td class="n">3</td><td class="n">10</td><td class="n">3</td><td class="n">&minus;5.52</td><td class="n good">+10.41</td><td class="n bad">&minus;17.70</td><td class="n bad">&minus;7.29</td></tr>
+  <tr><td>0.50% + 2.5R</td><td class="n">0</td><td class="n">4</td><td class="n">1</td><td class="n">&minus;12.44</td><td class="n">+3.49</td><td class="n bad">&minus;13.42</td><td class="n bad">&minus;9.93</td></tr>
+  <tr><td>0.75% + 2.5R</td><td class="n">1</td><td class="n">10</td><td class="n">3</td><td class="n">&minus;5.70</td><td class="n good">+10.23</td><td class="n bad">&minus;18.48</td><td class="n bad">&minus;8.26</td></tr>
+  <tr><td>1.00% + 2.5R</td><td class="n">1</td><td class="n">10</td><td class="n">3</td><td class="n">&minus;5.66</td><td class="n good">+10.27</td><td class="n bad">&minus;21.41</td><td class="n bad">&minus;11.14</td></tr>
+</table>
+</div>
+<div class="callout bad"><b>The rescue is real; it just isn&rsquo;t enough.</b> At 0.75%+1.9R the wider stop wins back
+<b>+10.40R</b> on the raid subset &mdash; 10 of the 15 survive, 3 reach the kept target, 3 turn net-positive. That is exactly
+the effect your MM-raid instinct predicted. But sizing every trade on the wider stop costs <b>&minus;15.15R</b> on the other
+76, so the full book still drops <b>&minus;4.75R</b>. At 1.0%, more raids survive (still 3 to TP) yet the cost grows faster
+(&minus;17.70R) and the book falls further. There is no buffer where the rescue outruns the shrink.</div>
+<div class="callout"><b>Why so many raid survivors don&rsquo;t reach TP.</b> Of 10 survivors at 0.75%+1.9R only 3 hit the
+target; 5 exit on the raw-wick <b>refund</b> and 2 on Friday. Backing the stop off keeps them alive through the intrabar
+poke, but the refund-on-close-through-wick rule still ejects them the moment the bar <i>closes</i> the wrong side of the
+wick &mdash; and a target sized on the tight baseline unit is often still a long way up. Protection buys survival, not a win.</div>
+
+<h2>4 &middot; The F11 hypothesis, settled</h2>
+<p>F11&rsquo;s closing note read: <span class="muted">&ldquo;the fix implied by the data is to keep the TP on the original
+tight risk unit while backing the hard stop off ~0.5&ndash;0.75% so intrabar raids miss it &mdash; a clean, declared next
+test.&rdquo;</span> This is that test, and it converts an open question into a closed one.</p>
+<div class="card">
+  <div class="kv">
+    <div class="k">F11 diagnosis of the wash</div><div class="v">fixed-R target moved out with the wider stop</div>
+    <div class="k">F15 removes that</div><div class="v">target LEVEL frozen to baseline geometry</div>
+    <div class="k">Result once the target is held</div><div class="v bad">still a net loss in all 6 cells</div>
+    <div class="k">Therefore the true cost is</div><div class="v">structural &mdash; a wider risk unit shrinks every winner</div>
+    <div class="k">Optimal stop for this fade</div><div class="v good">the tight 0.05% baseline</div>
+    <div class="k">Raids are</div><div class="v">the priced-in cost of the edge, not a leak to plug</div>
+  </div>
+</div>
+<p class="muted">The one thing decoupling buys cleanly is a <b>smoother ride</b>: at 0.75% the max drawdown drops from 4.6R to
+3.7R and stop-outs more than halve. If you value equity-curve calm over expectancy you could run 0.75%+1.9R and knowingly
+donate ~5R of edge over the sample &mdash; but that is a comfort trade, and the paired-t (&minus;0.89) says the sample can&rsquo;t
+even prove it&rsquo;s worse, let alone better. On the evidence, leave the stop tight.</p>
+
+<h2>5 &middot; Method &amp; reproducibility</h2>
+<div class="card">
+  <ul class="tight">
+    <li><b>Entries frozen.</b> The 91 Monday-fade entries come straight from <code>backtests/f3_exits_ledger_a.csv</code>.
+      The FROZEN entry recovery, the two-way wick cross-check (7.3&times;10<sup>&minus;12</sup>), and the MM-raid
+      classification (29 stop-outs &rarr; 15 raid-signature) are reused unchanged from
+      <code>backtests/bt_weekly2_stopbuf.py</code> (imported, never modified).</li>
+    <li><b>Baselines are the ledger itself.</b> Paired-t is against the validated frozen R at 0.05%+1.9R (+0.381994R)
+      and 0.05%+2.5R (+0.505594R) &mdash; not a re-simulation. F11 proved the engine reproduces them to ~10<sup>&minus;11</sup>.</li>
+    <li><b>Decoupled construction.</b> stop = <code>wick &times; (1 &plusmn; buf)</code>, size = <code>$100 / wide_stop_dist</code>,
+      TP = <code>entry &pm; k &times; stop_dist<sub>0</sub></code> with <code>stop_dist<sub>0</sub></code> the baseline risk unit;
+      refund watches the raw wick; Friday UK hard-close. Declared 6-cell grid: buf {0.5, 0.75, 1.0}% &times; k {1.9, 2.5}. No tuning.</li>
+    <li><b>Determinism.</b> Two independent full runs produced md5-identical per-trade ledgers
+      (<code>f15_decoupled</code> = <code>4533ed86&hellip;</code>). Engine <code>backtests/bt_weekly2_stopbuf_decoupled.py</code>
+      (py_compile clean). In-sample only, 2019&rarr;2024-12-31, N=91.</li>
+  </ul>
+</div>
+
+<div class="foot">
+  Task F15 &middot; Annie Monday-fade V1 decoupled stop/TP study &middot; in-sample 2019&rarr;2024, N=91.
+  Engine <code>backtests/bt_weekly2_stopbuf_decoupled.py</code>; per-trade ledger <code>backtests/f15_decoupled_a.csv</code>
+  (md5 4533ed86&hellip;). Frozen entries <code>backtests/f3_exits_ledger_a.csv</code>. Reuses F11
+  <code>bt_weekly2_stopbuf.py</code>. No validated file modified.
+</div>
+
+</div>
+<script>
+(function(){
+  var btn=document.getElementById('themeToggle');
+  if(!btn)return;
+  var mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;
+  function stored(){try{var t=localStorage.getItem('codexTheme');return (t==='light'||t==='dark'||t==='system')?t:'system';}catch(e){return 'system';}}
+  function eff(m){return (m==='light'||m==='dark')?m:((mq&&mq.matches)?'dark':'light');}
+  function apply(){var m=stored();document.documentElement.setAttribute('data-theme',eff(m));btn.textContent=(m==='light')?'◐ Light':(m==='dark')?'◑ Dark':'◓ Auto';}
+  apply();
+  btn.addEventListener('click',function(){var order={light:'dark',dark:'system',system:'light'};var n=order[stored()];try{localStorage.setItem('codexTheme',n);}catch(e){}apply();});
+  if(mq){var h=function(){if(stored()==='system')apply();};if(mq.addEventListener)mq.addEventListener('change',h);else if(mq.addListener)mq.addListener(h);}
+})();
+</script>
+</body>
+</html>
