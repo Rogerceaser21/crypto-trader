@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Midweek Counter Trade — Edge Hunt</title>
+<style>
+  :root{
+    --bg:#0e1117; --panel:#161b22; --panel2:#1c2230; --ink:#e6edf3; --muted:#9aa4b2;
+    --line:#2a3140; --accent:#6aa9ff; --up:#3fb950; --dn:#f85149; --warn:#e3b341; --m3:#26a69a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  .wrap{max-width:940px;margin:0 auto;padding:34px 22px 90px;}
+  header{border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:8px}
+  .eyebrow{letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:var(--accent);font-weight:700}
+  h1{font-size:30px;margin:8px 0 6px;line-height:1.2}
+  h2{font-size:21px;margin:38px 0 12px;padding-top:8px;border-top:1px solid var(--line)}
+  h3{font-size:16px;margin:22px 0 8px;color:var(--ink)}
+  p{color:var(--ink)}
+  .sub{color:var(--muted);font-size:15px;max-width:74ch}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:14px 0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:720px){.grid2{grid-template-columns:1fr}}
+  code,kbd{background:#0b0f16;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px}
+  .tblwrap{overflow-x:auto;margin:10px 0}
+  table{width:100%;border-collapse:collapse;font-size:14px;min-width:560px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--panel2);color:var(--muted);font-weight:600;font-size:12.5px;text-transform:uppercase;letter-spacing:.04em}
+  td.n{font-family:ui-monospace,Menlo,monospace;white-space:nowrap;text-align:right}
+  th.n{text-align:right}
+  .neg{color:var(--dn);font-weight:700}
+  .pos{color:var(--up);font-weight:700}
+  .verdict{border:1px solid var(--dn);background:linear-gradient(180deg,rgba(248,81,73,.14),rgba(248,81,73,.05));
+    border-radius:14px;padding:20px 22px;margin:18px 0 6px}
+  .verdict .badge{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+    background:var(--dn);color:#fff;border-radius:20px;padding:4px 14px;margin-bottom:10px}
+  .verdict h2{border:0;padding:0;margin:2px 0 8px;font-size:23px}
+  .verdict p{margin:6px 0 0}
+  .callout{border-left:4px solid var(--warn);background:rgba(227,179,65,.08);padding:12px 16px;border-radius:8px;margin:12px 0}
+  .callout.bad{border-left-color:var(--dn);background:rgba(248,81,73,.09)}
+  .callout.good{border-left-color:var(--m3);background:rgba(38,166,154,.08)}
+  .callout b{color:var(--ink)}
+  ul.tight{margin:6px 0 6px 0;padding-left:20px} ul.tight li{margin:5px 0}
+  .prior{display:flex;gap:12px;align-items:flex-start;margin:10px 0}
+  .prior .idx{flex:0 0 auto;width:28px;height:28px;border-radius:50%;background:var(--warn);color:#0b0f16;
+    font-weight:800;display:flex;align-items:center;justify-content:center;font-size:13px}
+  .kpi{display:flex;gap:14px;flex-wrap:wrap;margin:8px 0}
+  .kpi .box{flex:1 1 150px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .kpi .box .v{font-size:22px;font-weight:800;font-family:ui-monospace,Menlo,monospace}
+  .kpi .box .l{font-size:12px;color:var(--muted);margin-top:2px}
+  .muted{color:var(--muted)}
+  .foot{color:var(--muted);font-size:12.5px;margin-top:50px;border-top:1px solid var(--line);padding-top:16px}
+  .mono{font-family:ui-monospace,Menlo,monospace}
+  html[data-theme="light"]{
+    --bg:#f7f9fc; --panel:#ffffff; --panel2:#eef1f6; --ink:#1a2230; --muted:#5b6472;
+    --line:#d7dde6; --accent:#2f6fe0; --up:#1e7d34; --dn:#c92c22; --warn:#a6740b; --m3:#178f83;
+  }
+  html[data-theme="light"] code,html[data-theme="light"] kbd{background:#eef1f5;color:var(--ink)}
+  html[data-theme="light"] .callout{background:rgba(166,116,11,.10)}
+  html[data-theme="light"] .callout.bad{background:rgba(201,44,34,.09)}
+  html[data-theme="light"] .callout.good{background:rgba(23,143,131,.10)}
+  html[data-theme="light"] .verdict .badge{color:#fff}
+  .theme-toggle{position:fixed;top:16px;right:20px;z-index:100;background:var(--panel);
+    border:1px solid var(--line);color:var(--ink);border-radius:20px;padding:6px 14px;
+    font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.35);
+    font-family:inherit;letter-spacing:.02em}
+  html[data-theme="light"] .theme-toggle{box-shadow:0 2px 10px rgba(0,0,0,.10)}
+  .theme-toggle:active{transform:translateY(1px)}
+  @media(max-width:560px){.theme-toggle{top:10px;right:12px;padding:6px 10px;font-size:12px}body{padding-top:44px}}
+</style>
+<script>
+(function(){try{var t=localStorage.getItem('codexTheme');var e=(t==='light'||t==='dark')?t:((window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light');document.documentElement.setAttribute('data-theme',e);}catch(e){}})();
+</script>
+</head>
+<body>
+<button type="button" id="themeToggle" class="theme-toggle" aria-label="Cycle theme: light, dark, or system">&#9683; Auto</button>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Annie Trading &middot; Fade 2 research &middot; G3</div>
+  <h1>The Midweek Counter Trade</h1>
+  <p class="sub">Igor: <i>&ldquo;we&rsquo;ve found that Wednesday and Thursday have a peak &mdash; there must be a way we can
+  utilise this to have an edge.&rdquo;</i> This page hunts that edge as a <b>separate, standalone trade</b>: when a midweek
+  M/W (or Final Damage) reversal completes on the 1H, we <b>trade the direction the pattern implies</b> and see if it pays.
+  It does <b>not</b> touch the Monday fade. Verdict up top, honest priors, the full declared grid, and the drift table that
+  explains the result.</p>
+</header>
+
+<!-- ============================ VERDICT ============================ -->
+<div class="verdict">
+  <span class="badge">Verdict &middot; No edge</span>
+  <h2>The midweek peak is a real EVENT &mdash; but it is not tradeable against.</h2>
+  <p>All <b>6 declared cells lose money</b>, every one of the 6 years is negative, and the t-stats are significantly
+  <b>negative</b> (&minus;2.1 to &minus;4.2) &mdash; not weakly-zero, but reliably <i>against</i> the counter-trade. The
+  drift table shows why: after the signal fires, price on average keeps moving <b>against</b> the pattern direction at every
+  horizon. Countering the midweek peak means fighting the dominant drift. <b>Ship nothing.</b> The tradeable direction here
+  is <i>with</i> the prior move (continuation) &mdash; which is exactly what F7 already told us.</p>
+</div>
+<p class="muted" style="margin-top:6px">BTCUSDT Binance perp &middot; in-sample <b>2019&ndash;2024</b> (2025&ndash;26 locked out) &middot;
+271 weeks scanned &middot; 265 detections &middot; deterministic (double-run md5 match).</p>
+
+<div class="kpi">
+  <div class="box"><div class="v neg">6 / 6</div><div class="l">cells negative expectancy</div></div>
+  <div class="box"><div class="v neg">6 / 6</div><div class="l">years negative (2019&ndash;2024)</div></div>
+  <div class="box"><div class="v neg">0 / 6</div><div class="l">cells reaching t &ge; +2.5</div></div>
+  <div class="box"><div class="v neg">&minus;0.67%</div><div class="l">avg drift to Friday (pattern dir.)</div></div>
+</div>
+
+<!-- ============================ PRIORS ============================ -->
+<h2>1 &middot; Honest priors, declared before the run</h2>
+<p class="sub">Two prior results pointed hard at a null before a single trade was simulated. We state them, then test against them.</p>
+<div class="card">
+  <div class="prior"><div class="idx">a</div><div><b>The standalone midweek entry already died once.</b> In the original campaign, the S4
+    &ldquo;Mid-Week Reversal&rdquo; standalone entry went <b>0 / 12</b>. A naked midweek-reversal trigger had no track record to build on.</div></div>
+  <div class="prior"><div class="idx">b</div><div><b>F7 proved price CONTINUES the fade after this exact signal.</b> Exiting the Monday fade at the midweek
+    reversal <i>underperformed</i> simply holding to 2.5R &mdash; meaning, on average, price keeps going the fade&rsquo;s way past the
+    signal. The fade direction is the <b>opposite</b> of what the midweek pattern implies, so prior (b) argues <i>directly</i> against
+    a counter-trade.</div></div>
+  <p class="muted" style="margin:8px 0 0">Pre-registered decision rule: if all 6 cells are negative or insignificant, the verdict is
+  &ldquo;no edge&rdquo; and we say so plainly. A cell is promoted to candidate <b>only</b> if it clears <span class="mono">t &ge; 2.5</span>
+  (flagging that we ran 6 comparisons); only then do we run Monte Carlo + a 3-perturbation sensitivity. <b>No cell qualified</b>, so
+  neither was run.</p>
+</div>
+
+<!-- ============================ METHOD ============================ -->
+<h2>2 &middot; What the trade is</h2>
+<div class="grid2">
+  <div class="card">
+    <h3 style="margin-top:2px">Entry signal (reused verbatim from F7)</h3>
+    <ul class="tight">
+      <li><b>Detector V2</b> (M/W + Final Damage) on the 1H, the single declared detector &mdash; no shopping.</li>
+      <li>Peak-2 is a <span class="mono">k=3</span> fractal pivot, only knowable <b>k bars later</b>; the causal confirmation bar is
+          <span class="mono">b = peak2 + 3</span>. Nothing uses future data.</li>
+      <li>Completion must be <b>Wed 00:00 NY or later</b> and before the Friday-UK cap.</li>
+      <li>Scan <b>both</b> a top reversal and a bottom reversal; take whichever <b>completes first</b> (one trade / week).</li>
+      <li>Direction the pattern implies: <b>M-top &rarr; SHORT</b>, <b>W-bottom &rarr; LONG</b>.</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:2px">Trade construction</h3>
+    <ul class="tight">
+      <li><b>Entry</b> = open of the next 15m bar after the 1H confirmation bar closes.</li>
+      <li><b>Stop</b> = beyond the pattern&rsquo;s peak (peak-2 extreme) &plusmn;0.05% &mdash; above for a short, below for a long.</li>
+      <li><b>Target</b> = a fixed R multiple: 1.0R / 1.5R / 1.9R.</li>
+      <li><b>Final exit</b> = Friday UK-session close (hard cap).</li>
+      <li>Fills: 1m intrabar, same-bar stop&amp;target ambiguity = <b>loss</b>, fees 0.05%/side, slip 0.02%/fill, 1R = $100 fixed.</li>
+    </ul>
+  </div>
+</div>
+<p class="muted">Detection composition (265 signals): <b>133 shorts / 132 longs</b> &middot; types M 104, W 107, FDM 29, FDW 25 &middot;
+completion day <b>Wednesday 199, Thursday 58, Friday 8</b>. The Wed/Thu concentration confirms Igor&rsquo;s observation &mdash;
+the midweek peak is a real, well-populated event. The question is only whether it is tradeable <i>against</i>.</p>
+
+<!-- ============================ GRID ============================ -->
+<h2>3 &middot; The declared 6-cell grid</h2>
+<p class="sub">Targets {1.0R, 1.5R, 1.9R} &times; condition { <b>A</b> = all weeks with a detected midweek reversal | <b>B</b> = only the
+91 weeks where a Monday-fade entry existed }. Condition B is the same detector, filtered to the ledger weeks (89 of the 91 produced a
+detection).</p>
+<div class="tblwrap">
+<table>
+  <tr>
+    <th>Cell</th><th class="n">N</th><th class="n">WR %</th><th class="n">exp R</th><th class="n">median R</th>
+    <th class="n">total R</th><th class="n">PF</th><th class="n">t vs 0</th><th class="n">maxDD R</th><th class="n">hold h</th>
+    <th>exit mix (tp / stop / fri)</th>
+  </tr>
+  <tr><td><b>A</b> &middot; all weeks &middot; 1.0R</td><td class="n">265</td><td class="n">44.2</td><td class="n neg">&minus;0.237</td><td class="n">&minus;0.572</td><td class="n neg">&minus;62.7</td><td class="n">0.60</td><td class="n neg">&minus;3.98</td><td class="n">65.2</td><td class="n">8.4</td><td class="n">112 / 130 / 23</td></tr>
+  <tr><td><b>A</b> &middot; all weeks &middot; 1.5R</td><td class="n">265</td><td class="n">37.0</td><td class="n neg">&minus;0.221</td><td class="n">&minus;1.052</td><td class="n neg">&minus;58.7</td><td class="n">0.67</td><td class="n neg">&minus;3.12</td><td class="n">61.8</td><td class="n">10.4</td><td class="n">87 / 147 / 31</td></tr>
+  <tr><td><b>A</b> &middot; all weeks &middot; 1.9R</td><td class="n">265</td><td class="n">32.1</td><td class="n neg">&minus;0.259</td><td class="n">&minus;1.070</td><td class="n neg">&minus;68.7</td><td class="n">0.65</td><td class="n neg">&minus;3.35</td><td class="n">70.5</td><td class="n">12.0</td><td class="n">67 / 160 / 38</td></tr>
+  <tr><td><b>B</b> &middot; ledger weeks &middot; 1.0R</td><td class="n">89</td><td class="n">34.8</td><td class="n neg">&minus;0.428</td><td class="n">&minus;1.063</td><td class="n neg">&minus;38.1</td><td class="n">0.41</td><td class="n neg">&minus;4.23</td><td class="n">40.5</td><td class="n">7.7</td><td class="n">31 / 53 / 5</td></tr>
+  <tr><td><b>B</b> &middot; ledger weeks &middot; 1.5R</td><td class="n">89</td><td class="n">32.6</td><td class="n neg">&minus;0.310</td><td class="n">&minus;1.073</td><td class="n neg">&minus;27.6</td><td class="n">0.58</td><td class="n neg">&minus;2.50</td><td class="n">32.0</td><td class="n">8.2</td><td class="n">29 / 55 / 5</td></tr>
+  <tr><td><b>B</b> &middot; ledger weeks &middot; 1.9R</td><td class="n">89</td><td class="n">29.2</td><td class="n neg">&minus;0.295</td><td class="n">&minus;1.091</td><td class="n neg">&minus;26.3</td><td class="n">0.62</td><td class="n neg">&minus;2.14</td><td class="n">27.7</td><td class="n">9.4</td><td class="n">25 / 58 / 6</td></tr>
+</table>
+</div>
+<div class="callout bad"><b>Every cell is a loser.</b> Expectancy runs &minus;0.22R to &minus;0.43R per trade, profit factor 0.41&ndash;0.67
+(a winning system needs PF &gt; 1), win-rate never beats a coin-flip given the R:R, and the t-stats are <b>negative</b> &mdash;
+i.e. the losses are statistically reliable, not noise. Filtering to the fade weeks (condition B) makes it <i>worse</i>, not better.</div>
+<p class="muted">Read the negative t the other way and it is informative: a significantly-negative counter-trade means the
+<b>continuation</b> trade (with the prior move) carried a significant positive drift over this tape &mdash; consistent with F7&rsquo;s
+&ldquo;hold the fade&rdquo; finding. The edge, such as it is, points the opposite way to what Igor hoped for this setup.</p>
+
+<!-- ============================ DRIFT ============================ -->
+<h2>4 &middot; Why &mdash; the post-signal drift table</h2>
+<p class="sub">A cheap, construction-free diagnostic: after each detection, what is the average forward return <b>in the pattern
+direction</b> (short &rarr; down = positive; long &rarr; up = positive)? If the counter-trade had an edge, these would be
+<b>positive</b>. They are negative at every horizon &mdash; price drifts <i>against</i> the pattern.</p>
+<div class="tblwrap">
+<table>
+  <tr>
+    <th>Horizon</th><th class="n">mean %</th><th class="n">median %</th><th class="n">% positive</th><th class="n">t vs 0</th>
+    <th class="n">ledger-weeks mean %</th><th class="n">ledger % pos</th>
+  </tr>
+  <tr><td>+4h</td><td class="n neg">&minus;0.076</td><td class="n">+0.002</td><td class="n">50.2</td><td class="n">&minus;0.79</td><td class="n neg">&minus;0.136</td><td class="n">48.3</td></tr>
+  <tr><td>+8h</td><td class="n neg">&minus;0.167</td><td class="n">&minus;0.051</td><td class="n">47.9</td><td class="n">&minus;1.31</td><td class="n neg">&minus;0.166</td><td class="n">38.2</td></tr>
+  <tr><td>+24h</td><td class="n neg">&minus;0.466</td><td class="n">&minus;0.274</td><td class="n">45.7</td><td class="n">&minus;1.83</td><td class="n neg">&minus;0.291</td><td class="n">47.2</td></tr>
+  <tr><td>to Friday</td><td class="n neg">&minus;0.671</td><td class="n">&minus;0.328</td><td class="n">47.2</td><td class="n">&minus;2.09</td><td class="n neg">&minus;0.725</td><td class="n">49.4</td></tr>
+</table>
+</div>
+<p>The drift starts near-zero at +4h and gets <b>more negative the longer you hold</b> &mdash; the exact opposite of a
+counter-trend edge, which would need price to reverse <i>after</i> the peak. Both directions show it (short weeks &minus;0.78%
+to Friday, long weeks &minus;0.56%). This is the mechanical reason all six trade-construction cells lose: there is no reversal
+to harvest, only continuation to get run over by.</p>
+
+<!-- ============================ CONCLUSION ============================ -->
+<h2>5 &middot; Honest conclusion</h2>
+<div class="callout good">
+  <b>The observation was right; the trade is wrong.</b> The Wednesday/Thursday peak is <b>real and frequent</b> (257 of 265 signals
+  land Wed or Thu) &mdash; a genuine calendar feature of the tape. But it is a <b>marker of where the week&rsquo;s move matured</b>,
+  not a reversal you can sell/buy into. Every attempt to trade against it over 5.3 years of BTC loses, in every year, at every
+  target, on both the full universe and the fade-week subset.
+</div>
+<ul class="tight">
+  <li><b>No edge &mdash; do not build this.</b> The midweek peak is tradeable as an <i>event</i> (it tells you the week&rsquo;s
+      structure is set), but not as a counter-trade against.</li>
+  <li><b>Where the edge actually points:</b> the strongly-negative counter-trade t implies a <b>continuation</b> bias (stay with
+      the prior move / hold the fade) &mdash; the same conclusion F7 reached from the exit side. If anything is worth a future look,
+      it is a <i>midweek continuation</i> add, not a counter.</li>
+  <li><b>No promotion.</b> 0 of 6 cells cleared t &ge; +2.5, so no Monte Carlo and no sensitivity were run &mdash; there was nothing
+      to stress-test.</li>
+</ul>
+
+<div class="foot">
+  Annie Trading &middot; Fade 2 research &middot; task G3 &middot; engine <code>backtests/bt_midweek_counter.py</code>
+  (py_compile clean; V2 M/W+FD detector reused verbatim from <code>bt_weekly2_midweek_exit.py</code>).<br>
+  Per-trade ledger <code>g3_midweek_counter_ledger.csv</code> &middot; deterministic double-run md5
+  <span class="mono">02c33334ff06ae36a5b5bdd0b7ebc7ab</span> (identical across runs).<br>
+  In-sample 2019-09 &rarr; 2024-12-31; the 2025&ndash;26 block is sliced off and untouched. This page is self-contained.
+</div>
+
+</div>
+<script>
+(function(){
+  var btn=document.getElementById('themeToggle');
+  if(!btn)return;
+  var mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;
+  function stored(){try{var t=localStorage.getItem('codexTheme');return (t==='light'||t==='dark'||t==='system')?t:'system';}catch(e){return 'system';}}
+  function eff(m){return (m==='light'||m==='dark')?m:((mq&&mq.matches)?'dark':'light');}
+  function apply(){var m=stored();document.documentElement.setAttribute('data-theme',eff(m));btn.textContent=(m==='light')?'◐ Light':(m==='dark')?'◑ Dark':'◓ Auto';}
+  apply();
+  btn.addEventListener('click',function(){var order={light:'dark',dark:'system',system:'light'};var n=order[stored()];try{localStorage.setItem('codexTheme',n);}catch(e){}apply();});
+  if(mq){var h=function(){if(stored()==='system')apply();};if(mq.addEventListener)mq.addEventListener('change',h);else if(mq.addListener)mq.addListener(h);}
+})();
+</script>
+</body>
+</html>
