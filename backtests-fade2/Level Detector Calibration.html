@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fade 2 Level Detector &mdash; Calibration</title>
+<style>
+  :root{
+    --bg:#0e1117; --panel:#161b22; --panel2:#1c2230; --ink:#e6edf3; --muted:#9aa4b2;
+    --line:#2a3140; --accent:#6aa9ff; --all:#9598a1; --m3:#26a69a; --m1:#ff9800;
+    --up:#3fb950; --dn:#f85149; --warn:#e3b341;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  .wrap{max-width:1000px;margin:0 auto;padding:34px 22px 90px;}
+  header{border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:8px}
+  .eyebrow{letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:var(--accent);font-weight:700}
+  h1{font-size:30px;margin:8px 0 6px;line-height:1.2}
+  h2{font-size:21px;margin:38px 0 12px;padding-top:8px;border-top:1px solid var(--line)}
+  h3{font-size:16px;margin:22px 0 8px;color:var(--ink)}
+  p{color:var(--ink)}
+  .sub{color:var(--muted);font-size:15px;max-width:76ch}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:14px 0}
+  code,kbd{background:#0b0f16;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px}
+  kbd{color:var(--accent)}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13.5px}
+  th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+  th{background:var(--panel2);color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+  td.n{font-family:ui-monospace,Menlo,monospace;white-space:nowrap}
+  tr.best td{background:rgba(106,169,255,.12)}
+  .callout{border-left:4px solid var(--warn);background:rgba(227,179,65,.08);padding:12px 16px;border-radius:8px;margin:12px 0}
+  .callout.good{border-left-color:var(--m3);background:rgba(38,166,154,.08)}
+  .callout.bad{border-left-color:var(--dn);background:rgba(248,81,73,.09)}
+  .callout b{color:var(--ink)}
+  .verdict{border:1px solid var(--line);border-left:5px solid var(--accent);background:var(--panel);
+    border-radius:12px;padding:16px 20px;margin:16px 0}
+  .verdict .big{font-size:19px;font-weight:800;margin:0 0 6px}
+  .kpis{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
+  .kpi{flex:1 1 150px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .kpi .v{font-size:24px;font-weight:800;font-family:ui-monospace,Menlo,monospace}
+  .kpi .l{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+  .foot{color:var(--muted);font-size:12.5px;margin-top:50px;border-top:1px solid var(--line);padding-top:16px}
+  .muted{color:var(--muted)}
+  ul.tight{margin:6px 0 6px 0;padding-left:20px} ul.tight li{margin:5px 0}
+  .pill{display:inline-block;font-size:10.5px;font-weight:700;border-radius:20px;padding:1px 8px;color:#0b0f16;background:var(--up)}
+  .pill.no{background:var(--dn);color:#fff}
+  html[data-theme="light"]{
+    --bg:#f7f9fc; --panel:#ffffff; --panel2:#eef1f6; --ink:#1a2230; --muted:#5b6472;
+    --line:#d7dde6; --accent:#2f6fe0; --all:#6b6f7a; --m3:#178f83; --m1:#c97400;
+    --up:#1e7d34; --dn:#c92c22; --warn:#a6740b;
+  }
+  html[data-theme="light"] code, html[data-theme="light"] kbd{background:#eef1f5;color:var(--ink)}
+  html[data-theme="light"] .callout{background:rgba(166,116,11,.10)}
+  html[data-theme="light"] .callout.good{background:rgba(23,143,131,.10)}
+  html[data-theme="light"] .callout.bad{background:rgba(201,44,34,.09)}
+  html[data-theme="light"] .pill{color:#fff}
+  html[data-theme="light"] tr.best td{background:rgba(47,111,224,.10)}
+  .theme-toggle{position:fixed;top:16px;right:20px;z-index:100;background:var(--panel);
+    border:1px solid var(--line);color:var(--ink);border-radius:20px;padding:6px 14px;
+    font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.35);
+    font-family:inherit;letter-spacing:.02em}
+  html[data-theme="light"] .theme-toggle{box-shadow:0 2px 10px rgba(0,0,0,.10)}
+  .theme-toggle:active{transform:translateY(1px)}
+@media(max-width:560px){.theme-toggle{top:10px;right:12px;padding:6px 10px;font-size:12px}body{padding-top:44px}}
+</style>
+<script>
+(function(){try{var t=localStorage.getItem('codexTheme');var e=(t==='light'||t==='dark')?t:((window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light');document.documentElement.setAttribute('data-theme',e);}catch(e){}})();
+</script>
+</head>
+<body>
+<button type="button" id="themeToggle" class="theme-toggle" aria-label="Cycle theme: light, dark, or system">&#9683; Auto</button>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Annie Trading &middot; Task F6 &middot; Fade 2</div>
+  <h1>Level Detector &mdash; Calibration</h1>
+  <p class="sub">The causal <b>L1&nbsp;/&nbsp;L2&nbsp;/&nbsp;L3</b> level detector for Annie&rsquo;s Monday Fade&nbsp;2,
+  built to Igor&rsquo;s rulings of <b>2026&#8209;07&#8209;14</b> and scored against his 36 hand&#8209;labelled weeks. A level is
+  a <b>volume&#8209;spike cluster of PVSRA vector candles</b> (&ldquo;a bunch on the volume histogram&rdquo;) followed by a
+  <b>board&#8209;meeting consolidation</b>. Everything is causal &mdash; a level is emitted only once its consolidation is
+  confirmed. This page is the honest scorecard: a pre&#8209;declared 18&#8209;cell knob grid, the best cell, and the
+  per&#8209;week detail &mdash; no tuning beyond the declared grid.</p>
+</header>
+
+<div class="verdict">
+  <p class="big">Verdict &mdash; the level count is still the fuzzy core, and this detector does not crack it.</p>
+  <p style="margin:0">Best pre&#8209;declared cell (<b>cluster&nbsp;2 &middot; quiet&#8209;gap&nbsp;2 &middot; board&#8209;band&nbsp;2.0%</b>)
+  reaches <b>64.1% balanced accuracy</b> (61.9% raw) across the pooled 15m&#8209;label + 1H&#8209;label observations &mdash;
+  only marginally above the <b>~60% semantic&#8209;core ceiling</b> flagged in CALIBRATION_V2, and well short of anything
+  you could trade blind. The signal that exists lives almost entirely on the <b>1H</b> (balanced 66.0%, raw agreement
+  <b>67.7%</b> vs 45% for the old counter). On the <b>15m the detector is essentially non&#8209;discriminative</b>
+  (balanced 52.4% &asymp; coin&#8209;flip): it prints &ldquo;3 levels&rdquo; in ~28 of 32 weeks, so it merely reproduces the
+  56% positive base&#8209;rate rather than reading the chart. This matches Annie&rsquo;s own warning that
+  &ldquo;counting levels is probably the most difficult part of the method.&rdquo;</p>
+</div>
+
+<div class="kpis">
+  <div class="kpi"><div class="v">64.1%</div><div class="l">Balanced acc &middot; best cell</div></div>
+  <div class="kpi"><div class="v">76.9%</div><div class="l">Hit&#8209;rate (recall on 3&#8209;level weeks)</div></div>
+  <div class="kpi"><div class="v">48.6%</div><div class="l">False&#8209;positive rate</div></div>
+  <div class="kpi"><div class="v">67.7%</div><div class="l">1H raw agree (was 45%)</div></div>
+  <div class="kpi"><div class="v">56.3%</div><div class="l">15m raw agree (was 53%)</div></div>
+</div>
+
+<h2>1 &middot; What a &ldquo;level&rdquo; is (the ruled definition)</h2>
+<div class="card">
+<ul class="tight">
+  <li><b>Level = volume&#8209;spike cluster + consolidation.</b> A cluster is a run of PVSRA vector candles
+  (&ge;150% class) not separated by a <b>quiet gap</b> of below&#8209;average&#8209;volume bars. Igor&rsquo;s ruling:
+  the realistic bunch is <b>~3 vector candles on the 15m</b> (the 1H often shows just 1 for the same event);
+  &ldquo;6 is impossible &mdash; tune <i>down</i>, not up.&rdquo;</li>
+  <li><b>Board meeting</b> (the pause that confirms a level): starting values ruled a &ldquo;good start&rdquo; &mdash;
+  <b>&ge;6 bars whose high&#8209;low band stays small while the 50&#8209;EMA slope flattens.</b> In this detector
+  &ldquo;flattens&rdquo; is self&#8209;normalising (board&#8209;window slope &le; 50% of the impulse slope), so there is no
+  magic absolute&#8209;slope constant to over&#8209;fit.</li>
+  <li><b>L1 &rarr; L2 &rarr; L3 sequencing.</b> L1 is the cluster that <b>breaks the 50&nbsp;EMA</b> with a vector, then
+  consolidates; L2 is the next break with PVSRA candles + consolidation; L3 is the strongest final leg. Capped at 3.</li>
+  <li><b>Timeframe.</b> Count on the <b>1H by default</b>; <b>switch to the 15m</b> after a vertical 1H leg
+  (single&#8209;bar range &ge; 3&times; the trailing&#8209;20 1H candle range) that is followed by a &ge;8&#8209;bar board
+  meeting &mdash; the &ldquo;damage is done&rdquo; shortcut. Post&#8209;switch 15m legs continue the trend from the last
+  confirmed 1H level, so the combined L1/L2/L3 sequence stays monotonic.</li>
+  <li><b>Causal.</b> A level is emitted only when its consolidation is confirmed &mdash; a board meeting forms after
+  the impulse, or (in a very strong trend where the pause is skipped) the visibly&#8209;starting next leg is the proof
+  the prior one ended. No look&#8209;ahead.</li>
+  <li><b>BBWP is dropped</b> by ruling and appears nowhere. PVSRA classes are reused unchanged from the
+  <code>detectors/pvsra.py</code> module (200% = vol &ge; 2&times; prior&#8209;10 avg; 150% class &ge; 1.5&times;).</li>
+</ul>
+</div>
+
+<h2>2 &middot; How it was scored</h2>
+<p>Ground truth is Igor&rsquo;s workbook tab <code>data/tab_FMWB.csv</code>, columns <b>&ldquo;3 Levels completed on 15M
+TF?&rdquo;</b> and <b>&ldquo;3 levels on 1H TF?&rdquo;</b> &mdash; the same 36 hand&#8209;labelled weeks CALIBRATION_V2 uses
+(4 rows excluded for broken/ambiguous dates). Candles are <code>backtests/data/btcusdt_1m.parquet</code> resampled to
+15m and 1H exactly as <code>bt_data</code>/<code>bt_weekly</code> do. Per week, the fade <b>direction</b> and <b>entry
+point</b> (the M/W second peak) come causally from <code>patterns.detect_weekly_pattern</code> on the 1H &mdash; the
+same machinery <code>weekly.extract_week</code> uses &mdash; then feed the level detector.</p>
+<ul class="tight">
+  <li><b>15m label</b> is scored against the pure&#8209;15m count &ge; 3.</li>
+  <li><b>1H label</b> is scored against the 1H&#8209;default&#8209;with&#8209;15m&#8209;switch count &ge; 3.</li>
+  <li>The two label columns are <b>pooled</b> (26 positives / 37 negatives across the weeks) into one confusion matrix
+  per cell. <b>Hit&#8209;rate</b> = TP/(TP+FN) on the &ldquo;3&#8209;levels = yes&rdquo; weeks; <b>false&#8209;positive
+  rate</b> = FP/(FP+TN); <b>balanced accuracy</b> = &frac12;(hit&#8209;rate + specificity), which strips out the
+  base&#8209;rate inflation the raw agreement suffers on the mostly&#8209;negative 1H column.</li>
+</ul>
+<div class="callout"><b>Base&#8209;rate honesty.</b> A degenerate detector that always says &ldquo;3 levels&rdquo; scores 56% on
+the 15m column and 26% on the 1H column; one that always says &ldquo;no&rdquo; scores 44% / 74%. Both sit at exactly
+<b>50% balanced accuracy</b>. That 50% &mdash; not 0% &mdash; is the number to beat.</div>
+
+<h2>3 &middot; The 18&#8209;cell knob grid (pre&#8209;declared, no further tuning)</h2>
+<p>Cluster size <kbd>{2,3}</kbd> &times; quiet&#8209;gap <kbd>{2,3,4}</kbd> &times; board&#8209;band
+<kbd>{1.0,1.5,2.0}%</kbd>. Fixed constants outside the grid: min board bars = 6, flat&#8209;slope ratio = 0.5,
+vertical&#8209;leg multiple = 3&times;, vertical board bars = 8. The starred row is the best cell by balanced accuracy.</p>
+<table>
+<thead><tr><th>cluster</th><th>quiet&#8209;gap</th><th>board&#8209;band</th><th>TP/FP/TN/FN</th><th>hit&#8209;rate</th>
+<th>FP&#8209;rate</th><th>15m agree</th><th>1H agree</th><th>balanced acc</th></tr></thead>
+<tbody>
+<tr><td class='n'>2</td><td class='n'>2</td><td class='n'>1.0%</td><td class='n'>18/21/16/8</td><td class='n'>69.2%</td><td class='n'>56.8%</td><td class='n'>50.0%</td><td class='n'>58.1%</td><td class='n'><b>56.2%</b></td></tr>
+<tr><td class='n'>2</td><td class='n'>2</td><td class='n'>1.5%</td><td class='n'>20/22/15/6</td><td class='n'>76.9%</td><td class='n'>59.5%</td><td class='n'>50.0%</td><td class='n'>61.3%</td><td class='n'><b>58.7%</b></td></tr>
+<tr class="best"><td class='n'>2 &#9733;</td><td class='n'>2</td><td class='n'>2.0%</td><td class='n'>20/18/19/6</td><td class='n'>76.9%</td><td class='n'>48.6%</td><td class='n'>56.2%</td><td class='n'>67.7%</td><td class='n'><b>64.1%</b></td></tr>
+<tr><td class='n'>2</td><td class='n'>3</td><td class='n'>1.0%</td><td class='n'>18/19/18/8</td><td class='n'>69.2%</td><td class='n'>51.3%</td><td class='n'>50.0%</td><td class='n'>64.5%</td><td class='n'><b>58.9%</b></td></tr>
+<tr><td class='n'>2</td><td class='n'>3</td><td class='n'>1.5%</td><td class='n'>19/21/16/7</td><td class='n'>73.1%</td><td class='n'>56.8%</td><td class='n'>50.0%</td><td class='n'>61.3%</td><td class='n'><b>58.2%</b></td></tr>
+<tr><td class='n'>2</td><td class='n'>3</td><td class='n'>2.0%</td><td class='n'>19/19/18/7</td><td class='n'>73.1%</td><td class='n'>51.3%</td><td class='n'>53.1%</td><td class='n'>64.5%</td><td class='n'><b>60.9%</b></td></tr>
+<tr><td class='n'>2</td><td class='n'>4</td><td class='n'>1.0%</td><td class='n'>18/19/18/8</td><td class='n'>69.2%</td><td class='n'>51.3%</td><td class='n'>50.0%</td><td class='n'>64.5%</td><td class='n'><b>58.9%</b></td></tr>
+<tr><td class='n'>2</td><td class='n'>4</td><td class='n'>1.5%</td><td class='n'>19/20/17/7</td><td class='n'>73.1%</td><td class='n'>54.0%</td><td class='n'>50.0%</td><td class='n'>64.5%</td><td class='n'><b>59.5%</b></td></tr>
+<tr><td class='n'>2</td><td class='n'>4</td><td class='n'>2.0%</td><td class='n'>18/18/19/8</td><td class='n'>69.2%</td><td class='n'>48.6%</td><td class='n'>53.1%</td><td class='n'>64.5%</td><td class='n'><b>60.3%</b></td></tr>
+<tr><td class='n'>3</td><td class='n'>2</td><td class='n'>1.0%</td><td class='n'>17/14/23/9</td><td class='n'>65.4%</td><td class='n'>37.8%</td><td class='n'>53.1%</td><td class='n'>74.2%</td><td class='n'><b>63.8%</b></td></tr>
+<tr><td class='n'>3</td><td class='n'>2</td><td class='n'>1.5%</td><td class='n'>17/16/21/9</td><td class='n'>65.4%</td><td class='n'>43.2%</td><td class='n'>50.0%</td><td class='n'>71.0%</td><td class='n'><b>61.1%</b></td></tr>
+<tr><td class='n'>3</td><td class='n'>2</td><td class='n'>2.0%</td><td class='n'>17/14/23/9</td><td class='n'>65.4%</td><td class='n'>37.8%</td><td class='n'>56.2%</td><td class='n'>71.0%</td><td class='n'><b>63.8%</b></td></tr>
+<tr><td class='n'>3</td><td class='n'>3</td><td class='n'>1.0%</td><td class='n'>17/16/21/9</td><td class='n'>65.4%</td><td class='n'>43.2%</td><td class='n'>53.1%</td><td class='n'>67.7%</td><td class='n'><b>61.1%</b></td></tr>
+<tr><td class='n'>3</td><td class='n'>3</td><td class='n'>1.5%</td><td class='n'>17/18/19/9</td><td class='n'>65.4%</td><td class='n'>48.6%</td><td class='n'>53.1%</td><td class='n'>61.3%</td><td class='n'><b>58.4%</b></td></tr>
+<tr><td class='n'>3</td><td class='n'>3</td><td class='n'>2.0%</td><td class='n'>17/17/20/9</td><td class='n'>65.4%</td><td class='n'>46.0%</td><td class='n'>56.2%</td><td class='n'>61.3%</td><td class='n'><b>59.7%</b></td></tr>
+<tr><td class='n'>3</td><td class='n'>4</td><td class='n'>1.0%</td><td class='n'>18/16/21/8</td><td class='n'>69.2%</td><td class='n'>43.2%</td><td class='n'>56.2%</td><td class='n'>67.7%</td><td class='n'><b>63.0%</b></td></tr>
+<tr><td class='n'>3</td><td class='n'>4</td><td class='n'>1.5%</td><td class='n'>18/18/19/8</td><td class='n'>69.2%</td><td class='n'>48.6%</td><td class='n'>56.2%</td><td class='n'>61.3%</td><td class='n'><b>60.3%</b></td></tr>
+<tr><td class='n'>3</td><td class='n'>4</td><td class='n'>2.0%</td><td class='n'>18/16/21/8</td><td class='n'>69.2%</td><td class='n'>43.2%</td><td class='n'>59.4%</td><td class='n'>64.5%</td><td class='n'><b>63.0%</b></td></tr>
+</tbody>
+</table>
+<p class="muted">Two cells tie near the top (cluster&nbsp;3&middot;gap&nbsp;2&middot;1.0% and &middot;2.0% both reach 63.8%);
+the winner clears them by 0.4&nbsp;pp. The chosen cell uses <b>cluster&nbsp;2</b> &mdash; one notch below the ruled
+starting value of 3, which is the allowed direction (&ldquo;tune down, not up&rdquo;).</p>
+
+<h2>4 &middot; Best cell &mdash; the honest read</h2>
+<div class="card card">
+<table>
+<thead><tr><th>metric</th><th>pooled</th><th>15m column</th><th>1H column</th></tr></thead>
+<tbody>
+<tr><td>confusion TP/FP/TN/FN</td><td class="n">20/18/19/6</td><td class="n">15/11/3/3</td><td class="n">5/7/16/3</td></tr>
+<tr><td>label split (yes / no)</td><td class="n">26 / 37</td><td class="n">18 / 14</td><td class="n">8 / 23</td></tr>
+<tr><td>raw agreement</td><td class="n">61.9%</td><td class="n">56.3%</td><td class="n">67.7%</td></tr>
+<tr><td>balanced accuracy</td><td class="n"><b>64.1%</b></td><td class="n">52.4%</td><td class="n">66.0%</td></tr>
+<tr><td>vs CALIBRATION_V2</td><td class="n">&mdash;</td><td class="n">was 53%</td><td class="n">was 45%</td></tr>
+</tbody>
+</table>
+<p class="muted">On the 15m the detector fires &ldquo;3 levels&rdquo; on 11 of 14 no&#8209;weeks (specificity 21%) &mdash; it is
+saying yes almost always. On the 1H it correctly holds back on 16 of 23 no&#8209;weeks (specificity 70%), which is the
+real source of the pooled edge.</p>
+</div>
+<ul class="tight">
+  <li><b>The 15m detector adds no discrimination.</b> Balanced 52.4% is a hair above coin&#8209;flip. On the 15m almost
+  every fade week eventually prints three vector clusters, so &ldquo;3 levels&rdquo; fires nearly always and the 56% raw
+  agreement is just the positive base&#8209;rate. Igor&rsquo;s 15m label is <b>not recoverable</b> from mechanical
+  cluster counting.</li>
+  <li><b>The 1H detector is where the edge is.</b> Balanced 66.0%, raw 67.7% &mdash; a genuine lift over the old
+  counter&rsquo;s 45%. The 1H&#8209;default + vertical&#8209;switch rule earns most of that: it stays conservative in
+  choppy weeks (matching Igor&rsquo;s many 1H&nbsp;=&nbsp;0 labels) and escalates to the 15m only when a vertical leg
+  says the damage is done.</li>
+  <li><b>Ship it as a confidence input, not a gate.</b> A pooled 64% balanced / 49% FP&#8209;rate is a ranked&#8209;
+  candidate signal, exactly the &ldquo;scaffold + calibrated&#8209;proxy&rdquo; posture the Fade&nbsp;2 spec already
+  prescribes &mdash; never a stand&#8209;alone yes/no.</li>
+</ul>
+
+<h2>5 &middot; Worked example &mdash; week of 2025&#8209;07&#8209;28 (double hit)</h2>
+<div class="card">
+<p>Igor labelled this week a <b>Final Damage M (FDM) short</b> with <b>3 levels on both</b> the 15m and the 1H (his
+detector&rsquo;s own read is a plain M &mdash; same bearish side). The detector agrees on both level columns &mdash; and
+it exercises the 1H&rarr;15m switch. Fade entry is the reversal&rsquo;s second peak (HOW &asymp; <b>119,259</b>,
+Tue 07:00&nbsp;UTC); the trend is down.</p>
+<table>
+<thead><tr><th>view</th><th>L1</th><th>L2</th><th>L3</th><th>count</th></tr></thead>
+<tbody>
+<tr><td>Pure 15m</td><td class="n">118,119<br><span class="muted">Tue 10:00, 3 vec</span></td>
+  <td class="n">117,616<br><span class="muted">Wed 05:00, 2 vec</span></td>
+  <td class="n">115,700<br><span class="muted">Wed 18:00, 4 vec</span></td><td class="n">3 &check;</td></tr>
+<tr><td>1H default + switch</td><td class="n">116,923<br><span class="muted">Tue 12:00, 1H</span></td>
+  <td class="n">114,239<br><span class="muted">Thu 23:00, 15m</span></td>
+  <td class="n">114,056<br><span class="muted">Fri 06:30, 15m</span></td><td class="n">3 &check;</td></tr>
+</tbody>
+</table>
+<p style="margin-bottom:0">On the 1H view, L1 breaks the 50&nbsp;EMA on Tuesday; a vertical 1H leg on
+<b>Thu&nbsp;05:00&nbsp;UTC</b> followed by a &ge;8&#8209;bar board meeting arms the switch, so L2 and L3 are counted on
+the 15m and continue the down&#8209;leg to fresh lows. Both views make progressively lower extremes &mdash; a clean,
+monotonic three&#8209;level fade. This is the detector at its best; most weeks are murkier, which is why the aggregate
+sits at 64%.</p>
+</div>
+
+<h2>6 &middot; Per&#8209;week detail (best cell)</h2>
+<p>Every scored week: Igor&rsquo;s label vs the detected count, with a <span class="pill">hit</span> /
+<span class="pill no">miss</span> per column. Blank cells are weeks Igor left unlabelled (NA).</p>
+<table>
+<thead><tr><th>week (Mon)</th><th>trigger</th><th>dir</th>
+<th>15m label</th><th>15m n</th><th>15m</th>
+<th>1H label</th><th>1H n</th><th>1H</th></tr></thead>
+<tbody>
+<tr><td class='n'>2025-08-11</td><td class='n'>M</td><td class='n'>down</td><td class='n'>0</td><td class='n'>3</td><td class='n'><span class='pill no'>miss</span></td><td class='n'>0</td><td class='n'>2</td><td class='n'><span class='pill'>hit</span></td></tr>
+<tr><td class='n'>2025-08-04</td><td class='n'>FDM</td><td class='n'>up</td><td class='n'>1</td><td class='n'>3</td><td class='n'><span class='pill'>hit</span></td><td class='n'>0</td><td class='n'>3</td><td class='n'><span class='pill no'>miss</span></td></tr>
+<tr><td class='n'>2025-07-28</td><td class='n'>FDM</td><td class='n'>down</td><td class='n'>1</td><td class='n'>3</td><td class='n'><span class='pill'>hit</span></td><td class='n'>1</td><td class='n'>3</td><td class='n'><span class='pill'>hit</span></td></tr>
+<tr><td class='n'>2025-07-21</td><td class='n'>M</td><td class='n'>down</td><td class='n'>0</td><td class='n'>3</td><td class='n'><span class='pill no'>miss</span></td><td class='n'>0</td><td class='n'>3</td><td class='n'><span class='pill no'>miss</span></td></tr>
+<tr><td class='n'>2025-07-14</td><td class='n'></td><td class='n'>down</td><td class='n'>0</td><td class='n'>2</td><td class='n'><span class='pill'>hit</span></td><td class='n'>0</td><td class='n'>1</td><td class='n'><span class='pill'>hit</span></td></tr>
+<tr><td class='n'>2025-07-07</td><td class='n'>M</td><td class='n'>up</td><td class='n'>0</td><td class='n'>3</td><td class='n'><span class='pill no'>miss</span></td><td class='n'>0</td><td class='n'>3</td><td class='n'><span class='pill no'>miss</span></td></tr>
+<tr><td class='n'>2025-06-30</td><td class='n'>FDM</td><td class='n'>up</td><td class='n'>1</td><td class='n'>2</td><td class='n'><span class='pill no'>miss</span></td><td class='n'>0</td><td class='n'>1</td><td class='n'><span class='pill'>hit</span></td></tr>
+<tr><td class='n'>2025-06-23</td><td class='n'>W</td><td class='n'>up</td><td class='n'>1</td><td class='n'>2</td><td class='n'><span class='pill no'>miss</span></td><td class='n'>1</td><td class='n'>3</td><td class='n'><span class='pill'>hit</span></td></tr>
+<tr><td class='n'>2025-06-16</td><td class='n'></td><td class='n'>down</td><td class='n muted'>&mdash;</td><td class='n'>3</td><td class='n muted'>&mdash;</td><td class='n muted'>&mdash;</td><td class='n'>3</td><td class='n muted'>&mdash;</td></tr>
+<tr><td class='n'>2025-06-09</td><td class='n'></td><td class='n'>down</td><td class='n muted'>&mdash;</td><td class='n'>3</td><td class='n muted'>&mdash;</td><td class='n muted'>&mdash;</td><td class='n'>1</td><td class='n muted'>&mdash;</td></tr>
+<tr><td class='n'>2025-06-02</td><td class='n'>W</td><td class='n'>down</td><td class='n'>0</td><td class='n'>2</td><td class='n'><span class='pill'>hit</span></td><td class='n'>0</td><td class='n'>2</td><td class='n'><span class='pill'>hit</span></td></tr>
+<tr><td class='n'>2025-05-26</td><td class='n'>FDW</td><td class='n'>down</td><td class='n'>0</td><td class='n'>3</td><td class='n'><span class='pill no'>miss</span></td><td class='n'>0</td><td class='n'>2</td><td class='n'><span class='pill'>hit</span></td></tr>
+<tr><td class='n'>2025-05-19</td><td class='n'>FDM</td><td class='n'>up</td><td class='n'>0</td><td class='n'>3</td><td class='n'><span class='pill no'>miss</span></td><td class='n muted'>&mdash;</td><td class='n'>3</td><td class='n muted'>&mdash;</td></tr>
+<tr><td class='n'>2025-05-12</td><td class='n'>FDM</td><td class='n'>up</td><td class='n'>1</td><td class='n'>3</td><td class='n'><span class='pill'>hit</span></td><td class='n'>1</td><td class='n'>3</td><td class='n'><span class='pill'>hit</span></td></tr>
+<tr><td class='n'>2025-05-05</td><td class='n'>FDW</td><td class='n'>up</td><td class='n'>1</td><td class='n'>3</td><td class='n'><span class='pill'>hit</span></td><td class='n'>1</td><td class='n'>3</td><td class='n'><span class='pill'>hit</span></td></tr>
+<tr><td class='n'>2023-05-01</td><td class='n'>FDM</td><td class='n'>up</td><td class='n'>1</td><td class='n'>3</td><td class='n'><span class='pill'>hit</span></td><td class='n'>1</td><td class='n'>3</td><td class='n'><span class='pill'>hit</span></td></tr>
+<tr><td class='n'>2023-04-24</td><td class='n'>M</td><td class='n'>up</td><td class='n'>1</td><td class='n'>3</td><td class='n'><span class='pill'>hit</span></td><td class='n'>0</td><td class='n'>3</td><td class='n'><span class='pill no'>miss</span></td></tr>
+<tr><td class='n'>2023-04-17</td><td class='n'>FDW</td><td class='n'>down</td><td class='n'>1</td><td class='n'>3</td><td class='n'><span class='pill'>hit</span></td><td class='n'>0</td><td class='n'>2</td><td class='n'><span class='pill'>hit</span></td></tr>
+<tr><td class='n'>2023-04-10</td><td class='n'>W</td><td class='n'>up</td><td class='n'>1</td><td class='n'>3</td><td class='n'><span class='pill'>hit</span></td><td class='n'>1</td><td class='n'>2</td><td class='n'><span class='pill no'>miss</span></td></tr>
+<tr><td class='n'>2023-04-03</td><td class='n'>FDW</td><td class='n'>up</td><td class='n'>0</td><td class='n'>2</td><td class='n'><span class='pill'>hit</span></td><td class='n'>0</td><td class='n'>0</td><td class='n'><span class='pill'>hit</span></td></tr>
+<tr><td class='n'>2023-03-27</td><td class='n'>M</td><td class='n'>up</td><td class='n'>1</td><td class='n'>3</td><td class='n'><span class='pill'>hit</span></td><td class='n'>0</td><td class='n'>1</td><td class='n'><span class='pill'>hit</span></td></tr>
+<tr><td class='n'>2023-03-20</td><td class='n'>W</td><td class='n'>up</td><td class='n'>0</td><td class='n'>3</td><td class='n'><span class='pill no'>miss</span></td><td class='n'>0</td><td class='n'>2</td><td class='n'><span class='pill'>hit</span></td></tr>
+<tr><td class='n'>2023-03-13</td><td class='n'></td><td class='n'>up</td><td class='n muted'>&mdash;</td><td class='n'>3</td><td class='n muted'>&mdash;</td><td class='n muted'>&mdash;</td><td class='n'>0</td><td class='n muted'>&mdash;</td></tr>
+<tr><td class='n'>2023-03-06</td><td class='n'>FDM</td><td class='n'>down</td><td class='n'>1</td><td class='n'>3</td><td class='n'><span class='pill'>hit</span></td><td class='n'>0</td><td class='n'>1</td><td class='n'><span class='pill'>hit</span></td></tr>
+<tr><td class='n'>2023-02-27</td><td class='n'>FDM</td><td class='n'>down</td><td class='n'>1</td><td class='n'>3</td><td class='n'><span class='pill'>hit</span></td><td class='n'>1</td><td class='n'>1</td><td class='n'><span class='pill no'>miss</span></td></tr>
+<tr><td class='n'>2023-02-20</td><td class='n'>FDM</td><td class='n'>down</td><td class='n'>0</td><td class='n'>3</td><td class='n'><span class='pill no'>miss</span></td><td class='n'>0</td><td class='n'>1</td><td class='n'><span class='pill'>hit</span></td></tr>
+<tr><td class='n'>2023-02-13</td><td class='n'>FDW</td><td class='n'>up</td><td class='n'>1</td><td class='n'>3</td><td class='n'><span class='pill'>hit</span></td><td class='n'>1</td><td class='n'>2</td><td class='n'><span class='pill no'>miss</span></td></tr>
+<tr><td class='n'>2023-02-06</td><td class='n'>W</td><td class='n'>down</td><td class='n'>1</td><td class='n'>3</td><td class='n'><span class='pill'>hit</span></td><td class='n'>0</td><td class='n'>2</td><td class='n'><span class='pill'>hit</span></td></tr>
+<tr><td class='n'>2023-01-30</td><td class='n'>W</td><td class='n'>up</td><td class='n'>1</td><td class='n'>3</td><td class='n'><span class='pill'>hit</span></td><td class='n'>0</td><td class='n'>3</td><td class='n'><span class='pill no'>miss</span></td></tr>
+<tr><td class='n'>2023-01-23</td><td class='n'>W</td><td class='n'>up</td><td class='n'>0</td><td class='n'>3</td><td class='n'><span class='pill no'>miss</span></td><td class='n'>0</td><td class='n'>1</td><td class='n'><span class='pill'>hit</span></td></tr>
+<tr><td class='n'>2023-01-16</td><td class='n'>M</td><td class='n'>up</td><td class='n'>0</td><td class='n'>3</td><td class='n'><span class='pill no'>miss</span></td><td class='n'>0</td><td class='n'>3</td><td class='n'><span class='pill no'>miss</span></td></tr>
+<tr><td class='n'>2023-01-09</td><td class='n'></td><td class='n'>up</td><td class='n'>0</td><td class='n'>3</td><td class='n'><span class='pill no'>miss</span></td><td class='n'>0</td><td class='n'>3</td><td class='n'><span class='pill no'>miss</span></td></tr>
+<tr><td class='n'>2023-01-02</td><td class='n'></td><td class='n'>up</td><td class='n muted'>&mdash;</td><td class='n'>2</td><td class='n muted'>&mdash;</td><td class='n muted'>&mdash;</td><td class='n'>2</td><td class='n muted'>&mdash;</td></tr>
+<tr><td class='n'>2022-12-26</td><td class='n'>W</td><td class='n'>down</td><td class='n'>0</td><td class='n'>3</td><td class='n'><span class='pill no'>miss</span></td><td class='n'>0</td><td class='n'>2</td><td class='n'><span class='pill'>hit</span></td></tr>
+<tr><td class='n'>2022-12-19</td><td class='n'>FDM</td><td class='n'>up</td><td class='n'>1</td><td class='n'>2</td><td class='n'><span class='pill no'>miss</span></td><td class='n'>0</td><td class='n'>2</td><td class='n'><span class='pill'>hit</span></td></tr>
+<tr><td class='n'>2022-12-12</td><td class='n'>FDM</td><td class='n'>down</td><td class='n'>1</td><td class='n'>3</td><td class='n'><span class='pill'>hit</span></td><td class='n'>0</td><td class='n'>1</td><td class='n'><span class='pill'>hit</span></td></tr>
+</tbody>
+</table>
+
+<h2>7 &middot; Limitations &amp; honesty</h2>
+<ul class="tight">
+  <li>There is <b>no per&#8209;level ground truth</b> in the workbook &mdash; only the aggregate &ldquo;did the week show
+  3 levels&rdquo;. The individual L1/L2/L3 boundaries, board&#8209;meeting locations and the 15m switch point are
+  <b>unvalidated by column</b>; they can only be eyeballed against Igor&rsquo;s TradingView snapshots.</li>
+  <li>The <b>direction + entry are inherited</b> from the M/W detector, which is itself near a coin&#8209;flip on
+  Igor&rsquo;s labels. A wrong direction feeds the level detector a wrong leg, so some misses are upstream, not the
+  counter&rsquo;s fault.</li>
+  <li>The <b>15m column is a dead end</b> for mechanical counting (52% balanced). Do not read the 56% raw figure as
+  progress &mdash; it is the base&#8209;rate.</li>
+  <li>No cell in the declared grid meaningfully clears <b>~60% balanced</b>. Per the task&rsquo;s honesty rule, that is
+  stated plainly: this calibrates the level count as a <b>weak confidence signal</b>, not a reliable gate.</li>
+</ul>
+
+<div class="foot">
+  <p><b>Provenance &amp; reproducibility.</b> Detector module <code>detectors/levels_fade2.py</code> (new module &mdash;
+  the existing <code>detectors/levels.py</code> is untouched, since <code>weekly.py</code>, <code>bt_weekly.py</code> and
+  <code>bt_backflip.py</code> import its <code>count_levels</code>). Calibration harness
+  <code>backtests/f6_levels_calibrate.py</code>; grid <code>backtests/f6_grid.csv</code>, per&#8209;week
+  <code>backtests/f6_bestcell_perweek.csv</code>. Both modules <code>py_compile</code>&#8209;clean. The calibration was
+  run twice; <code>f6_grid.csv</code> is byte&#8209;identical &mdash; md5 <code>f9387aa3c8d571e560f294761ed180a0</code>. Ground truth
+  <code>Strategy Codex/Annie/data/tab_FMWB.csv</code> (36 weeks); candles
+  <code>backtests/data/btcusdt_1m.parquet</code> resampled 15m/1H.</p>
+  <p>Annie Trading &middot; Fade 2 &middot; Task F6 &mdash; causal L1/L2/L3 level detector, calibrated against Igor&rsquo;s
+  rulings of 2026&#8209;07&#8209;14. Self&#8209;contained.</p>
+</div>
+
+</div>
+<script>
+(function(){
+  var btn=document.getElementById('themeToggle');
+  if(!btn)return;
+  var mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;
+  function stored(){try{var t=localStorage.getItem('codexTheme');return (t==='light'||t==='dark'||t==='system')?t:'system';}catch(e){return 'system';}}
+  function eff(m){return (m==='light'||m==='dark')?m:((mq&&mq.matches)?'dark':'light');}
+  function apply(){var m=stored();document.documentElement.setAttribute('data-theme',eff(m));btn.textContent=(m==='light')?'\u25D0 Light':(m==='dark')?'\u25D1 Dark':'\u25D3 Auto';}
+  apply();
+  btn.addEventListener('click',function(){var order={light:'dark',dark:'system',system:'light'};var n=order[stored()];try{localStorage.setItem('codexTheme',n);}catch(e){}apply();});
+  if(mq){var h=function(){if(stored()==='system')apply();};if(mq.addEventListener)mq.addEventListener('change',h);else if(mq.addListener)mq.addListener(h);}
+})();
+</script>
+</body>
+</html>
