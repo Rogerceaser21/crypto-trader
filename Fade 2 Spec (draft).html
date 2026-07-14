@@ -34,6 +34,7 @@
   .tag{display:inline-block;font-size:10.5px;font-weight:800;border-radius:20px;padding:2px 9px;color:#0b0f16;white-space:nowrap;letter-spacing:.03em}
   .tag.sourced{background:var(--sourced)} .tag.inferred{background:var(--inferred)} .tag.missing{background:var(--missing);color:#fff}
   .tag.crisp{background:var(--crisp)} .tag.fuzzy{background:var(--fuzzy)} .tag.unknown{background:var(--unknown)}
+  .tag.ruled{background:var(--sourced);color:#0b0f16}
   .src{color:var(--muted);font-size:12px;font-style:italic}
   .callout{border-left:4px solid var(--warn);background:rgba(227,179,65,.08);padding:12px 16px;border-radius:8px;margin:14px 0}
   .callout.good{border-left-color:var(--crisp);background:rgba(38,166,154,.08)}
@@ -53,6 +54,10 @@
     display:flex;align-items:center;justify-content:center;font-size:14px}
   .prop{display:block;margin-top:6px;padding:8px 12px;border-radius:8px;background:rgba(38,166,154,.09);border:1px solid rgba(38,166,154,.25);font-size:13.5px}
   .prop b{color:var(--crisp)}
+  .ruling{display:block;margin-top:8px;padding:8px 12px;border-radius:8px;background:rgba(63,185,80,.10);border:1px solid rgba(63,185,80,.32);font-size:13.5px}
+  .ruling b{color:var(--sourced)}
+  .strike{text-decoration:line-through;opacity:.6}
+  html[data-theme="light"] .ruling{background:rgba(30,125,52,.09);border-color:rgba(30,125,52,.30)}
   .foot{color:var(--muted);font-size:12.5px;margin-top:50px;border-top:1px solid var(--line);padding-top:16px}
   .kv{font-size:12px;color:var(--muted)}
   /* ---- Theme toggle ---- */
@@ -67,7 +72,7 @@
   html[data-theme="light"] .callout.good{background:rgba(23,143,131,.10)}
   html[data-theme="light"] .callout.bad{background:rgba(201,44,34,.09)}
   html[data-theme="light"] .callout.q{background:rgba(47,111,224,.08)}
-  html[data-theme="light"] .tag.sourced,html[data-theme="light"] .tag.crisp{color:#fff}
+  html[data-theme="light"] .tag.sourced,html[data-theme="light"] .tag.crisp,html[data-theme="light"] .tag.ruled{color:#fff}
   html[data-theme="light"] .tag.inferred,html[data-theme="light"] .tag.fuzzy,html[data-theme="light"] .tag.unknown{color:#fff}
   html[data-theme="light"] ol.q>li::before{color:#fff}
   .theme-toggle{position:fixed;top:16px;right:20px;z-index:100;background:var(--panel);
@@ -87,13 +92,14 @@
 <div class="wrap">
 
 <header>
-  <div class="eyebrow">Annie Trading &middot; Task F4 &middot; mechanical spec DRAFT</div>
+  <div class="eyebrow">Annie Trading &middot; Task F4 &middot; spec v1 &mdash; rulings received 2026-07-14; detector build in progress</div>
   <h1>Annie's Monday Fade 2</h1>
   <p class="sub">The full weekly system as Igor described it (2026-07-13), fleshed out from the course
-  material and his own hand-labelled backtests. This is a <b>research + writing draft</b> — no backtest was run.
-  Its job is to state every rule with a <b>source</b>, be honest about what is <b>crisp</b> versus <b>fuzzy</b>,
-  and hand Igor a numbered list of the exact decisions that block a mechanical detector, each with a proposed
-  default he can approve or override.</p>
+  material and his own hand-labelled backtests. <b>Igor ruled on all 12 open questions below on 2026-07-14</b>
+  (plus a standing instruction on stop placement &mdash; <a href="#ruling13">Ruling&nbsp;13</a>). Each numbered question keeps
+  its original text and proposed default as the record, with <span class="tag ruled">&#9989; RULED</span> and Igor's own
+  words appended in a green <b>IGOR'S RULING (2026-07-14)</b> line. Detector build against these rulings is now in
+  progress. It still states every rule with a <b>source</b>, and is honest about what is <b>crisp</b> versus <b>fuzzy</b>.</p>
   <div class="legend">
     <span><span class="tag sourced">SOURCED</span> explicit in the material</span>
     <span><span class="tag inferred">INFERRED</span> reasonable reading &mdash; flagged</span>
@@ -105,8 +111,9 @@
   </div>
   <p class="kv" style="margin-top:12px">Sources: <code>Annie System Rulebook (source).md</code> v2.1 &middot; 24 video
   transcripts (<code>transcripts/</code>) &middot; Igor's 7-tab backtest workbook (<code>data/tab_*.csv</code>) &middot;
-  <code>detectors/CALIBRATION_V2.md</code> &middot; Igor's 8 rulings (2026-07-11). Timestamps like <code>~[04:01]</code>
-  are the position in the named transcript, not a verified clock time.</p>
+  <code>detectors/CALIBRATION_V2.md</code> &middot; Igor's 8 rulings (2026-07-11) &middot; Igor's 13 Fade&nbsp;2 rulings
+  (2026-07-14, this doc). Timestamps like <code>~[04:01]</code> are the position in the named transcript, not a verified
+  clock time.</p>
 </header>
 
 <h2>Verdict &mdash; how mechanizable is this, honestly?</h2>
@@ -172,8 +179,9 @@
 <div class="callout good"><b>Bottom line for the build.</b> Code the scaffold as hard gates (clock, PVSRA, EMA cross,
 SVC shape, Friday close). Treat the M/W read, the direction, and the level count as <b>scored proxies</b> calibrated
 against Igor's 36 labelled weeks, not as ground truth. Ship Fade 2 as a <b>ranked-candidate detector</b> (it proposes
-setups with a confidence, Igor's labels grade it), and resolve the <a href="#opens">12 open questions</a> below before
-freezing thresholds.</div>
+setups with a confidence, Igor's labels grade it). Igor has now ruled on all <a href="#opens">12 open questions</a>
+below (2026-07-14) &mdash; each is marked <span class="tag ruled">&#9989; RULED</span> with his ruling recorded inline;
+detector build proceeds against those rulings, plus the new stop-placement instruction at <a href="#ruling13">Ruling&nbsp;13</a>.</div>
 
 <h2>The 6-step system, rule by rule</h2>
 <p class="muted">Each rule carries a source tag and a colour tag. <span class="tag sourced">SOURCED</span> = stated in the
@@ -272,9 +280,10 @@ rulebook &sect;2 "M/W pattern validity" + ruling #5.</p>
   <tr><td>It is OK for price to cross back over the 50 EMA during the retest <b>as long as it does not break beyond the
     second peak</b> of the M/W.</td>
     <td><span class="tag sourced">SOURCED</span></td><td class="src">"Weekly Setup V2" ~[07:02]</td></tr>
-  <tr><td>BBWP&lt;35 appears as a confluence column in Igor's sheet but is not described as a hard gate in the videos &mdash;
-    treat as optional/A-B, not required.</td>
-    <td><span class="tag inferred">INFERRED</span></td><td class="src">sheet cols; <code>CALIBRATION_V2</code>; see <a href="#q12">Q12</a></td></tr>
+  <tr><td><span class="strike">BBWP&lt;35 appears as a confluence column in Igor's sheet but is not described as a hard gate in the videos &mdash;
+    treat as optional/A-B, not required.</span><br><span class="ruling"><b>DROPPED BY RULING (2026-07-14):</b> Igor &mdash;
+    "just something I was testing, didn't get anywhere with it." Removed from the testable-rules set; see <a href="#q12">Q12</a>.</span></td>
+    <td><span class="tag ruled">&#9989; RULED</span></td><td class="src">sheet cols; <code>CALIBRATION_V2</code>; see <a href="#q12">Q12</a></td></tr>
 </table>
 </div>
 
@@ -531,85 +540,140 @@ step&nbsp;5 starts <b>unlabelled</b>.</div>
 Fade&nbsp;2 (M/W type, direction, level count) sits at 33&ndash;53%. That is the honest ceiling to design around.</p>
 
 <!-- OPEN QUESTIONS -->
-<h2 id="opens">Open questions for Igor</h2>
-<p class="muted">Every ambiguity that blocks a mechanical detector, each with a concrete proposed default so a "yes" ships it
-and any other answer overrides it. (Question&nbsp;0, the abort rule, is tracked separately.)</p>
+<h2 id="opens">Open questions for Igor &mdash; RULED 2026-07-14</h2>
+<p class="muted">Every ambiguity that blocked a mechanical detector, each with a concrete proposed default so a "yes" ships it
+and any other answer overrides it. Igor ruled on all 12 below on 2026-07-14 &mdash; each question keeps its original text
+and proposed default as the record, with his ruling appended in a green <b>IGOR'S RULING</b> line.
+(Question&nbsp;0, the abort rule, remains tracked separately &mdash; see the note on <a href="#q1">Q1</a>.)</p>
 
 <ol class="q">
-  <li id="q1"><b>Is the 50-EMA vector-cross required to ENTER, or only to COUNT L1?</b> Igor says "cross preferred, NOT
+  <li id="q1"><span class="tag ruled">&#9989; RULED</span> <b>Is the 50-EMA vector-cross required to ENTER, or only to COUNT L1?</b> Igor says "cross preferred, NOT
     required"; the rulebook says "L1 must break the 50 with a vector or it doesn't count." These are reconcilable but the
     detector needs one rule.
     <span class="prop"><b>Proposed default:</b> the aggressive second-peak M/W entry does <b>not</b> wait for the cross
     (enter on peak&nbsp;2, invalidate only on a close beyond peak&nbsp;2); the 200%-vector 50-EMA cross is required only to
     <b>count L1</b> for the three-level hold and is the conservative-entry confirmation. Cross gates the <i>count</i>, not the
-    <i>entry</i>.</span></li>
+    <i>entry</i>.</span>
+    <span class="ruling"><b>IGOR'S RULING (2026-07-14):</b> test <b>both</b> triggers as separate entry variants &mdash;
+    (a) V1's 200%-vector-through-50EMA, and (b) the first PVSRA green/red candle on the 15m in the <b>opposite</b> direction
+    of the peak. <span class="tag inferred">INFERRED</span> variant (b) needs a void-rule companion &mdash; armed only after
+    price first reaches the 50-EMA. This companion rule is our inference, not something Igor ruled on explicitly &mdash;
+    Question&nbsp;0 (the abort/void rule) remains open.</span></li>
 
-  <li id="q2"><b>Which direction(s) may Fade 2 fire?</b> Detector direction is a coin-flip (50%). Do we let it fire both
+  <li id="q2"><span class="tag ruled">&#9989; RULED</span> <b>Which direction(s) may Fade 2 fire?</b> Detector direction is a coin-flip (50%). Do we let it fire both
     ways and let geometry decide, or constrain it?
     <span class="prop"><b>Proposed default:</b> Fade&nbsp;2 <b>only</b> trades the reversal of the Monday false move, and the
     M/W must sit at the <b>weekly extreme</b> &mdash; W at the LOW &rarr; long, M at the HOW &rarr; short. No naked
-    both-sides firing.</span></li>
+    both-sides firing.</span>
+    <span class="ruling"><b>IGOR'S RULING (2026-07-14):</b> confirmed emphatically. <b>Only</b> the reversal of the Monday
+    false move &mdash; W at the low &rarr; long, M at the high &rarr; short. Proposed default stands as written.</span></li>
 
-  <li id="q3"><b>How is the weekend box built, exactly, and what counts as a "spike out"?</b> "Close-clusters not wicks" is
+  <li id="q3"><span class="tag ruled">&#9989; RULED</span> <b>How is the weekend box built, exactly, and what counts as a "spike out"?</b> "Close-clusters not wicks" is
     descriptive.
     <span class="prop"><b>Proposed default:</b> box = min/max of candle <b>closes</b> in the Fri-17:00-NY &rarr;
     Sun-17:00-NY window; a fake move = a wick beyond the box that <b>closes back inside within 3 candles</b> (15m). If no
-    such spike, fall back to an M/W inside the box.</span></li>
+    such spike, fall back to an M/W inside the box.</span>
+    <span class="ruling"><b>IGOR'S RULING (2026-07-14):</b> V1's existing build is the <b>first point of call</b> &mdash;
+    engine = 24-bin close-cluster centroid box over Fri&nbsp;17:00&rarr;Sun&nbsp;17:00&nbsp;NY; the Pine port is the plain
+    close min/max range. <b>Also</b> test the proposed default above (wick-out + close-back-inside-3-candles), <b>and</b> a
+    new confluence qualifier: the spike must <b>cross at least one Weekend-SD indicator average line</b> (History/5Y,
+    1-Month, or 3-Month) to count as a spike. All three variants declared and tested side by side.</span></li>
 
-  <li id="q4"><b>Confirm the peak-2 "vicinity" bound at 35%?</b> Grid-chosen on your weeks (33% trigger-exact agreement;
+  <li id="q4"><span class="tag ruled">&#9989; RULED</span> <b>Confirm the peak-2 "vicinity" bound at 35%?</b> Grid-chosen on your weeks (33% trigger-exact agreement;
     ties broke tighter).
     <span class="prop"><b>Proposed default:</b> peak-2 shortfall/overshoot up to <b>35%</b> of the internal leg is a valid
-    M/W; beyond 35% = breakout, not a fade. Keep 35% until a bigger labelled set moves it.</span></li>
+    M/W; beyond 35% = breakout, not a fade. Keep 35% until a bigger labelled set moves it.</span>
+    <span class="ruling"><b>IGOR'S RULING (2026-07-14):</b> confirmed. Peak-2 vicinity at 35% stands.</span></li>
 
-  <li id="q5"><b>What merges bars into "one level" vs starts the next?</b> Annie: 4&ndash;6 elevated bars can be one level;
+  <li id="q5"><span class="tag ruled">&#9989; RULED</span> <b>What merges bars into "one level" vs starts the next?</b> Annie: 4&ndash;6 elevated bars can be one level;
     a lone spike is its own.
     <span class="prop"><b>Proposed default:</b> a contiguous run of PVSRA-coloured bars (200% or 150%) with <b>no gap of
     &ge;6 below-average-volume bars</b> between them = one level; a &ge;6-bar quiet gap starts the next level's count.
-    Tune the <code>6</code> on the labelled weeks.</span></li>
+    Tune the <code>6</code> on the labelled weeks.</span>
+    <span class="ruling"><b>IGOR'S RULING (2026-07-14):</b> the realistic bunch is <b>~3 PVSRA candles on the 15m</b> (the
+    1H often shows just 1) &mdash; counted "as a bunch on the volume histogram." <b>Start with 3 on the 15m; 6 is
+    impossible.</b> This overrides the proposed default's 6-bar gap number, and the count is explicitly <b>TF-dependent</b>
+    (15m vs 1H give different bunch sizes for the same level).</span></li>
 
-  <li id="q6"><b>When does the level count live on 15m instead of 1H (the "damage is done" shortcut)?</b>
+  <li id="q6"><span class="tag ruled">&#9989; RULED</span> <b>When does the level count live on 15m instead of 1H (the "damage is done" shortcut)?</b>
     <span class="prop"><b>Proposed default:</b> count on the <b>1H</b> by default; if a single 1H leg is "vertical"
     (its range &ge; 3&times; the trailing-20 1H candle range) <b>and</b> is followed by a board meeting of &ge;8 bars,
-    switch the remaining count to the 15m. Confirm the 3&times; / 8-bar knobs.</span></li>
+    switch the remaining count to the 15m. Confirm the 3&times; / 8-bar knobs.</span>
+    <span class="ruling"><b>IGOR'S RULING (2026-07-14):</b> "we can try that" &mdash; confirmed as a testable default. Ship
+    the 1H&rarr;15m switch-after-a-vertical-leg rule as written; the 3&times; / 8-bar knobs remain tunable against the
+    labelled weeks, not frozen numbers.</span></li>
 
-  <li id="q7"><b>What numerically is a board meeting / channel?</b> Ruling #4 says "just a channel, no boundary rules,"
+  <li id="q7"><span class="tag ruled">&#9989; RULED</span> <b>What numerically is a board meeting / channel?</b> Ruling #4 says "just a channel, no boundary rules,"
     but the detector needs a trigger for partials.
     <span class="prop"><b>Proposed default:</b> board meeting = &ge;6 bars whose high-low band stays &le;1.5% while the 50-EMA
-    slope flattens (|slope| below a small threshold). Take a partial + move management at each detected board meeting.</span></li>
+    slope flattens (|slope| below a small threshold). Take a partial + move management at each detected board meeting.</span>
+    <span class="ruling"><b>IGOR'S RULING (2026-07-14):</b> "good start" &mdash; confirmed as the starting values. Ship
+    &ge;6 bars, &le;1.5% band, flat 50-EMA slope as the initial board-meeting definition; tune from there.</span></li>
 
-  <li id="q8"><b>What fires the exit when "is this L3?" is fuzzy?</b> The exit gates on L3, but the level count is the
+  <li id="q8"><span class="tag ruled">&#9989; RULED</span> <b>What fires the exit when "is this L3?" is fuzzy?</b> The exit gates on L3, but the level count is the
     weakest detector.
     <span class="prop"><b>Proposed default:</b> exit on the <b>first</b> of &mdash; (a) an SVC after <b>&ge;2 counted levels</b>
     at a weekly HOW/LOW/liq level, (b) a Wed/Thu-US MWR window with an opposite M/W, or (c) <b>Friday UK close</b>. Whichever
-    comes first wins.</span></li>
+    comes first wins.</span>
+    <span class="ruling"><b>IGOR'S RULING (2026-07-14):</b> "Perfect" &mdash; confirmed as written. First-of-three exit
+    (SVC after &ge;2 levels at extreme/liq level &middot; Wed/Thu-US opposite M/W &middot; Friday close) ships as the exit
+    rule.</span></li>
 
-  <li id="q9"><b>Keep the sub-1H engulfing candle as a valid SVC/stopping trigger?</b> Ruling #2 allows it; it lifted
+  <li id="q9"><span class="tag ruled">&#9989; RULED</span> <b>Keep the sub-1H engulfing candle as a valid SVC/stopping trigger?</b> Ruling #2 allows it; it lifted
     Reversal-SVC agreement +9pp to 61%.
     <span class="prop"><b>Proposed default:</b> <b>yes</b> &mdash; an engulfing candle with 150%+ PVSRA volume counts as an SVC
-    under 1H, alongside the small-body/long-wick shape.</span></li>
+    under 1H, alongside the small-body/long-wick shape.</span>
+    <span class="ruling"><b>IGOR'S RULING (2026-07-14):</b> confirmed. Engulfing candle with 150%+ volume counts as an SVC
+    under 1H.</span></li>
 
-  <li id="q10"><b>Is the 5m/15m "3 trap candles" micro-rule a hard gate or optional confluence?</b> It has no ground-truth
+  <li id="q10"><span class="tag ruled">&#9989; RULED</span> <b>Is the 5m/15m "3 trap candles" micro-rule a hard gate or optional confluence?</b> It has no ground-truth
     column, so we cannot yet measure it.
     <span class="prop"><b>Proposed default:</b> implement as <b>optional confluence</b> that raises a candidate's confidence,
-    <b>not</b> a required gate, until we hand-label examples from the 41 TradingView snapshots; then A/B it.</span></li>
+    <b>not</b> a required gate, until we hand-label examples from the 41 TradingView snapshots; then A/B it.</span>
+    <span class="ruling"><b>IGOR'S RULING (2026-07-14):</b> confirmed &mdash; optional confluence, not a hard gate.</span></li>
 
-  <li id="q11"><b>Run the retest menu as 2-of-3 (no liq data) or wait for a free feed to make it 2-of-4?</b>
+  <li id="q11"><span class="tag ruled">&#9989; RULED</span> <b>Run the retest menu as 2-of-3 (no liq data) or wait for a free feed to make it 2-of-4?</b>
     <span class="prop"><b>Proposed default:</b> ship <b>2-of-3</b> over {50-EMA retest, origin-vector retest, HL/LH structure}
-    now, with a <code>liq_level</code> hook; wire free Coinalyze/Coinglass later to restore 2-of-4. (Per rulings #1, #6.)</span></li>
+    now, with a <code>liq_level</code> hook; wire free Coinalyze/Coinglass later to restore 2-of-4. (Per rulings #1, #6.)</span>
+    <span class="ruling"><b>IGOR'S RULING (2026-07-14):</b> <b>no Coinalyze, no paid data.</b> Annie's liquidity concept is
+    mechanical from price/volume alone: the market maker targets (a) <b>previous wicks</b> &mdash; hard rule, where
+    stops/liquidations sit &mdash; and (b) <b>unrecovered vector candles</b> (fast one-direction PVSRA candles within the
+    Monday spike-out or the previous week that price has not yet revisited = recovery targets). This becomes the
+    <b>liq-level proxy detector (task&nbsp;F12)</b> and <b>restores the retest menu to 2-of-4</b> using the proxy in place of a
+    paid feed &mdash; supersedes the 2-of-3 proposed default above.</span></li>
 
-  <li id="q12"><b>Is BBWP&lt;35 a required filter, optional confluence, or an A/B toggle?</b> It is a column in your sheet but
+  <li id="q12"><span class="tag ruled">&#9989; RULED</span> <b>Is BBWP&lt;35 a required filter, optional confluence, or an A/B toggle?</b> It is a column in your sheet but
     never a hard gate in the videos; agreement is 52&ndash;60%.
     <span class="prop"><b>Proposed default:</b> <b>optional A/B toggle</b>, off in the baseline, tested as a confluence
-    booster &mdash; not a hard gate.</span></li>
+    booster &mdash; not a hard gate.</span>
+    <span class="ruling"><b>IGOR'S RULING (2026-07-14):</b> <b>dropped entirely.</b> Igor: "just something I was testing,
+    didn't get anywhere with it." BBWP is removed from the testable-rules set (the Step&nbsp;3 row is struck through above,
+    not deleted, as the record).</span></li>
 </ol>
 
-<div class="callout q"><b>Answer style:</b> a plain "yes to all" freezes every default above and I can move Fade&nbsp;2 from
-draft to a codeable spec. Override any number the way you ruled on the earlier eight &mdash; your ruling wins and gets recorded.</div>
+<h3 id="ruling13">Ruling 13 &mdash; stop placement (new standing instruction, 2026-07-14)</h3>
+<div class="card">
+  <p><span class="tag ruled">&#9989; RULED</span> Igor observed that V1 entries were "stopped out by the market maker
+  because the SL was too close" to the peak. This is a standing instruction, not answering one of the 12 numbered
+  questions above &mdash; it applies across every M/W entry variant in this spec (both Q1 trigger variants).</p>
+  <span class="ruling"><b>IGOR'S RULING (2026-07-14):</b> stops placed tight against the M/W peak get run by the market
+  maker before the real move starts. A <b>stop-buffer research sweep is queued as task&nbsp;F11</b> &mdash; test a range of
+  buffers beyond the peak/wick extreme (not just "at the wick") and measure the reduction in premature stop-outs against
+  R:R given up. No buffer size is frozen yet; F11 owns picking it.</span>
+</div>
+
+<div class="callout q"><b>Answer style, updated 2026-07-14:</b> all 12 questions above are now <span class="tag ruled">&#9989; RULED</span>
+&mdash; Igor's answers are recorded inline, each proposed default kept as the record it either confirms or overrides. Detector
+build (task F4) proceeds against these rulings, plus the liq-proxy detector (task F12, Q11) and the stop-buffer sweep
+(task F11, Ruling 13). Any future override the way Igor ruled on the earlier eight &mdash; his ruling wins and gets recorded.</div>
 
 <div class="foot">
-  Annie Trading &middot; <code>Fade 2 Spec (draft).html</code> &middot; Task&nbsp;F4 research + writing draft (no backtest run).
-  Rules sourced from the rulebook v2.1, 24 video transcripts, Igor's 7-tab workbook, <code>CALIBRATION_V2</code>, and Igor's
-  8 rulings (2026-07-11) + his Fade&nbsp;2 description (2026-07-13). Timestamps are transcript positions, not verified clock
+  Annie Trading &middot; <code>Fade 2 Spec (draft).html</code> &middot; Task&nbsp;F4 &mdash; spec v1, rulings received
+  2026-07-14, detector build in progress.
+  Rules sourced from the rulebook v2.1, 24 video transcripts, Igor's 7-tab workbook, <code>CALIBRATION_V2</code>, Igor's
+  8 rulings (2026-07-11), his Fade&nbsp;2 description (2026-07-13), and his 13 Fade&nbsp;2 rulings recorded inline above
+  (2026-07-14: Q1&ndash;Q12 + Ruling&nbsp;13, stop placement). Follow-on tasks opened by these rulings: F11 (stop-buffer
+  sweep) and F12 (liq-level proxy detector). Timestamps are transcript positions, not verified clock
   times. This page is self-contained.
 </div>
 
