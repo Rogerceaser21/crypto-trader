@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>V3 Config Table — Monday Fade, Live Streaming Entries</title>
+<style>
+  :root{
+    --bg:#0e1117; --panel:#161b22; --panel2:#1c2230; --ink:#e6edf3; --muted:#9aa4b2;
+    --line:#2a3140; --accent:#6aa9ff; --all:#9598a1; --m3:#26a69a; --m1:#ff9800;
+    --up:#3fb950; --dn:#f85149; --warn:#e3b341;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  .wrap{max-width:1040px;margin:0 auto;padding:34px 22px 90px;}
+  header{border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:8px}
+  .eyebrow{letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:var(--accent);font-weight:700}
+  h1{font-size:31px;margin:8px 0 6px;line-height:1.2}
+  h2{font-size:21px;margin:40px 0 12px;padding-top:8px;border-top:1px solid var(--line)}
+  h3{font-size:16px;margin:22px 0 8px;color:var(--ink)}
+  p{color:var(--ink)}
+  .sub{color:var(--muted);font-size:15px;max-width:78ch}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:14px 0}
+  code,kbd{background:#0b0f16;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px}
+  kbd{color:var(--accent)}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13.5px}
+  th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+  th{background:var(--panel2);color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.03em}
+  td.n,th.n{font-family:ui-monospace,Menlo,monospace;white-space:nowrap;text-align:right}
+  tr.best td{background:rgba(38,166,154,.13)}
+  tr.best td:first-child{box-shadow:inset 3px 0 0 var(--m3)}
+  .pos{color:var(--up)} .neg{color:var(--dn)}
+  .tag{display:inline-block;font-size:10.5px;font-weight:800;border-radius:20px;padding:2px 9px;color:#0b0f16;letter-spacing:.02em}
+  .tag.best{background:var(--m3)} .tag.warn{background:var(--warn)} .tag.bad{background:var(--dn);color:#fff}
+  .callout{border-left:4px solid var(--warn);background:rgba(227,179,65,.08);padding:12px 16px;border-radius:8px;margin:12px 0}
+  .callout.good{border-left-color:var(--m3);background:rgba(38,166,154,.08)}
+  .callout.bad{border-left-color:var(--dn);background:rgba(248,81,73,.09)}
+  .callout b{color:var(--ink)}
+  .verdict{background:linear-gradient(180deg,rgba(38,166,154,.16),rgba(38,166,154,.05));
+    border:1px solid var(--m3);border-radius:14px;padding:20px 22px;margin:18px 0 6px}
+  .verdict .lead{font-size:19px;font-weight:800;line-height:1.35;margin:0 0 4px}
+  .verdict .cfg{font-family:ui-monospace,Menlo,monospace;font-size:15px;color:var(--m3);font-weight:700}
+  .qbox{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+  @media(max-width:720px){.qbox{grid-template-columns:1fr}}
+  .qbox .q{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+  .qbox .q h4{margin:0 0 6px;font-size:14px;color:var(--accent);letter-spacing:.02em}
+  .qbox .q .a{font-weight:700}
+  .muted{color:var(--muted)}
+  ul.tight{margin:6px 0 6px 0;padding-left:20px} ul.tight li{margin:5px 0}
+  .foot{color:var(--muted);font-size:12.5px;margin-top:50px;border-top:1px solid var(--line);padding-top:16px}
+  .scroll{overflow-x:auto}
+  .mono{font-family:ui-monospace,Menlo,monospace;font-size:12px}
+  .grp{background:var(--panel2);font-weight:700;color:var(--ink)}
+
+  /* ---- Theme toggle ---- */
+  html[data-theme="light"]{
+    --bg:#f7f9fc; --panel:#ffffff; --panel2:#eef1f6; --ink:#1a2230; --muted:#5b6472;
+    --line:#d7dde6; --accent:#2f6fe0; --all:#6b6f7a; --m3:#178f83; --m1:#c97400;
+    --up:#1e7d34; --dn:#c92c22; --warn:#a6740b;
+  }
+  html[data-theme="light"] code, html[data-theme="light"] kbd{background:#eef1f5;color:var(--ink)}
+  html[data-theme="light"] .callout{background:rgba(166,116,11,.10)}
+  html[data-theme="light"] .callout.good{background:rgba(23,143,131,.10)}
+  html[data-theme="light"] .callout.bad{background:rgba(201,44,34,.09)}
+  html[data-theme="light"] .tag.best,html[data-theme="light"] .tag.warn{color:#fff}
+  .theme-toggle{position:fixed;top:16px;right:20px;z-index:100;background:var(--panel);
+    border:1px solid var(--line);color:var(--ink);border-radius:20px;padding:6px 14px;
+    font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.35);
+    font-family:inherit;letter-spacing:.02em}
+  html[data-theme="light"] .theme-toggle{box-shadow:0 2px 10px rgba(0,0,0,.10)}
+  .theme-toggle:active{transform:translateY(1px)}
+@media(max-width:560px){.theme-toggle{top:10px;right:12px;padding:6px 10px;font-size:12px}body{padding-top:44px}}
+</style>
+<script>
+(function(){try{var t=localStorage.getItem('codexTheme');var e=(t==='light'||t==='dark')?t:((window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light');document.documentElement.setAttribute('data-theme',e);}catch(e){}})();
+</script>
+</head>
+<body>
+<button type="button" id="themeToggle" class="theme-toggle" aria-label="Cycle theme: light, dark, or system">&#9683; Auto</button>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Annie Trading &middot; live-config decision table (Task&nbsp;G2)</div>
+  <h1>V3 Config Table</h1>
+  <p class="sub">The definitive live-config backtest for the Annie <b>Monday fade</b>, run on <b>streaming entries</b>
+  &mdash; the honest live mode where you commit to the <i>running</i> early-week extreme the moment a chain fires (no
+  hindsight about which spike was &ldquo;the&rdquo; spike). Eight declared configs: <b>SD&nbsp;gate</b> {off&nbsp;/&nbsp;on}
+  &times; <b>take-profit</b> {1.9R&nbsp;/&nbsp;2.5R} &times; <b>break-even&nbsp;@1R</b> {off&nbsp;/&nbsp;on}.
+  BTCUSDT perp, in-sample <b>2019 &rarr; 2024-12-31</b> only; the 2025-26 locked out-of-sample run is untouched.</p>
+</header>
+
+<div class="verdict">
+  <p class="lead">Recommended V3 default:
+    <span class="cfg">SD gate OFF &middot; TP 2.5R &middot; BE OFF</span> &nbsp;<span class="tag best">★ SHIP</span></p>
+  <p style="margin:2px 0 0">The plain fade &mdash; all 167 streaming Monday entries, held to a fixed <b>2.5R</b> target with the
+  stop, refund-zone and Friday close as-is, <b>no</b> break-even and <b>no</b> SD filter &mdash; is the top cell on every
+  headline metric: <b class="pos">+57.95R</b> total, <b>+0.347R</b>/trade, PF&nbsp;1.64, <b>t&nbsp;=&nbsp;+2.84</b>
+  (clears the 2.5 significance bar), maxDD&nbsp;&minus;11.1R, ~2.7 trades/month.</p>
+  <div class="qbox">
+    <div class="q">
+      <h4>Q1 &middot; Does BE@1R help or hurt at 2.5R live?</h4>
+      <div class="a"><span class="tag bad">HURTS</span> &nbsp;&minus;26.5R (&minus;0.159R/trade, paired t&nbsp;=&nbsp;&minus;2.48).</div>
+      <p class="muted" style="margin:6px 0 0">At the live default it drags +57.95R down to +31.42R. Win-rate collapses
+      45.5%&nbsp;&rarr;&nbsp;31.7% as <b>41</b> would-be winners get scratched at break-even. Every BE-on cell is worse than
+      its BE-off twin. Do not move to break-even.</p>
+    </div>
+    <div class="q">
+      <h4>Q2 &middot; What does the SD gate cost / buy live?</h4>
+      <div class="a"><span class="tag bad">COSTS</span> &nbsp;it throws away net winners.</div>
+      <p class="muted" style="margin:6px 0 0">Requiring the spike to cross an SD mean line drops <b>66</b> of 167 trades &mdash;
+      and those dropped small-spike fades are the <b>better</b> book (+0.55R/trade, t&nbsp;=&nbsp;+2.60) vs the big-spike
+      fades it keeps (+0.21R). The gate cuts +57.95R to <b>+21.46R</b>. Buys nothing; do not gate.</p>
+    </div>
+  </div>
+</div>
+
+<h2>1 &middot; The 8-cell decision grid</h2>
+<p class="muted">Streaming Monday fade, IS 2019&ndash;2024. <b>expR</b> = mean R/trade, <b>totR</b> = summed R (1R = 1% risk),
+<b>PF</b> = profit factor, <b>t</b> = one-sample t on per-trade R (project bar: |t|&nbsp;&ge;&nbsp;2.5), <b>maxDD</b> = max
+equity drawdown in R, <b>t/mo</b> = trades per month. Exit mix = TP&nbsp;/&nbsp;stop&nbsp;/&nbsp;BE&nbsp;/&nbsp;refund&nbsp;/&nbsp;Friday.</p>
+<div class="scroll">
+<table>
+  <tr>
+    <th>Config</th><th class="n">N</th><th class="n">WR%</th><th class="n">expR</th><th class="n">totR</th>
+    <th class="n">PF</th><th class="n">t</th><th class="n">maxDD</th><th class="n">t/mo</th><th>Exit mix (tp/st/be/rf/fr)</th>
+  </tr>
+  <tr class="grp"><td colspan="10">SD gate OFF &mdash; all 167 streaming entries (the honest live universe)</td></tr>
+  <tr><td>1.9R &middot; BE off</td><td class="n">167</td><td class="n">48.5</td><td class="n pos">+0.257</td><td class="n pos">+42.85</td><td class="n">1.51</td><td class="n pos">+2.46</td><td class="n">&minus;7.74</td><td class="n">2.69</td><td class="mono">66 / 73 / 0 / 2 / 26</td></tr>
+  <tr><td>1.9R &middot; BE@1R</td><td class="n">167</td><td class="n">35.3</td><td class="n pos">+0.122</td><td class="n pos">+20.36</td><td class="n">1.27</td><td class="n">+1.31</td><td class="n">&minus;7.64</td><td class="n">2.69</td><td class="mono">49 / 61 / 35 / 2 / 20</td></tr>
+  <tr class="best"><td><b>2.5R &middot; BE off</b> <span class="tag best">★ default</span></td><td class="n">167</td><td class="n">45.5</td><td class="n pos">+0.347</td><td class="n pos"><b>+57.95</b></td><td class="n">1.64</td><td class="n pos"><b>+2.84</b></td><td class="n">&minus;11.08</td><td class="n">2.69</td><td class="mono">55 / 78 / 0 / 2 / 32</td></tr>
+  <tr><td>2.5R &middot; BE@1R</td><td class="n">167</td><td class="n">31.7</td><td class="n pos">+0.188</td><td class="n pos">+31.42</td><td class="n">1.42</td><td class="n">+1.77</td><td class="n">&minus;7.70</td><td class="n">2.69</td><td class="mono">40 / 61 / 41 / 2 / 23</td></tr>
+  <tr class="grp"><td colspan="10">SD gate ON &mdash; only spikes that cross an SD mean line (101 entries)</td></tr>
+  <tr><td>1.9R &middot; BE off</td><td class="n">101</td><td class="n">43.6</td><td class="n pos">+0.101</td><td class="n pos">+10.19</td><td class="n">1.20</td><td class="n">+0.80</td><td class="n">&minus;12.17</td><td class="n">1.66</td><td class="mono">30 / 45 / 0 / 1 / 25</td></tr>
+  <tr><td>1.9R &middot; BE@1R</td><td class="n">101</td><td class="n">30.7</td><td class="n neg">&minus;0.012</td><td class="n neg">&minus;1.20</td><td class="n">0.97</td><td class="n">&minus;0.11</td><td class="n">&minus;10.76</td><td class="n">1.66</td><td class="mono">22 / 39 / 20 / 1 / 19</td></tr>
+  <tr><td>2.5R &middot; BE off</td><td class="n">101</td><td class="n">42.6</td><td class="n pos">+0.213</td><td class="n pos">+21.46</td><td class="n">1.41</td><td class="n">+1.46</td><td class="n">&minus;10.15</td><td class="n">1.66</td><td class="mono">25 / 46 / 0 / 1 / 29</td></tr>
+  <tr><td>2.5R &middot; BE@1R</td><td class="n">101</td><td class="n">28.7</td><td class="n pos">+0.055</td><td class="n pos">+5.51</td><td class="n">1.12</td><td class="n">+0.43</td><td class="n">&minus;12.05</td><td class="n">1.66</td><td class="mono">18 / 39 / 22 / 1 / 21</td></tr>
+</table>
+</div>
+<p class="muted">Reading the grid top-to-bottom: the untouched plain fade (row 3) wins. Adding BE@1R lowers totR in all four
+pairs; turning the SD gate on roughly halves N and cuts totR by 57&ndash;63%. Nothing in the lower (gate-on) block beats
+the plain 2.5R fade.</p>
+
+<h2>2 &middot; Paired comparisons (shared trades, one axis at a time)</h2>
+
+<h3>BE@1R on vs off &mdash; same trade set, only the break-even rule changes</h3>
+<div class="scroll">
+<table>
+  <tr><th>Fixed {gate, TP}</th><th class="n">n</th><th class="n">meanΔ (on−off)</th><th class="n">sumΔ</th><th class="n">totR off</th><th class="n">totR on</th><th class="n">paired t</th><th>Bar ≥2.5?</th></tr>
+  <tr><td>gate off &middot; 1.9R</td><td class="n">167</td><td class="n neg">&minus;0.135</td><td class="n neg">&minus;22.49</td><td class="n">+42.85</td><td class="n">+20.36</td><td class="n neg">&minus;2.65</td><td><span class="tag warn">yes</span></td></tr>
+  <tr><td>gate off &middot; 2.5R <span class="muted">(live default axis)</span></td><td class="n">167</td><td class="n neg">&minus;0.159</td><td class="n neg">&minus;26.53</td><td class="n">+57.95</td><td class="n">+31.42</td><td class="n neg">&minus;2.48</td><td class="muted">near (−2.48)</td></tr>
+  <tr><td>gate on &middot; 1.9R</td><td class="n">101</td><td class="n neg">&minus;0.113</td><td class="n neg">&minus;11.39</td><td class="n">+10.19</td><td class="n">&minus;1.20</td><td class="n">&minus;1.92</td><td class="muted">no</td></tr>
+  <tr><td>gate on &middot; 2.5R</td><td class="n">101</td><td class="n neg">&minus;0.158</td><td class="n neg">&minus;15.95</td><td class="n">+21.46</td><td class="n">+5.51</td><td class="n">&minus;2.14</td><td class="muted">no</td></tr>
+</table>
+</div>
+<p class="muted">Every cell is negative. BE@1R systematically converts winners-in-progress into ~0R scratches (see the BE
+counts in the exit mix: 35&ndash;41 trades per gate-off cell). It reduces drawdown a little (−11.1R&nbsp;&rarr;&nbsp;−7.7R at
+2.5R) but that variance cut is bought with a third of the edge. <b>Verdict: BE@1R hurts.</b></p>
+
+<h3>TP 2.5R vs 1.9R &mdash; same trade set, only the target changes</h3>
+<div class="scroll">
+<table>
+  <tr><th>Fixed {gate, BE}</th><th class="n">n</th><th class="n">meanΔ (2.5−1.9)</th><th class="n">sumΔ</th><th class="n">totR 1.9</th><th class="n">totR 2.5</th><th class="n">paired t</th><th>Bar ≥2.5?</th></tr>
+  <tr><td>gate off &middot; BE off <span class="muted">(live default axis)</span></td><td class="n">167</td><td class="n pos">+0.090</td><td class="n pos">+15.09</td><td class="n">+42.85</td><td class="n">+57.95</td><td class="n">+1.87</td><td class="muted">no (still +)</td></tr>
+  <tr><td>gate off &middot; BE on</td><td class="n">167</td><td class="n pos">+0.066</td><td class="n pos">+11.06</td><td class="n">+20.36</td><td class="n">+31.42</td><td class="n">+1.80</td><td class="muted">no</td></tr>
+  <tr><td>gate on &middot; BE off</td><td class="n">101</td><td class="n pos">+0.112</td><td class="n pos">+11.27</td><td class="n">+10.19</td><td class="n">+21.46</td><td class="n pos">+2.73</td><td><span class="tag best">yes</span></td></tr>
+  <tr><td>gate on &middot; BE on</td><td class="n">101</td><td class="n pos">+0.067</td><td class="n pos">+6.72</td><td class="n">&minus;1.20</td><td class="n">+5.51</td><td class="n">+1.81</td><td class="muted">no</td></tr>
+</table>
+</div>
+<p class="muted">2.5R beats 1.9R in all four pairs &mdash; the extra reward per winner outweighs the lower hit-rate. The delta
+clears the 2.5 bar on the gate-on set and is consistently positive (though sub-bar, t≈1.9) on the full live set. <b>Verdict:
+2.5R is the target.</b></p>
+
+<h3>SD gate on vs off &mdash; the gate only filters, so its whole effect is what it drops</h3>
+<p class="muted" style="margin-bottom:4px">Retained trades keep <b>identical</b> R whether the gate is on or off (the gate
+changes nothing about execution) &mdash; so the retained-subset paired delta is <b>exactly 0</b> by construction. The gate's
+real effect is the <b>aggregate R of the dropped trades</b>. Dropped trades here are net winners, so dropping them costs R.</p>
+<div class="scroll">
+<table>
+  <tr><th>Fixed {TP, BE}</th><th class="n">N off→on</th><th class="n">dropped</th><th class="n">totR off→on (Δ)</th><th class="n">dropped expR</th><th class="n">dropped WR</th><th class="n">dropped totR</th><th class="n">t</th><th>Bar ≥2.5?</th></tr>
+  <tr><td>1.9R &middot; BE off</td><td class="n">167→101</td><td class="n">66</td><td class="n">+42.85→+10.19 <span class="neg">(−32.66)</span></td><td class="n pos">+0.495</td><td class="n">56.1%</td><td class="n pos">+32.66</td><td class="n pos">+2.77</td><td><span class="tag warn">yes</span></td></tr>
+  <tr><td>2.5R &middot; BE off <span class="muted">(live default axis)</span></td><td class="n">167→101</td><td class="n">66</td><td class="n">+57.95→+21.46 <span class="neg">(−36.49)</span></td><td class="n pos">+0.553</td><td class="n">50.0%</td><td class="n pos">+36.49</td><td class="n pos">+2.60</td><td><span class="tag warn">yes</span></td></tr>
+  <tr><td>1.9R &middot; BE@1R</td><td class="n">167→101</td><td class="n">66</td><td class="n">+20.36→−1.20 <span class="neg">(−21.56)</span></td><td class="n pos">+0.327</td><td class="n">42.4%</td><td class="n pos">+21.56</td><td class="n">+2.04</td><td class="muted">no</td></tr>
+  <tr><td>2.5R &middot; BE@1R</td><td class="n">167→101</td><td class="n">66</td><td class="n">+31.42→+5.51 <span class="neg">(−25.90)</span></td><td class="n pos">+0.393</td><td class="n">36.4%</td><td class="n pos">+25.90</td><td class="n">+2.13</td><td class="muted">no</td></tr>
+</table>
+</div>
+<p class="muted">The 66 trades the gate throws away out-earn the 101 it keeps (dropped +0.55R vs retained +0.21R at 2.5R). A
+big spike that has already blown past the SD mean carries momentum and fades worse; a modest poke out of the box
+mean-reverts more reliably &mdash; so demanding an SD-mean crossing selects for the <b>wrong</b> spikes. On the BE-off cells
+the dropped book is significant (t&nbsp;&ge;&nbsp;2.5). <b>Verdict: the SD gate is a net cost as a fade filter.</b></p>
+
+<h2>3 &middot; How the SD gate was computed (causal, live lines &mdash; not a fixed 2.8%)</h2>
+<div class="card">
+  <p style="margin-top:0">Igor's rule: a Monday spike qualifies only if its excursion from the weekend base crosses at least
+  one of three Weekend-SD average lines. The gate is a faithful port of <code>Weekend_Monday_SD_Levels_LIVE.pine</code>:</p>
+  <ul class="tight">
+    <li><b>Base</b> = close at the dead-gap end (<b>Monday 02:00 Dubai = Sunday 22:00 UTC</b>) &mdash; the same base all the
+      Pine's level lines share (<code>close[1]</code> at the boundary bar).</li>
+    <li><b>Three mean lines</b>, per side: <span class="tag" style="background:var(--all)">all-history</span> UP&nbsp;2.8076% /
+      DOWN&nbsp;2.7809% (Truth-Report constants); <span class="tag m1" style="background:var(--m1)">live 4-Monday</span> mean;
+      <span class="tag m3">live 13-Monday</span> (3-month) mean. The live means are computed <b>causally</b> from prior
+      completed Mondays only &mdash; a Monday's own move never feeds its own lines; the rolling store keeps the last 13.</li>
+    <li><b>Cross test:</b> crossing the <b>smallest applicable</b> line = crossing at least one. Pass if the spike's
+      excursion% (from base to the running spike wick) ≥ that smallest line.</li>
+  </ul>
+  <p class="muted" style="margin-bottom:0">This is emphatically <b>not</b> a fixed 2.8% gate: the smallest line spans
+  <b>0.30%&ndash;2.81%</b> (median 2.11%), and in <b>110 of 167</b> weeks the binding line is a live sub-2.5% line; only 42
+  early weeks fall back to the history constant. Kept (pass) spikes average <b>5.16%</b> excursion; dropped spikes
+  <b>1.24%</b>. The gate genuinely uses the live self-updating lines, exactly as the indicator draws them.</p>
+</div>
+
+<h2>4 &middot; Trust: fills, fidelity &amp; determinism</h2>
+<div class="card">
+  <ul class="tight">
+    <li><b>Streaming entries</b> reproduced verbatim from <code>f10_streaming_mirror.detect_week_streaming</code> (167 IS
+      Monday entries) &mdash; the causal running-extreme commit, phantom trades included.</li>
+    <li><b>Execution</b> = <code>bt_weekly</code> conventions verbatim: taker fee 0.05%/side, slippage 0.02%/fill, entry at
+      the next 15m open, stop/TP filled at level with adverse slippage, <b>1m intrabar</b> ordering with same-minute stop&amp;TP
+      counted a <b>loss</b>, refund-zone exit on a close through the raw 2nd-peak wick, Friday-UK hard close, 1% risk on $10k.</li>
+    <li><b>BE-off cells</b> run through the canonical <code>bt_weekly.execute</code> engine unchanged. The custom BE executor
+      is validated to reproduce that engine <b>bit-for-bit with BE disabled</b> (max|dR| = 0.00e+00, 167/167 matched, both
+      TPs) &mdash; so the BE on/off comparison isolates only the break-even overlay.</li>
+    <li><b>Anchor:</b> the gate-off / BE-off cells reproduce the published streaming ledger exactly &mdash;
+      <b>+42.85R</b> at 1.9R, <b>+57.95R</b> at 2.5R.</li>
+    <li><b>Deterministic:</b> two full independent runs produced <b>identical md5</b> on all 8 per-trade CSVs.</li>
+  </ul>
+  <div class="scroll">
+  <table>
+    <tr><th>Per-trade CSV</th><th>md5 (run 1 = run 2)</th></tr>
+    <tr><td class="mono">v3_goff_tp1p9_beoff.csv</td><td class="mono">4dd498be400eaeab8307b928e2caf8f9</td></tr>
+    <tr><td class="mono">v3_goff_tp1p9_beon.csv</td><td class="mono">b726770612abf30d33e4aa82a498b8ce</td></tr>
+    <tr><td class="mono">v3_goff_tp2p5_beoff.csv</td><td class="mono">bde8496ce6b78713a8925628f648aa5a</td></tr>
+    <tr><td class="mono">v3_goff_tp2p5_beon.csv</td><td class="mono">4b7607dcebfb379f5895fb859c4ada4d</td></tr>
+    <tr><td class="mono">v3_gon_tp1p9_beoff.csv</td><td class="mono">7fe3f90cfa742be5cdbeb8b573c2aa39</td></tr>
+    <tr><td class="mono">v3_gon_tp1p9_beon.csv</td><td class="mono">7753dfdfd69e9d59e46469aa3c1bc219</td></tr>
+    <tr><td class="mono">v3_gon_tp2p5_beoff.csv</td><td class="mono">cc9480463f413482849e2ccd97bbc709</td></tr>
+    <tr><td class="mono">v3_gon_tp2p5_beon.csv</td><td class="mono">c2e355a3b84e20d0e4417b9457a759d4</td></tr>
+  </table>
+  </div>
+  <p class="muted" style="margin-bottom:0">Engine: <code>backtests/bt_v3_config.py</code>. Data: <code>backtests/data/btcusdt_1m.parquet</code>.</p>
+</div>
+
+<h2>5 &middot; Honest limits</h2>
+<div class="callout">
+  <ul class="tight" style="margin:0">
+    <li><b>In-sample only.</b> 2019&ndash;2024-12-31. None of these cells has met the locked 2025-26 OOS. The recommendation is
+      the IS-best live config, not an OOS-proven one &mdash; the single coordinated OOS event is still pending.</li>
+    <li><b>Streaming ≠ hindsight.</b> These are the phantom-inclusive live entries; the number is honestly lower and noisier
+      than the validated 91-trade hindsight ledger (+0.382R). This page measures what a real trader could actually have taken.</li>
+    <li><b>Spike-excursion definition.</b> The gate measures the running spike wick (the stop wick at entry) as a % move from
+      the dead-gap base. That is the causal quantity known at entry; a different excursion definition (e.g. the full Monday-window
+      high) could shift a few borderline weeks, but the direction of the result &mdash; small spikes fade better &mdash; is large
+      and unlikely to flip.</li>
+    <li><b>t-bars are raw.</b> No multiple-comparison correction across the 8 cells / 12 paired tests. The BE-hurts and
+      gate-costs findings are consistent in sign across every cell, which is stronger than any single t; but treat individual
+      near-bar t-values (e.g. −2.48, +2.73) as descriptive.</li>
+    <li><b>One market.</b> BTCUSDT perp only. The fade thesis is BTC-specific weekend structure.</li>
+  </ul>
+</div>
+
+<div class="foot">
+  V3 Config Table &middot; Task G2 &middot; streaming Monday fade, IS 2019&ndash;2024. Engine <code>backtests/bt_v3_config.py</code>
+  (py_compile clean, deterministic, md5-verified). Recommended live default: <b>SD gate OFF, TP 2.5R, BE OFF</b>. This page is
+  self-contained.
+</div>
+
+</div>
+<script>
+(function(){
+  var btn=document.getElementById('themeToggle');
+  if(!btn)return;
+  var mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;
+  function stored(){try{var t=localStorage.getItem('codexTheme');return (t==='light'||t==='dark'||t==='system')?t:'system';}catch(e){return 'system';}}
+  function eff(m){return (m==='light'||m==='dark')?m:((mq&&mq.matches)?'dark':'light');}
+  function apply(){var m=stored();document.documentElement.setAttribute('data-theme',eff(m));btn.textContent=(m==='light')?'◐ Light':(m==='dark')?'◑ Dark':'◓ Auto';}
+  apply();
+  btn.addEventListener('click',function(){var order={light:'dark',dark:'system',system:'light'};var n=order[stored()];try{localStorage.setItem('codexTheme',n);}catch(e){}apply();});
+  if(mq){var h=function(){if(stored()==='system')apply();};if(mq.addEventListener)mq.addEventListener('change',h);else if(mq.addListener)mq.addListener(h);}
+})();
+</script>
+</body>
+</html>
