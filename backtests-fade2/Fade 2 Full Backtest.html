@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Annie's Monday Fade 2 — Full System Backtest</title>
+<style>
+  :root{
+    --bg:#0e1117; --panel:#161b22; --panel2:#1c2230; --ink:#e6edf3; --muted:#9aa4b2;
+    --line:#2a3140; --accent:#6aa9ff; --up:#3fb950; --dn:#f85149; --warn:#e3b341; --m3:#26a69a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  .wrap{max-width:1000px;margin:0 auto;padding:34px 22px 90px;}
+  header{border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:8px}
+  .eyebrow{letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:var(--accent);font-weight:700}
+  h1{font-size:30px;margin:8px 0 6px;line-height:1.2}
+  h2{font-size:21px;margin:40px 0 12px;padding-top:8px;border-top:1px solid var(--line)}
+  h3{font-size:16px;margin:22px 0 8px;color:var(--ink)}
+  p{color:var(--ink)}
+  .sub{color:var(--muted);font-size:15px;max-width:80ch}
+  .small{font-size:12.5px}.muted{color:var(--muted)}
+  .pos{color:var(--up);font-weight:700}.neg{color:var(--dn);font-weight:700}
+  code{background:#0b0f16;border:1px solid var(--line);border-radius:5px;padding:1px 6px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:14px 0}
+  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0}
+  @media(max-width:760px){.cards{grid-template-columns:repeat(2,1fr)}}
+  .cards .k{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+  .cards .v{font-size:22px;font-weight:800;margin-top:4px}
+  .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13.5px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:middle}
+  th{background:var(--panel2);color:var(--muted);font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em}
+  td.n{font-family:ui-monospace,Menlo,monospace;white-space:nowrap;text-align:right}
+  tr.grp td{background:rgba(106,169,255,.06);font-weight:700}
+  tr.anchor td{background:rgba(63,185,80,.08)}
+  tr.best td{background:rgba(38,166,154,.10)}
+  caption{caption-side:top;text-align:left;color:var(--muted);font-size:12.5px;margin-bottom:6px}
+  figcaption{color:var(--muted);font-size:12.5px;margin-top:8px;max-width:84ch}
+  .verdict{border-radius:14px;padding:20px 22px;margin:18px 0 6px;border:1px solid var(--line);
+    background:linear-gradient(180deg,rgba(227,179,65,.12),rgba(227,179,65,.03))}
+  .verdict.bad{background:linear-gradient(180deg,rgba(248,81,73,.10),rgba(248,81,73,.03))}
+  .verdict.good{background:linear-gradient(180deg,rgba(63,185,80,.12),rgba(63,185,80,.03))}
+  .verdict .flag{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--warn)}
+  .verdict.bad .flag{color:var(--dn)} .verdict.good .flag{color:var(--up)}
+  .verdict h2{border:0;margin:6px 0 10px;padding:0;font-size:22px}
+  .verdict p{margin:0 0 8px;color:var(--ink)}
+  .verdict ul{margin:8px 0 0;padding-left:20px} .verdict li{margin:5px 0}
+  .callout{border-left:4px solid var(--warn);background:rgba(227,179,65,.08);padding:12px 16px;border-radius:8px;margin:14px 0}
+  .callout.good{border-left-color:var(--m3);background:rgba(38,166,154,.09)}
+  .callout.bad{border-left-color:var(--dn);background:rgba(248,81,73,.09)}
+  .callout b{color:var(--ink)}
+  ul.tight{margin:6px 0;padding-left:20px} ul.tight li{margin:5px 0}
+  .pill{display:inline-block;font-size:11px;font-weight:800;border-radius:20px;padding:2px 10px;color:#0b0f16;background:var(--up)}
+  .pill.no{background:var(--dn);color:#fff}
+  .foot{color:var(--muted);font-size:12.5px;margin-top:50px;border-top:1px solid var(--line);padding-top:16px}
+  html[data-theme="light"]{
+    --bg:#f7f9fc; --panel:#ffffff; --panel2:#eef1f6; --ink:#1a2230; --muted:#5b6472;
+    --line:#d7dde6; --accent:#2f6fe0; --up:#1e7d34; --dn:#c92c22; --warn:#a6740b; --m3:#178f83;
+  }
+  html[data-theme="light"] code{background:#eef1f5;color:var(--ink)}
+  html[data-theme="light"] .callout{background:rgba(166,116,11,.10)}
+  html[data-theme="light"] .callout.good{background:rgba(23,143,131,.10)}
+  html[data-theme="light"] .callout.bad{background:rgba(201,44,34,.09)}
+  html[data-theme="light"] .pill{color:#fff} html[data-theme="light"] .pill.no{color:#fff}
+  .theme-toggle{position:fixed;top:16px;right:20px;z-index:100;background:var(--panel);
+    border:1px solid var(--line);color:var(--ink);border-radius:20px;padding:6px 14px;
+    font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.35);
+    font-family:inherit;letter-spacing:.02em}
+  html[data-theme="light"] .theme-toggle{box-shadow:0 2px 10px rgba(0,0,0,.10)}
+  .theme-toggle:active{transform:translateY(1px)}
+@media(max-width:560px){.theme-toggle{top:10px;right:12px;padding:6px 10px;font-size:12px}body{padding-top:44px}}
+</style>
+<script>
+(function(){try{var t=localStorage.getItem('codexTheme');var e=(t==='light'||t==='dark')?t:((window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light');document.documentElement.setAttribute('data-theme',e);}catch(e){}})();
+</script>
+</head>
+<body>
+<button type="button" id="themeToggle" class="theme-toggle" aria-label="Cycle theme: light, dark, or system">&#9683; Auto</button>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Annie Trading &middot; Monday Fade 2 &middot; task F8 &mdash; the campaign flagship</div>
+  <h1>Annie's Monday Fade 2 — Full System Backtest</h1>
+  <p class="sub">The complete weekly system, exactly as Igor ruled it (13 rulings, 2026-07-14, incl. the
+  Ruling-13 revision: <b>entry trigger = V1's 50-EMA vector cross ONLY</b>). Every ruled component is wired into one
+  pre-registered <b>2&times;2&times;4 = 16-cell grid</b> and run in-sample only. The validated Fade-1 entry chain is the
+  spine (the 91 trades); the grid tests three "upgrade" layers on top — a <b>spike qualifier</b> (Weekend-SD cross),
+  a <b>4th retest confluence</b> (keyless liquidity proxy), and a <b>level-based exit</b> (SVC + midweek reversal +
+  Friday) against the two fixed targets. BTC-USDT perp, 15m timing / 1H structure. In-sample <b>2019-10-20 &rarr;
+  2024-12-31</b>; the locked 2025-26 out-of-sample block is sliced off and <b>never touched</b>.</p>
+</header>
+
+<!-- ============ VERDICT (first) ============ -->
+<div class="verdict bad">
+  <div class="flag">Verdict</div>
+  <h2>The full Fade 2 does not beat the simple validated fade. All three upgrade layers fail to add value in-sample.</h2>
+  <p>The elaborate machinery Igor described — count three levels, wait for the SVC, exit on the midweek reversal, gate on
+  the Weekend-SD spike, add a liquidity confluence — is all faithfully coded here and it <b>underperforms a plain fixed
+  target on the same 91 entries</b>. Concretely:</p>
+  <ul>
+    <li><b>The level exit LOSES to the fixed target.</b> Best level cell = <b>+0.334R</b>/trade (LEVEL + 50%-off-at-1.9R
+    then breakeven); the plain <b>2.5R target = +0.506R</b>, the 1.9R Fade-1 anchor = +0.382R. The clever exit gives up
+    ~0.17R per trade. What it buys is <b>lower drawdown and a higher win rate</b> (3.7R DD / 59% WR vs 6.1R / 54%), not
+    more money. Fade 2's value, if any, is <b>variance reduction — not expectancy</b>.</li>
+    <li><b>The Weekend-SD spike qualifier is a filter trap.</b> It cuts the book from <b>91 &rarr; 73 trades</b> (&minus;20%)
+    while per-trade expectancy stays flat (+0.382 &rarr; +0.369R at 1.9R). Total R falls with it. Exactly the F2 lesson —
+    fewer trades, no better edge. Drop it.</li>
+    <li><b>The 2-of-4 liquidity confluence is inert.</b> It changed <b>zero</b> entries (ledger byte-identical to 2-of-3).
+    Structural reason below: the 50-EMA retest bar already carries confluence&nbsp;②, so a 4th vote is never needed.</li>
+  </ul>
+  <p style="margin-top:10px">The best configuration on this data remains the one already known: the validated fade with a
+  <b>fixed 2.5R target</b> (the F3 candidate, +0.506R, +46.0R total, t=3.35). If Igor prefers a smoother equity curve over
+  peak return, the <b>level exit is a defensible, remarkably robust low-variance alternative</b> (P(ruin)=0, stable under
+  every sensitivity perturbation) — but he should choose it with eyes open that it earns less.</p>
+</div>
+
+<!-- ============ 1. ANCHOR GATE ============ -->
+<h2>1 &middot; Anchor gate — the base cell reproduces the validated 91 exactly</h2>
+<p class="sub">Before any grid number is trusted, the base cell <code>(spike=none, retest=2-of-3, exit=1.9R)</code> must
+reproduce the validated Fade-1 Monday book bar-for-bar. It does.</p>
+<div class="cards">
+  <div class="card"><div class="k">Base trades</div><div class="v">91 <span class="muted small">/ 91</span></div></div>
+  <div class="card"><div class="k">Expectancy</div><div class="v pos">+0.382R</div><div class="muted small">target +0.382R</div></div>
+  <div class="card"><div class="k">vs frozen ledger</div><div class="v">4.8&times;10<sup>&minus;11</sup></div><div class="muted small">max per-trade R gap</div></div>
+  <div class="card"><div class="k">Gate</div><div class="v"><span class="pill">PASS</span></div><div class="muted small">n=91 &amp; +0.382R</div></div>
+</div>
+<div class="callout good"><b>Entry = Fade-1's validated chain, unchanged.</b> Weekend close-cluster box &rarr; Monday-only
+spike-out &rarr; fade = the reversal only (W at the low &rarr; long, M at the high &rarr; short) &rarr; L1 = a 200%-class
+PVSRA vector body-closing across the 15m 50&nbsp;EMA (Ruling&nbsp;13: this cross is the <i>only</i> trigger) &rarr; 2-of-N
+retest &rarr; next 15m open. Stop = the running weekly wick &plusmn;0.05% (the tight stop, per the F11+F15 verdict). The
+base cell is detected by the validated <code>bt_weekly2</code> pipeline and cross-checks byte-for-byte against the frozen
+<code>f3_exits_ledger_a.csv</code>.</div>
+
+<!-- ============ 2. THE 16-CELL GRID ============ -->
+<h2>2 &middot; The pre-registered 16-cell grid</h2>
+<p class="sub"><b>A. Spike qualifier</b> {none | SD-cross}. <b>B. Retest menu</b> {2-of-3 (validated) | 2-of-4 (adds a
+liq-proxy level within 0.35% of the retest as the 4th confluence)}. <b>C. Exit</b> {1.9R | 2.5R | LEVEL | LEVEL+BE}.
+Paired-t columns compare each cell against <b>its own entry set's</b> 1.9R and 2.5R (matched per trade). A comparison is
+flagged with <b>*</b> at |t|&nbsp;&ge;&nbsp;2.5 — the significance bar for the ~14 non-trivial comparisons in the grid.</p>
+
+<div class="callout"><b>B collapses:</b> the 2-of-4 rows are <b>byte-identical</b> to the 2-of-3 rows (same md5), because
+the liquidity confluence never once became the deciding second vote (§3c). The grid below therefore shows the <b>8 distinct
+cells</b>; the 2-of-4 half is an exact duplicate and is folded in, not repeated.</p>
+
+<div class="scroll">
+<table>
+  <caption>In-sample, BTC-USDT perp. Fees 0.05%/side, slippage 0.02%/fill, 1R = 1% of $10k. expR = R/trade; totR = sum R;
+  DD = max equity drawdown in R; t0 = t-stat vs zero; pT1.9 / pT2.5 = paired-t vs this set's 1.9R / 2.5R exit.</caption>
+  <tr><th>Spike (A)</th><th>Retest (B)</th><th>Exit (C)</th><th>N</th><th>WR</th><th>expR</th><th>totR</th><th>PF</th>
+      <th>t0</th><th>DD</th><th>pT1.9</th><th>pT2.5</th><th>exit mix</th></tr>
+
+  <tr class="grp"><td colspan="13">A = none &nbsp;·&nbsp; B = 2-of-3 &nbsp;<span class="muted small">(≡ 2-of-4, identical)</span></td></tr>
+  <tr class="anchor"><td>none</td><td>2-of-3</td><td>1.9R <span class="muted small">(anchor)</span></td>
+      <td class="n">91</td><td class="n">54.9%</td><td class="n pos">+0.382</td><td class="n">+34.8</td><td class="n">2.05</td>
+      <td class="n">+2.98</td><td class="n">4.6</td><td class="n">0.00</td><td class="n neg">&minus;2.56</td>
+      <td class="small">tp 32 / fri 30 / stop 29</td></tr>
+  <tr><td>none</td><td>2-of-3</td><td>2.5R</td>
+      <td class="n">91</td><td class="n">53.8%</td><td class="n pos">+0.506</td><td class="n">+46.0</td><td class="n">2.34</td>
+      <td class="n">+3.35</td><td class="n">6.1</td><td class="n pos">+2.56 *</td><td class="n">0.00</td>
+      <td class="small">tp 27 / fri 34 / stop 30</td></tr>
+  <tr><td>none</td><td>2-of-3</td><td>LEVEL</td>
+      <td class="n">91</td><td class="n">56.0%</td><td class="n pos">+0.325</td><td class="n">+29.6</td><td class="n">2.06</td>
+      <td class="n">+2.34</td><td class="n">5.5</td><td class="n neg">&minus;0.52</td><td class="n neg">&minus;1.61</td>
+      <td class="small">level 60 / stop 24 / fri 7</td></tr>
+  <tr class="best"><td>none</td><td>2-of-3</td><td>LEVEL+BE <span class="muted small">(best level cell)</span></td>
+      <td class="n">91</td><td class="n">59.3%</td><td class="n pos">+0.334</td><td class="n">+30.4</td><td class="n">2.23</td>
+      <td class="n">+2.87</td><td class="n">3.7</td><td class="n neg">&minus;0.61</td><td class="n neg">&minus;1.89</td>
+      <td class="small">level 58 / stop 21 / be 5 / fri 7</td></tr>
+
+  <tr class="grp"><td colspan="13">A = SD-cross &nbsp;·&nbsp; B = 2-of-3 &nbsp;<span class="muted small">(≡ 2-of-4, identical)</span></td></tr>
+  <tr><td>SD-cross</td><td>2-of-3</td><td>1.9R</td>
+      <td class="n">73</td><td class="n">54.8%</td><td class="n pos">+0.369</td><td class="n">+27.0</td><td class="n">2.10</td>
+      <td class="n">+2.66</td><td class="n">4.3</td><td class="n">0.00</td><td class="n neg">&minus;4.70</td>
+      <td class="small">fri 28 / tp 24 / stop 21</td></tr>
+  <tr><td>SD-cross</td><td>2-of-3</td><td>2.5R</td>
+      <td class="n">73</td><td class="n">54.8%</td><td class="n pos">+0.532</td><td class="n">+38.8</td><td class="n">2.58</td>
+      <td class="n">+3.23</td><td class="n">4.2</td><td class="n pos">+4.70 *</td><td class="n">0.00</td>
+      <td class="small">fri 31 / tp 21 / stop 21</td></tr>
+  <tr><td>SD-cross</td><td>2-of-3</td><td>LEVEL</td>
+      <td class="n">73</td><td class="n">57.5%</td><td class="n pos">+0.313</td><td class="n">+22.9</td><td class="n">2.19</td>
+      <td class="n">+2.22</td><td class="n">3.3</td><td class="n neg">&minus;0.49</td><td class="n neg">&minus;1.75</td>
+      <td class="small">level 52 / stop 16 / fri 5</td></tr>
+  <tr><td>SD-cross</td><td>2-of-3</td><td>LEVEL+BE</td>
+      <td class="n">73</td><td class="n">60.3%</td><td class="n pos">+0.329</td><td class="n">+24.0</td><td class="n">2.41</td>
+      <td class="n">+2.71</td><td class="n">3.3</td><td class="n neg">&minus;0.48</td><td class="n neg">&minus;2.07</td>
+      <td class="small">level 51 / stop 14 / be 3 / fri 5</td></tr>
+</table>
+</div>
+<figcaption>Read the exit dimension as the story: within every entry set, <b>2.5R &gt; 1.9R &gt; LEVEL+BE &gt; LEVEL</b> on
+expectancy and total R. The only place the level exit wins is win rate and drawdown. The SD-cross rows are a smaller,
+not a better, book than their "none" counterparts.</figcaption>
+
+<!-- ============ 3. THREE FINDINGS ============ -->
+<h2>3 &middot; What each upgrade layer actually did</h2>
+
+<h3>a) The level exit under-earns the fixed target — honestly</h3>
+<p>This was the flagship hypothesis: hold through the three levels and exit on the real midweek reversal instead of a
+mechanical R multiple. Coded exactly to the Q8 ruling — exit on the <b>first of</b> (a) an SVC after &ge;2 confirmed F6
+1H-levels at a weekly extreme or an active liq-proxy level, (b) a Wed/Thu-NY opposite M/W/FD via the F7 detector, or
+(c) the Friday cap, with the hard stop live throughout. It <b>fires</b> — 58-60 of 91 trades exit on the level rule, not on
+the stop or Friday — so the machinery is genuinely active, not a pass-through. But it exits <b>too early on the winners</b>:
+the midweek reversal and the SVC both trigger before a clean 2.5R has been paid, so mean R drops to +0.325/+0.334 versus
++0.506 for the plain 2.5R. This is the F7 result, confirmed inside the full system: <b>the fixed target beats the level
+exit.</b> The consolation is real but modest — the level exit lifts win rate to 56-59% and cuts max drawdown to 3.7R
+(from 6.1R at 2.5R), so it is the <b>lower-variance</b> choice, just not the higher-return one.</p>
+
+<h3>b) The Weekend-SD spike qualifier is a filter trap</h3>
+<p>Gating on "the Monday spike must cross the smallest of the three Weekend-SD average lines" (History const, live 4-Monday
+mean, live 13-Monday mean, all measured causally from the Sun-22:00-UTC dead-gap base) removes <b>18 of 91</b> weeks — the
+small-Monday-move weeks whose excursion never reaches ~2.8%. Per-trade expectancy barely moves (+0.382 &rarr; +0.369R at
+1.9R; a hair better at 2.5R, +0.506 &rarr; +0.532R), so the filter <b>buys no edge</b> — it just shrinks the book and the
+total R with it. It does tighten PF and drawdown at 2.5R (2.34 &rarr; 2.58; 6.1R &rarr; 4.2R), a mild quality tilt, but not
+one worth forfeiting a fifth of the trades. <b>This is the F2 lesson verbatim: cutting N without lifting expectancy is a
+trap, not a filter.</b></p>
+
+<h3>c) The 2-of-4 liquidity confluence is inert (and here's exactly why)</h3>
+<p>Wiring the keyless liq-proxy (previous wicks + unrecovered vectors, task F12) in as the ruled 4th retest confluence
+changed <b>nothing</b> — the 2-of-4 ledger is byte-identical to 2-of-3. The reason is structural, not a bug: the retest
+menu's own gate is the <b>50-EMA touch</b>, and L1 is by definition the vector that <i>broke across</i> that 50-EMA, so a
+bar that wicks back to the EMA almost always re-enters the L1 vector's range too. Confluence&nbsp;② (return into the L1
+range) is present at <b>all 91</b> retests. With ② already satisfied at the first retest bar, the menu reaches its "2 of N"
+the instant it touches the EMA — a 4th vote can never be the tie-breaker, so the liq test is never even evaluated. The
+proxy is fine; it simply has no room to act inside this particular menu.</p>
+
+<!-- ============ 4. MC + SENSITIVITY ============ -->
+<h2>4 &middot; Robustness of the best level cell — Monte Carlo &amp; sensitivity</h2>
+<p class="sub">Best level-exit cell = <code>(none, 2-of-3, LEVEL+BE)</code>, +30.4R over 91 trades. Even though it earns less
+than the fixed target, it is the most <b>robust</b> object in the grid — worth documenting because it is the honest
+fall-back if Igor wants a smooth curve.</p>
+<div class="cards">
+  <div class="card"><div class="k">P(ruin) @ 1% risk</div><div class="v pos">0.00%</div><div class="muted small">10,000 bootstraps</div></div>
+  <div class="card"><div class="k">5th-pct final equity</div><div class="v pos">+13.1R</div><div class="muted small">median +30.4R</div></div>
+  <div class="card"><div class="k">95th-pct max DD</div><div class="v">7.9R</div><div class="muted small">resampled paths</div></div>
+  <div class="card"><div class="k">Sensitivity band</div><div class="v">+0.31→+0.34R</div><div class="muted small">across 7 perturbations</div></div>
+</div>
+<p><b>Monte Carlo</b> (resample the 91 per-trade R's 10,000&times; with replacement, 1% fixed risk = a 100R account):
+the account is never wiped in any path (P(ruin)=0), the 5th-percentile final equity is still solidly positive at +13.1R,
+and the 95th-percentile worst drawdown is 7.9R. <b>Sensitivity</b> (perturb one detector knob at a time, &le;9 cells):</p>
+<div class="scroll">
+<table>
+  <tr><th>Perturbation</th><th>SVC vol · cluster · board</th><th>N</th><th>expR</th><th>totR</th><th>t0</th><th>level exits</th></tr>
+  <tr class="best"><td>baseline (F6 winner)</td><td class="n">2.0 · 2 · 0.020</td><td class="n">91</td><td class="n pos">+0.334</td><td class="n">+30.4</td><td class="n">+2.87</td><td class="n">58</td></tr>
+  <tr><td>SVC vol threshold &minus;25%</td><td class="n">1.5 · 2 · 0.020</td><td class="n">91</td><td class="n pos">+0.335</td><td class="n">+30.5</td><td class="n">+2.87</td><td class="n">58</td></tr>
+  <tr><td>SVC vol threshold +25%</td><td class="n">2.5 · 2 · 0.020</td><td class="n">91</td><td class="n pos">+0.334</td><td class="n">+30.4</td><td class="n">+2.87</td><td class="n">58</td></tr>
+  <tr><td>level-cluster size &minus;1</td><td class="n">2.0 · 1 · 0.020</td><td class="n">91</td><td class="n pos">+0.314</td><td class="n">+28.6</td><td class="n">+2.73</td><td class="n">58</td></tr>
+  <tr><td>level-cluster size +1</td><td class="n">2.0 · 3 · 0.020</td><td class="n">91</td><td class="n pos">+0.324</td><td class="n">+29.4</td><td class="n">+2.80</td><td class="n">57</td></tr>
+  <tr><td>consolidation band &minus;0.5pp</td><td class="n">2.0 · 2 · 0.015</td><td class="n">91</td><td class="n pos">+0.334</td><td class="n">+30.4</td><td class="n">+2.87</td><td class="n">58</td></tr>
+  <tr><td>consolidation band +0.5pp</td><td class="n">2.0 · 2 · 0.025</td><td class="n">91</td><td class="n pos">+0.334</td><td class="n">+30.4</td><td class="n">+2.87</td><td class="n">58</td></tr>
+</table>
+</div>
+<figcaption>Expectancy stays in a tight +0.31&ndash;0.34R band and the verdict (level exit &lt; fixed target) never flips
+under any perturbation. The result is stable — it is not a knife-edge artefact of the F6 knob choice.</figcaption>
+
+<!-- ============ 5. COMPARISON ============ -->
+<h2>5 &middot; Fade 2 vs Fade 1 vs the F3 2.5R candidate</h2>
+<div class="scroll">
+<table>
+  <tr><th>Configuration</th><th>N</th><th>WR</th><th>expR</th><th>total R</th><th>PF</th><th>t</th><th>max DD</th><th>read</th></tr>
+  <tr class="anchor"><td><b>Fade 1</b> — validated fade, 1.9R fixed <span class="muted small">(anchor)</span></td>
+      <td class="n">91</td><td class="n">54.9%</td><td class="n pos">+0.382</td><td class="n">+34.8R</td><td class="n">2.05</td><td class="n">2.98</td><td class="n">4.6R</td>
+      <td class="small">the proven baseline</td></tr>
+  <tr class="best"><td><b>F3 2.5R candidate</b> — same entries, 2.5R fixed</td>
+      <td class="n">91</td><td class="n">53.8%</td><td class="n pos">+0.506</td><td class="n">+46.0R</td><td class="n">2.34</td><td class="n">3.35</td><td class="n">6.1R</td>
+      <td class="small"><b>best expectancy &amp; total R</b></td></tr>
+  <tr><td><b>Fade 2 best</b> — full system, LEVEL+BE exit</td>
+      <td class="n">91</td><td class="n">59.3%</td><td class="n pos">+0.334</td><td class="n">+30.4R</td><td class="n">2.23</td><td class="n">2.87</td><td class="n">3.7R</td>
+      <td class="small">best WR &amp; drawdown, lowest return</td></tr>
+</table>
+</div>
+<figcaption>On the identical 91 entries, the ranking on money is F3&nbsp;2.5R &gt; Fade&nbsp;1 &gt; Fade&nbsp;2. Fade&nbsp;2's
+full apparatus wins only on <b>win rate and drawdown</b>. If the goal is expectancy, the wider fixed target is the answer
+and none of the Fade-2 layers are needed; if the goal is a smooth ride, LEVEL+BE trades ~11R of total return for ~2.4R less
+drawdown and a 4-point-higher win rate.</figcaption>
+
+<!-- ============ 6. HONEST LIMITS ============ -->
+<h2>6 &middot; Honest limits</h2>
+<div class="callout bad">
+  <b>Read this before acting on any number above.</b>
+  <ul class="tight">
+    <li><b>In-sample only.</b> Everything here is 2019&ndash;2024. The 2025-26 block is locked and untouched — no
+    conclusion here is out-of-sample validated. The eventual single coordinated OOS event decides whether any of it holds.</li>
+    <li><b>91 trades is thin</b> for a weekly system, and the SD-cross slice (73) is thinner. Paired-t of the level exit vs
+    2.5R (&minus;1.6 to &minus;2.1) is <i>directionally</i> clear but not past the 2.5 bar; treat "level &lt; fixed" as a
+    strong lean, not a proof.</li>
+    <li><b>The level/SVC/liq detectors are proxies, not Annie's eye.</b> The Fade-2 spec itself rates the level count at
+    45&ndash;53% agreement with Igor's labels and the SVC at 61%. The level exit inherits that fuzz — a human reading
+    "this is L3, this is the reversal" may well beat the mechanical version. The backtest measures the <i>coded</i> system,
+    not the discretionary one.</li>
+    <li><b>The liq proxy is untested as a level source</b> here — it never got to act (§3c), so this run says nothing about
+    whether the proxy is any good, only that the 2-of-4 menu had no room for it.</li>
+    <li><b>Direction is still the campaign's weak point</b> (coded fade direction ≈ coin-flip vs Igor). Fade 2 inherits
+    Fade 1's entries wholesale, so it inherits that ceiling; none of the exit or confluence work touches it.</li>
+  </ul>
+</div>
+
+<!-- ============ 7. METHOD ============ -->
+<h2>7 &middot; Method, invariants &amp; reproducibility</h2>
+<ul class="tight">
+  <li><b>Nothing validated was modified.</b> New file <code>backtests/bt_fade2.py</code> imports the entry detector
+  (<code>bt_weekly2</code>, l1_mode a = Ruling 13), the fixed/partial exit machinery (<code>bt_weekly2_exits</code>, F3),
+  the midweek reversal detector (<code>bt_weekly2_midweek_exit</code>, F7), the 1H level detector
+  (<code>detectors/levels_fade2</code>, F6 winning cell 2·2·0.02), the calibrated SVC (<code>detectors/svc</code>,
+  engulfing counts &lt;1H), and the keyless liq proxy (<code>detectors/liq_proxy</code>, F12).</li>
+  <li><b>Fill conventions are bt_weekly verbatim:</b> entry at the next 15m open, stop/target filled at level with adverse
+  slippage, 1m intrabar resolution, same-minute stop&amp;target ambiguity counted a <b>loss</b>, fees 0.05%/side, slippage
+  0.02%/fill, 1R = 1% of $10k fixed (no compounding). The hard stop is live under every exit variant.</li>
+  <li><b>Everything causal.</b> The SD live means use only prior completed Mondays; the liq proxy reads only candles
+  strictly before the query bar; the level detector emits a level only once its consolidation is confirmed; the midweek
+  reversal is confirmed k bars after its pivot. No future data enters any decision.</li>
+  <li><b>Declared grid only.</b> A {none, SD-cross} &times; B {2-of-3, 2-of-4} &times; C {1.9R, 2.5R, LEVEL, LEVEL+BE};
+  all thresholds (LIQ 0.35%, weekly-extreme 0.5%, &ge;2 levels, F6 2·2·0.02, SVC 150%/wick&gt;body/2&times;vol) pre-registered
+  in the file header, not fit to the result.</li>
+  <li><b>Deterministic double run.</b> Detect + resolve run twice; the per-trade CSVs are md5-identical:</li>
+</ul>
+<div class="scroll">
+<table>
+  <tr><th>Entry set (per-trade ledger)</th><th>md5 (both runs)</th><th>match</th></tr>
+  <tr><td>none / 2-of-3 &nbsp;<code>f8_fade2_none_2of3.csv</code></td><td><code>fb4fcbfc665220fbab173394f96f4421</code></td><td><span class="pill">MATCH</span></td></tr>
+  <tr><td>none / 2-of-4 &nbsp;<code>f8_fade2_none_2of4.csv</code></td><td><code>fb4fcbfc665220fbab173394f96f4421</code></td><td><span class="pill">MATCH</span> <span class="muted small">(= 2-of-3)</span></td></tr>
+  <tr><td>SD-cross / 2-of-3 &nbsp;<code>f8_fade2_SDcross_2of3.csv</code></td><td><code>d8f319d6f2acbb31c4bec7b93fcd664b</code></td><td><span class="pill">MATCH</span></td></tr>
+  <tr><td>SD-cross / 2-of-4 &nbsp;<code>f8_fade2_SDcross_2of4.csv</code></td><td><code>d8f319d6f2acbb31c4bec7b93fcd664b</code></td><td><span class="pill">MATCH</span> <span class="muted small">(= 2-of-3)</span></td></tr>
+</table>
+</div>
+
+<div class="foot">Generated by <code>backtests/bt_fade2.py</code> (task F8; no validated file modified). BTC-USDT Binance USD-M
+perp, 15m entry timing / 1H structure, sizing 1% of $10k (1R = $100). In-sample 2019-10-20 &rarr; 2024-12-31 only; the
+locked 2025-26 out-of-sample window is never enumerated or read. Rules per the Fade&nbsp;2 spec (13 rulings, 2026-07-14,
+incl. the Ruling-13 revision: entry = the 50-EMA vector cross only). Not financial advice.</div>
+
+</div>
+<script>
+(function(){
+  var btn=document.getElementById('themeToggle'); if(!btn)return;
+  var mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;
+  function stored(){try{var t=localStorage.getItem('codexTheme');return (t==='light'||t==='dark'||t==='system')?t:'system';}catch(e){return 'system';}}
+  function eff(m){return (m==='light'||m==='dark')?m:((mq&&mq.matches)?'dark':'light');}
+  function apply(){var m=stored();document.documentElement.setAttribute('data-theme',eff(m));btn.textContent=(m==='light')?'◐ Light':(m==='dark')?'◑ Dark':'◓ Auto';}
+  apply();
+  btn.addEventListener('click',function(){var order={light:'dark',dark:'system',system:'light'};var n=order[stored()];try{localStorage.setItem('codexTheme',n);}catch(e){}apply();});
+  if(mq){var h=function(){if(stored()==='system')apply();};if(mq.addEventListener)mq.addEventListener('change',h);else if(mq.addListener)mq.addListener(h);}
+})();
+</script>
+</body>
+</html>
