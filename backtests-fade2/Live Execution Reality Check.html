@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Live Execution Reality Check — Monday Fade</title>
+<style>
+  :root{
+    --bg:#0e1117; --panel:#161b22; --panel2:#1c2230; --ink:#e6edf3; --muted:#9aa4b2;
+    --line:#2a3140; --accent:#6aa9ff; --up:#3fb950; --dn:#f85149; --warn:#e3b341;
+    --good:#26a69a; --bad:#f85149;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  .wrap{max-width:1000px;margin:0 auto;padding:34px 22px 90px;}
+  header{border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:8px}
+  .eyebrow{letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:var(--accent);font-weight:700}
+  h1{font-size:30px;margin:8px 0 6px;line-height:1.2}
+  h2{font-size:21px;margin:40px 0 12px;padding-top:8px;border-top:1px solid var(--line)}
+  h3{font-size:16px;margin:22px 0 8px;color:var(--ink)}
+  p{color:var(--ink)}
+  .sub{color:var(--muted);font-size:15px;max-width:76ch}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:14px 0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:760px){.grid2{grid-template-columns:1fr}}
+  code,kbd{background:#0b0f16;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px}
+  kbd{color:var(--accent)}
+  .tblwrap{overflow-x:auto;margin:10px 0}
+  table{width:100%;border-collapse:collapse;font-size:14px;min-width:640px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--panel2);color:var(--muted);font-weight:600;font-size:12.5px;text-transform:uppercase;letter-spacing:.04em}
+  td.n,th.n{font-family:ui-monospace,Menlo,monospace;white-space:nowrap;text-align:right}
+  tr.hl td{background:rgba(106,169,255,.07)}
+  .pos{color:var(--up);font-weight:600} .neg{color:var(--dn);font-weight:600}
+  .rowlab{font-weight:700}
+  .tag{display:inline-block;font-size:11px;font-weight:800;border-radius:20px;padding:2px 11px;color:#0b0f16}
+  .tag.anchor{background:var(--accent)} .tag.stream{background:var(--good)} .tag.lock{background:var(--bad);color:#fff}
+  .verdict{border-radius:14px;padding:20px 22px;margin:16px 0 8px;border:1px solid var(--line)}
+  .verdict.head{background:linear-gradient(180deg,rgba(38,166,154,.12),rgba(248,81,73,.06));border-color:#33414e}
+  .verdict h2{border:0;padding:0;margin:0 0 8px;font-size:20px}
+  .vgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:8px}
+  @media(max-width:760px){.vgrid{grid-template-columns:1fr}}
+  .vcard{border-radius:10px;padding:14px 16px;border:1px solid var(--line);background:var(--panel)}
+  .vcard.good{border-left:4px solid var(--good)} .vcard.bad{border-left:4px solid var(--bad)}
+  .vcard .k{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700}
+  .vcard .big{font-size:26px;font-weight:800;margin:2px 0 2px}
+  .callout{border-left:4px solid var(--warn);background:rgba(227,179,65,.08);padding:12px 16px;border-radius:8px;margin:12px 0}
+  .callout.good{border-left-color:var(--good);background:rgba(38,166,154,.08)}
+  .callout.bad{border-left-color:var(--bad);background:rgba(248,81,73,.09)}
+  .callout b{color:var(--ink)}
+  ol.steps{counter-reset:s;list-style:none;padding-left:0;margin:0}
+  ol.steps li{position:relative;padding:10px 0 10px 46px;border-bottom:1px solid var(--line)}
+  ol.steps li:last-child{border-bottom:0}
+  ol.steps li::before{counter-increment:s;content:counter(s);position:absolute;left:0;top:10px;
+    width:30px;height:30px;border-radius:50%;background:var(--accent);color:#0b0f16;font-weight:800;
+    display:flex;align-items:center;justify-content:center;font-size:14px}
+  ul.tight{margin:6px 0 6px 0;padding-left:20px} ul.tight li{margin:5px 0}
+  .muted{color:var(--muted)}
+  .foot{color:var(--muted);font-size:12.5px;margin-top:50px;border-top:1px solid var(--line);padding-top:16px}
+  .mono{font-family:ui-monospace,Menlo,monospace;font-size:12px}
+  .proof{background:#0b0f16;border:1px solid var(--line);border-radius:10px;padding:14px 16px;font-family:ui-monospace,Menlo,monospace;font-size:12px;line-height:1.7;overflow-x:auto;color:#c9d3e0}
+  .proof .ok{color:var(--up);font-weight:700}
+  html[data-theme="light"]{
+    --bg:#f7f9fc; --panel:#ffffff; --panel2:#eef1f6; --ink:#1a2230; --muted:#5b6472;
+    --line:#d7dde6; --accent:#2f6fe0; --up:#1e7d34; --dn:#c92c22; --warn:#a6740b;
+    --good:#178f83; --bad:#c92c22;
+  }
+  html[data-theme="light"] code, html[data-theme="light"] kbd{background:#eef1f5;color:var(--ink)}
+  html[data-theme="light"] .proof{background:#0f1622;color:#c9d3e0}
+  html[data-theme="light"] .callout{background:rgba(166,116,11,.10)}
+  html[data-theme="light"] .callout.good{background:rgba(23,143,131,.10)}
+  html[data-theme="light"] .callout.bad{background:rgba(201,44,34,.09)}
+  html[data-theme="light"] .tag.lock,html[data-theme="light"] .vcard.bad .big{color:#c92c22}
+  html[data-theme="light"] .tag.lock{color:#fff}
+  .theme-toggle{position:fixed;top:16px;right:20px;z-index:100;background:var(--panel);
+    border:1px solid var(--line);color:var(--ink);border-radius:20px;padding:6px 14px;
+    font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.35);
+    font-family:inherit;letter-spacing:.02em}
+  html[data-theme="light"] .theme-toggle{box-shadow:0 2px 10px rgba(0,0,0,.10)}
+  .theme-toggle:active{transform:translateY(1px)}
+  @media(max-width:560px){.theme-toggle{top:10px;right:12px;padding:6px 10px;font-size:12px}body{padding-top:44px}}
+</style>
+<script>
+(function(){try{var t=localStorage.getItem('codexTheme');var e=(t==='light'||t==='dark')?t:((window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light');document.documentElement.setAttribute('data-theme',e);}catch(e){}})();
+</script>
+</head>
+<body>
+<button type="button" id="themeToggle" class="theme-toggle" aria-label="Cycle theme: light, dark, or system">&#9683; Auto</button>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Annie Trading &middot; Fade 1 (Weekly FMWB Monday fade) &middot; live-executability audit</div>
+  <h1>Live Execution Reality Check</h1>
+  <p class="sub">The validated Monday fade earns <b>+0.382R / trade</b> across 91 trades &mdash; but that ledger quietly
+  assumes you knew <em>in hindsight</em> which early-week spike was <b>THE</b> spike (the single furthest poke out of the
+  weekend box over all of Sun/Mon/early-Tue). In real time you never have that. This page runs the exact same fade with
+  <b>real fills</b> in the two ways you actually <em>could</em> have traded it live &mdash; and asks the only question that
+  matters: <b>what would you actually have made?</b></p>
+</header>
+
+<!-- ============================ VERDICT ============================ -->
+<div class="verdict head">
+  <div class="eyebrow" style="color:var(--warn)">Verdict &middot; first</div>
+  <h2>Only <span style="color:var(--good)">streaming</span> keeps the edge. <span style="color:var(--bad)">Lock-at-close destroys it.</span></h2>
+  <p style="margin:6px 0 0;max-width:82ch">Committing to the <b>running</b> extreme in real time (<b>Streaming</b> &mdash; the
+  mode the shipped Pine indicator actually uses) preserves a real, significant edge: <b>+0.257R/trade</b> over 167 trades,
+  <b>t = 2.46</b>, and in fact a <b>higher total R</b> than the anchor because it trades more often. Waiting for the Tuesday
+  early-window close (<b>Lock-at-close</b>) collapses the edge to <b>+0.041R/trade</b> (t = 0.36, indistinguishable from zero):
+  <b>71 of 91</b> fills arrive a median <b>22 hours late</b> at worse prices, surrendering <b>~89%</b> of the total R.</p>
+  <div class="vgrid">
+    <div class="vcard good">
+      <div class="k">Streaming &mdash; live &amp; tradeable</div>
+      <div class="big pos">+0.257R<span style="font-size:14px;color:var(--muted)"> / trade</span></div>
+      <div class="muted">67% of the per-trade edge survives; 123% of total R (more trades). t=2.46, PF 1.51. Cost: 2&times; the trades, ~1.7&times; the drawdown, and 55% of them are near-breakeven <b>phantoms</b>.</div>
+    </div>
+    <div class="vcard bad">
+      <div class="k">Lock-at-close &mdash; not tradeable</div>
+      <div class="big neg">+0.041R<span style="font-size:14px;color:var(--muted)"> / trade</span></div>
+      <div class="muted">Only <b>11%</b> of the total R survives. t=0.36 &mdash; no measurable edge left. The delay alone gives back <b>&minus;31R</b> of the 35R.</div>
+    </div>
+  </div>
+  <div class="callout" style="margin:16px 0 0">
+    <b>Material caveat on Fade 1.</b> The headline <b>+0.382R</b> is a hindsight number. The honest <b>live</b> expectancy is
+    <b>+0.257R/trade</b> at the 1.9R target (or <b>+0.347R</b> at 2.5R) <em>and only if traded streaming</em>. You cannot
+    cherry-pick the good entries in real time &mdash; picking only the 75 that reproduce the validated ledger requires exactly
+    the hindsight you don't have. Fade 1 remains a positive, statistically-real edge live &mdash; just a thinner and choppier
+    one than the validated ledger shows, and worthless if execution has to wait for the early window to close.
+  </div>
+</div>
+
+<!-- ============================ WHY ============================ -->
+<h2>1 &middot; Why the validated ledger isn&rsquo;t the live ledger</h2>
+<p>The validated detector scores the whole early window (Sun 17:00 &rarr; Tue 17:00 NY) at once, then fades the
+<b>single furthest excursion</b> out of the weekend box. That is a legitimate <em>design</em> measurement, but it is a
+<b>look-back</b>: on Monday morning you don&rsquo;t yet know that the extreme you&rsquo;re watching won&rsquo;t be beaten
+by a bigger one on Tuesday. Two honest ways to actually push the button:</p>
+
+<div class="grid2">
+  <div class="card">
+    <h3 style="margin-top:2px"><span class="tag stream">A</span> &nbsp;Streaming</h3>
+    <p class="muted" style="margin-top:0">Commit to the <b>running</b> extreme the instant a retest chain fires. Reproduces
+    the validated entries <em>and</em> takes <b>phantom</b> trades a later, bigger spike would have retroactively invalidated.
+    Stop is set from the running weekly extreme <b>at the entry bar</b>; if a new extreme prints afterwards the stop does
+    <b>not</b> move &mdash; a live stop is fixed at entry. Entry logic reused verbatim from
+    <code>f10_streaming_mirror.detect_week_streaming</code> (first chain per week).</p>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:2px"><span class="tag lock">B</span> &nbsp;Lock-at-close</h3>
+    <p class="muted" style="margin-top:0">No phantoms &mdash; you wait for the early window to <b>close</b> (Tue 17:00 NY)
+    so the winning spike is knowable, then take one trade for the week. Fill = the next 15m open after the signal is knowable:
+    if the chain completed <b>after</b> the lock you get the true bar (= validated); if it completed <b>before</b> the lock
+    you could not have acted, so you fill <b>at the lock bar</b> &mdash; often a day late. Stop/TP are re-derived from the
+    <b>actual fill</b> (a live trader sizes off the fill they really got).</p>
+  </div>
+</div>
+
+<div class="callout">
+  <b>Anchor (correctness gate).</b> Before believing either live mode, the same harness re-runs the validated detection on
+  <b>ideal fills at the true entry bar</b> and must reproduce the validated <b>91 / +0.382R</b> ledger
+  (<code>f3_exits_ledger_a.csv</code>, column <code>R__fix_1.9</code>) to the last decimal. It does &mdash; see the proof band.
+</div>
+
+<!-- ============================ TABLE 1.9R ============================ -->
+<h2>2 &middot; Side-by-side &mdash; primary target 1.9R</h2>
+<p class="sub">Monday fade, in-sample 2019 &rarr; 2024-12-31 only (locked 2025-26 OOS untouched). Execution = bt_weekly
+conventions verbatim: fee 0.05%/side, slippage 0.02%/fill, 1m intrabar resolution, same-bar stop&amp;TP counted a loss,
+refund-zone exit, Friday-UK hard close, 1% risk on $10k (1R = $100).</p>
+<div class="tblwrap">
+<table>
+  <thead><tr>
+    <th>Execution mode</th><th class="n">N</th><th class="n">Win%</th><th class="n">exp R</th>
+    <th class="n">total R</th><th class="n">PF</th><th class="n">t-stat</th><th class="n">max DD</th>
+    <th class="n">trades/mo</th><th class="n">R retained</th>
+  </tr></thead>
+  <tbody>
+    <tr class="hl">
+      <td class="rowlab"><span class="tag anchor">&#9679;</span> Anchor <span class="muted">(hindsight, ideal)</span></td>
+      <td class="n">91</td><td class="n">54.9%</td><td class="n pos">+0.382</td><td class="n pos">+34.76</td>
+      <td class="n">2.05</td><td class="n">+2.98</td><td class="n">&minus;4.58R</td><td class="n">1.46</td><td class="n">100%</td>
+    </tr>
+    <tr>
+      <td class="rowlab"><span class="tag stream">&#9679;</span> Streaming <span class="muted">(live)</span></td>
+      <td class="n">167</td><td class="n">48.5%</td><td class="n pos">+0.257</td><td class="n pos">+42.85</td>
+      <td class="n">1.51</td><td class="n">+2.46</td><td class="n">&minus;7.74R</td><td class="n">2.69</td><td class="n pos">123%</td>
+    </tr>
+    <tr>
+      <td class="rowlab"><span class="tag lock">&#9679;</span> Lock-at-close <span class="muted">(live)</span></td>
+      <td class="n">91</td><td class="n">41.8%</td><td class="n neg">+0.041</td><td class="n neg">+3.73</td>
+      <td class="n">1.09</td><td class="n neg">+0.36</td><td class="n">&minus;11.27R</td><td class="n">1.47</td><td class="n neg">11%</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<p class="muted" style="font-size:13px">R-retained = variant total R &divide; anchor total R. Streaming exceeds 100% because
+it takes 167 trades vs 91 &mdash; even the marginal phantoms are barely net-positive, so more trades &rArr; more total R,
+at a lower per-trade quality. Lock keeps only one trade per week yet retains a tenth of the R.</p>
+
+<!-- ============================ TABLE 2.5R ============================ -->
+<h2>3 &middot; Secondary target 2.5R <span class="muted" style="font-size:15px">(the F3 finding)</span></h2>
+<p class="sub">The wider 2.5R target lifts every mode&rsquo;s total R and t-stat but does <b>not</b> change the verdict &mdash;
+streaming stays a real edge, lock-at-close stays dead.</p>
+<div class="tblwrap">
+<table>
+  <thead><tr>
+    <th>Execution mode</th><th class="n">N</th><th class="n">Win%</th><th class="n">exp R</th>
+    <th class="n">total R</th><th class="n">PF</th><th class="n">t-stat</th><th class="n">max DD</th><th class="n">R retained</th>
+  </tr></thead>
+  <tbody>
+    <tr class="hl">
+      <td class="rowlab"><span class="tag anchor">&#9679;</span> Anchor <span class="muted">(hindsight)</span></td>
+      <td class="n">91</td><td class="n">53.8%</td><td class="n pos">+0.506</td><td class="n pos">+46.01</td>
+      <td class="n">2.34</td><td class="n">+3.35</td><td class="n">&minus;6.12R</td><td class="n">100%</td>
+    </tr>
+    <tr>
+      <td class="rowlab"><span class="tag stream">&#9679;</span> Streaming <span class="muted">(live)</span></td>
+      <td class="n">167</td><td class="n">45.5%</td><td class="n pos">+0.347</td><td class="n pos">+57.95</td>
+      <td class="n">1.64</td><td class="n">+2.84</td><td class="n">&minus;11.08R</td><td class="n pos">126%</td>
+    </tr>
+    <tr>
+      <td class="rowlab"><span class="tag lock">&#9679;</span> Lock-at-close <span class="muted">(live)</span></td>
+      <td class="n">91</td><td class="n">40.7%</td><td class="n neg">+0.051</td><td class="n neg">+4.65</td>
+      <td class="n">1.11</td><td class="n neg">+0.41</td><td class="n">&minus;13.58R</td><td class="n neg">10%</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ============================ PHANTOMS ============================ -->
+<h2>4 &middot; Streaming&rsquo;s hidden tax: phantom trades</h2>
+<p>Split the 167 streaming trades by whether they reproduce a validated entry (week + entry within &plusmn;2 bars) or are
+<b>phantoms</b> &mdash; running-extreme fades the hindsight engine would never have taken. <b>55% are phantoms.</b> They are
+not disasters, but they are close to dead money, and they are why streaming&rsquo;s per-trade edge is a third thinner than
+the ledger and its win-rate and profit-factor sag.</p>
+<div class="tblwrap">
+<table>
+  <thead><tr>
+    <th>Streaming subset (1.9R)</th><th class="n">N</th><th class="n">share</th><th class="n">Win%</th>
+    <th class="n">exp R</th><th class="n">total R</th><th class="n">PF</th><th class="n">t-stat</th>
+  </tr></thead>
+  <tbody>
+    <tr>
+      <td class="rowlab">Reproduces validated entry</td>
+      <td class="n">75</td><td class="n">45%</td><td class="n">58.7%</td>
+      <td class="n pos">+0.486</td><td class="n pos">+36.42</td><td class="n">2.49</td><td class="n">+3.44</td>
+    </tr>
+    <tr>
+      <td class="rowlab">Phantom <span class="muted">(hindsight would skip)</span></td>
+      <td class="n">92</td><td class="n">55%</td><td class="n">40.2%</td>
+      <td class="n">+0.070</td><td class="n">+6.44</td><td class="n">1.11</td><td class="n neg">+0.47</td>
+    </tr>
+    <tr class="hl">
+      <td class="rowlab">All streaming trades</td>
+      <td class="n">167</td><td class="n">100%</td><td class="n">48.5%</td>
+      <td class="n pos">+0.257</td><td class="n pos">+42.85</td><td class="n">1.51</td><td class="n">+2.46</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<div class="callout">
+  <b>The catch you can&rsquo;t engineer around.</b> The 75 &ldquo;good&rdquo; streaming trades are excellent (+0.486R, PF 2.49),
+  but they are only knowable as good <em>after</em> the week resolves. In real time the phantom and the keeper look identical
+  at entry &mdash; both are the running extreme&rsquo;s retest. You take all 167 or you don&rsquo;t stream. The phantom drag
+  (+0.070R over 92 trades) is the honest price of live entry timing.
+</div>
+
+<!-- ============================ DELAY ============================ -->
+<h2>5 &middot; Lock-at-close: the delay cost, itemised</h2>
+<p>Lock-at-close has <b>no phantoms</b> &mdash; it takes the same 91 validated weeks. Its problem is purely <b>timing</b>:
+the fade&rsquo;s edge lives in entering <em>as the retest confirms</em>, and most confirmations happen on Monday, long before
+the Tuesday-17:00 lock lets a lock-trader act.</p>
+<div class="tblwrap">
+<table>
+  <thead><tr>
+    <th>Fill timing (1.9R)</th><th class="n">count</th><th class="n">Win%</th><th class="n">exp R</th>
+    <th class="n">vs anchor</th><th class="n">note</th>
+  </tr></thead>
+  <tbody>
+    <tr>
+      <td class="rowlab">True bar <span class="muted">(chain completes after the lock)</span></td>
+      <td class="n">20 / 91</td><td class="n">&mdash;</td><td class="n">&mdash;</td><td class="n pos">identical</td>
+      <td>Reproduces the anchor trade exactly (max |&Delta;R| = 0).</td>
+    </tr>
+    <tr>
+      <td class="rowlab">Late fill <span class="muted">(chain completes before the lock)</span></td>
+      <td class="n">71 / 91</td><td class="n">40.8%</td><td class="n neg">&minus;0.003</td><td class="n neg">gutted</td>
+      <td>Filled at the lock bar, median <b>22.0h</b> late (max 42.8h), at lock-bar prices.</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<div class="grid2">
+  <div class="card">
+    <h3 style="margin-top:2px">Where the R went</h3>
+    <ul class="tight">
+      <li>Paired over the same 91 weeks: anchor <b class="pos">+34.76R</b> &rarr; lock <b class="neg">+3.73R</b> =
+          <b class="neg">&minus;31.03R</b> handed to delay.</li>
+      <li>The 71 late fills alone average <b>&minus;0.003R</b> &mdash; the whole surviving edge is carried by the 20 true-bar fills.</li>
+      <li>By the time the lock lets you in, price has usually already travelled toward TP, so you enter worse and get stopped or Friday-closed instead.</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:2px">Exit-mix shift (how the delay bleeds)</h3>
+    <div class="tblwrap">
+    <table style="min-width:0">
+      <thead><tr><th>exit</th><th class="n">Anchor</th><th class="n">Lock</th><th class="n">Streaming</th></tr></thead>
+      <tbody>
+        <tr><td>TP</td><td class="n pos">32</td><td class="n neg">16</td><td class="n">66</td></tr>
+        <tr><td>Stop</td><td class="n">29</td><td class="n">33</td><td class="n">73</td></tr>
+        <tr><td>Friday close</td><td class="n">30</td><td class="n neg">42</td><td class="n">26</td></tr>
+        <tr><td>Refund</td><td class="n">0</td><td class="n">0</td><td class="n">2</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p class="muted" style="font-size:13px;margin:6px 0 0">Lock <b>halves</b> TP exits (32&rarr;16) and floods the Friday
+    bucket (30&rarr;42): late entries miss the move and time out flat.</p>
+  </div>
+</div>
+
+<!-- ============================ PAIRED ============================ -->
+<h2>6 &middot; Paired per-week check</h2>
+<p class="sub">On weeks that appear in both a variant and the anchor (one Monday trade each), compare R directly &mdash; this
+strips out any &ldquo;more trades&rdquo; effect and isolates per-week quality.</p>
+<div class="tblwrap">
+<table>
+  <thead><tr><th>Overlap (1.9R)</th><th class="n">weeks</th><th class="n">anchor R</th><th class="n">variant R</th><th class="n">mean &Delta; / week</th></tr></thead>
+  <tbody>
+    <tr><td class="rowlab"><span class="tag stream">&#9679;</span> Streaming vs anchor</td>
+      <td class="n">88</td><td class="n">+35.85</td><td class="n pos">+36.45</td><td class="n pos">+0.007</td></tr>
+    <tr><td class="rowlab"><span class="tag lock">&#9679;</span> Lock vs anchor</td>
+      <td class="n">91</td><td class="n">+34.76</td><td class="n neg">+3.73</td><td class="n neg">&minus;0.341</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="muted" style="font-size:13px">Where streaming <em>and</em> the anchor take the same week, they are essentially
+identical (&Delta; +0.007R/wk) &mdash; streaming&rsquo;s dilution is entirely the extra phantom weeks, not worse trades on shared
+weeks. Lock loses <b>&minus;0.341R every week</b>, on the very same setups &mdash; pure timing damage.</p>
+
+<!-- ============================ PROOF ============================ -->
+<h2>7 &middot; Proof band</h2>
+<div class="proof">
+ANCHOR CORRECTNESS GATE (1.9R vs f3_exits_ledger_a.R__fix_1.9)<br>
+&nbsp;&nbsp;anchor N=91 &nbsp; f3 N=91 &nbsp; matched rows=91 &nbsp; max|dR|=4.82e-11 &rarr; <span class="ok">PASS</span><br>
+&nbsp;&nbsp;anchor 1.9R : N=91 &nbsp;WR=54.9% &nbsp;expR=+0.3820 &nbsp;totR=+34.76 &nbsp;PF=2.05 &nbsp;t=+2.98<br>
+<br>
+DETERMINISM (two full runs, per-trade CSV md5) &rarr; <span class="ok">PASS &mdash; all 6 identical</span><br>
+&nbsp;&nbsp;f10x_anchor_1p9.csv &nbsp;65d61de805569bc1a57217b848ba4ca7<br>
+&nbsp;&nbsp;f10x_stream_1p9.csv &nbsp;60964a0f154eebb2e2b4e46c4fe96c1d<br>
+&nbsp;&nbsp;f10x_lock_1p9.csv &nbsp;&nbsp;&nbsp;11b61daea18cde65d2897f96b42db17c<br>
+&nbsp;&nbsp;f10x_anchor_2p5.csv &nbsp;5a1318ec99c6d6128d889c53de133626<br>
+&nbsp;&nbsp;f10x_stream_2p5.csv &nbsp;f3924009ffa137d4b82e9017d26c2e27<br>
+&nbsp;&nbsp;f10x_lock_2p5.csv &nbsp;&nbsp;&nbsp;80ec9b9cb4b7f23a770ebba74de5fba4
+</div>
+<p class="muted" style="font-size:13px">Harness: <code>backtests/bt_weekly2_live_exec.py</code> (new; never touches
+<code>bt_weekly.py</code> or any validated ledger). Streaming entry logic is <code>f10_streaming_mirror.detect_week_streaming</code>
+verbatim; execution is <code>bt_weekly.execute</code> verbatim. Streaming shows 167 in-sample trades here vs the 224 quoted
+in F10 because F10 counted the full 2019&ndash;2026 span; this audit is in-sample-only (2019&rarr;2024-12-31), OOS locked.</p>
+
+<div class="foot">
+  <b>Live Execution Reality Check</b> &middot; Annie Fade 1 (Weekly FMWB Monday fade) &middot; Task F10.
+  In-sample 2019&rarr;2024-12-31, BTC-USDT perp 1m&rarr;15m. Anchor gate reproduces the validated 91/+0.382R ledger to
+  4.8e-11 R. Verdict: streaming preserves the edge (+0.257R/trade, t=2.46) at the cost of 55% phantom trades and ~1.7&times;
+  drawdown; lock-at-close does not (+0.041R/trade, t=0.36). Numbers are deterministic (md5-verified double run).
+</div>
+
+</div>
+<script>
+(function(){
+  var btn=document.getElementById('themeToggle');
+  if(!btn)return;
+  var mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;
+  function stored(){try{var t=localStorage.getItem('codexTheme');return (t==='light'||t==='dark'||t==='system')?t:'system';}catch(e){return 'system';}}
+  function eff(m){return (m==='light'||m==='dark')?m:((mq&&mq.matches)?'dark':'light');}
+  function apply(){var m=stored();document.documentElement.setAttribute('data-theme',eff(m));btn.textContent=(m==='light')?'◐ Light':(m==='dark')?'◑ Dark':'◓ Auto';}
+  apply();
+  btn.addEventListener('click',function(){var order={light:'dark',dark:'system',system:'light'};var n=order[stored()];try{localStorage.setItem('codexTheme',n);}catch(e){}apply();});
+  if(mq){var h=function(){if(stored()==='system')apply();};if(mq.addEventListener)mq.addEventListener('change',h);else if(mq.addListener)mq.addListener(h);}
+})();
+</script>
+</body>
+</html>
