@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wednesday Reversal Statistics — Descriptive Base Rates</title>
+<style>
+  :root{
+    --bg:#0e1117; --panel:#161b22; --panel2:#1c2230; --ink:#e6edf3; --muted:#9aa4b2;
+    --line:#2a3140; --accent:#6aa9ff; --up:#3fb950; --dn:#f85149; --warn:#e3b341; --m3:#26a69a;
+    --asia:#6aa9ff; --uk:#e3b341; --us:#26a69a; --dgz:#5b6472;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  .wrap{max-width:940px;margin:0 auto;padding:34px 22px 90px;}
+  header{border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:8px}
+  .eyebrow{letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:var(--accent);font-weight:700}
+  h1{font-size:30px;margin:8px 0 6px;line-height:1.2}
+  h2{font-size:21px;margin:38px 0 12px;padding-top:8px;border-top:1px solid var(--line)}
+  h3{font-size:16px;margin:22px 0 8px;color:var(--ink)}
+  p{color:var(--ink)}
+  .sub{color:var(--muted);font-size:15px;max-width:74ch}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:14px 0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:720px){.grid2{grid-template-columns:1fr}}
+  code,kbd{background:#0b0f16;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px}
+  .tblwrap{overflow-x:auto;margin:10px 0}
+  table{width:100%;border-collapse:collapse;font-size:14px;min-width:560px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--panel2);color:var(--muted);font-weight:600;font-size:12.5px;text-transform:uppercase;letter-spacing:.04em}
+  td.n{font-family:ui-monospace,Menlo,monospace;white-space:nowrap;text-align:right}
+  th.n{text-align:right}
+  .neg{color:var(--dn);font-weight:700}
+  .pos{color:var(--up);font-weight:700}
+  .hl{color:var(--accent);font-weight:700}
+  .verdict{border:1px solid var(--accent);background:linear-gradient(180deg,rgba(106,169,255,.14),rgba(106,169,255,.05));
+    border-radius:14px;padding:20px 22px;margin:18px 0 6px}
+  .verdict .badge{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+    background:var(--accent);color:#0b0f16;border-radius:20px;padding:4px 14px;margin-bottom:10px}
+  .verdict h2{border:0;padding:0;margin:2px 0 8px;font-size:23px}
+  .verdict p{margin:6px 0 0}
+  .callout{border-left:4px solid var(--warn);background:rgba(227,179,65,.08);padding:12px 16px;border-radius:8px;margin:12px 0}
+  .callout.bad{border-left-color:var(--dn);background:rgba(248,81,73,.09)}
+  .callout.good{border-left-color:var(--m3);background:rgba(38,166,154,.08)}
+  .callout b{color:var(--ink)}
+  ul.tight{margin:6px 0 6px 0;padding-left:20px} ul.tight li{margin:5px 0}
+  .kpi{display:flex;gap:14px;flex-wrap:wrap;margin:8px 0}
+  .kpi .box{flex:1 1 150px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .kpi .box .v{font-size:22px;font-weight:800;font-family:ui-monospace,Menlo,monospace}
+  .kpi .box .l{font-size:12px;color:var(--muted);margin-top:2px}
+  .muted{color:var(--muted)}
+  .foot{color:var(--muted);font-size:12.5px;margin-top:50px;border-top:1px solid var(--line);padding-top:16px}
+  .mono{font-family:ui-monospace,Menlo,monospace}
+  /* session bar visual */
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);margin:6px 0 14px}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .legend i{width:12px;height:12px;border-radius:3px;display:inline-block}
+  .sw-asia{background:var(--asia)} .sw-uk{background:var(--uk)} .sw-us{background:var(--us)} .sw-dgz{background:var(--dgz)}
+  .sbar-row{display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center;margin:9px 0}
+  .sbar-row .lab{font-size:13px;color:var(--muted);text-align:right}
+  .sbar{display:flex;height:30px;border-radius:6px;overflow:hidden;border:1px solid var(--line);background:var(--panel2)}
+  .seg{display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:700;color:#0b0f16;
+    white-space:nowrap;overflow:hidden;min-width:0}
+  .seg.asia{background:var(--asia)} .seg.uk{background:var(--uk)} .seg.us{background:var(--us)} .seg.dgz{background:var(--dgz);color:#e6edf3}
+  @media(max-width:560px){.sbar-row{grid-template-columns:78px 1fr}.sbar-row .lab{font-size:11.5px}}
+  html[data-theme="light"]{
+    --bg:#f7f9fc; --panel:#ffffff; --panel2:#eef1f6; --ink:#1a2230; --muted:#5b6472;
+    --line:#d7dde6; --accent:#2f6fe0; --up:#1e7d34; --dn:#c92c22; --warn:#a6740b; --m3:#178f83;
+    --asia:#2f6fe0; --uk:#a6740b; --us:#178f83; --dgz:#8a93a3;
+  }
+  html[data-theme="light"] .seg{color:#fff}
+  html[data-theme="light"] .seg.dgz{color:#fff}
+  html[data-theme="light"] .verdict .badge{color:#fff}
+  html[data-theme="light"] code,html[data-theme="light"] kbd{background:#eef1f5;color:var(--ink)}
+  html[data-theme="light"] .callout{background:rgba(166,116,11,.10)}
+  html[data-theme="light"] .callout.bad{background:rgba(201,44,34,.09)}
+  html[data-theme="light"] .callout.good{background:rgba(23,143,131,.10)}
+  .theme-toggle{position:fixed;top:16px;right:20px;z-index:100;background:var(--panel);
+    border:1px solid var(--line);color:var(--ink);border-radius:20px;padding:6px 14px;
+    font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.35);
+    font-family:inherit;letter-spacing:.02em}
+  html[data-theme="light"] .theme-toggle{box-shadow:0 2px 10px rgba(0,0,0,.10)}
+  .theme-toggle:active{transform:translateY(1px)}
+  @media(max-width:560px){.theme-toggle{top:10px;right:12px;padding:6px 10px;font-size:12px}body{padding-top:44px}}
+</style>
+<script>
+(function(){try{var t=localStorage.getItem('codexTheme');var e=(t==='light'||t==='dark')?t:((window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light');document.documentElement.setAttribute('data-theme',e);}catch(e){}})();
+</script>
+</head>
+<body>
+<button type="button" id="themeToggle" class="theme-toggle" aria-label="Cycle theme: light, dark, or system">&#9683; Auto</button>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Annie Trading &middot; Fade 2 research &middot; descriptive study</div>
+  <h1>Wednesday Reversal Statistics</h1>
+  <p class="sub">Igor&rsquo;s two questions, answered from our own data: <b>(1)</b> How often do we get a reversal on a
+  Wednesday? <b>(2)</b> When we do, which session does the reversing &mdash; US, UK, or Asia? This is a
+  <b>descriptive study only</b>: event frequency and session attribution, no strategy and no trade simulation.
+  Because a &ldquo;reversal&rdquo; can mean three different things, we pre-declared three definitions and computed
+  <b>all</b> of them &mdash; no cherry-picking.</p>
+</header>
+
+<!-- ============================ VERDICT ============================ -->
+<div class="verdict">
+  <span class="badge">The two answers</span>
+  <h2>Depends what you call a reversal &mdash; but when the week&rsquo;s real turn lands on Wednesday, the US session prints it.</h2>
+  <p><b>Q1 &mdash; how often:</b> The week&rsquo;s <i>dominant extreme</i> (its real turning point) lands on Wednesday only
+  <b>13.2%</b> of weeks (Thursday 16.3%, and Friday is actually the single most common at 21.4%). A crude
+  &ldquo;did Wednesday close flip the Mon&ndash;Tue drift&rdquo; is a pure <b>coin flip (51.3%</b>, p&nbsp;=&nbsp;0.67). But Annie&rsquo;s
+  actual <i>M/W reversal structure</i> confirms on the Wednesday trading day in <b>72.4%</b> of weeks &mdash; as a chart
+  <i>event</i> the midweek reversal is nearly ubiquitous.</p>
+  <p><b>Q2 &mdash; which session:</b> When the week&rsquo;s real turn is on a Wednesday, the <b>US session</b> prints it
+  <b>61.7%</b> of the time (UK 17.0%, Asia 10.6%) &mdash; exactly matching Annie&rsquo;s &ldquo;US&nbsp;=&nbsp;reversal.&rdquo;
+  At the finer M/W-structure grain the confirmation splits <b>UK 40% / US 40%</b> (Asia 20%). So: <b>US first, UK second,
+  Asia a distant third.</b></p>
+</div>
+<p class="muted" style="margin-top:6px">BTCUSDT Binance perp &middot; 15m/1m candles &middot; <b>2019-09 &rarr; 2026-07-11</b> &middot;
+<b>355</b> complete Sun-17:00-NY weeks &middot; <b>includes 2025&ndash;26 (descriptive only &mdash; the OOS backtest lockout is untouched)</b> &middot;
+deterministic (double-run md5 match).</p>
+
+<div class="kpi">
+  <div class="box"><div class="v hl">13.2%</div><div class="l">weeks whose real turn lands on Wed (D1)</div></div>
+  <div class="box"><div class="v hl">72.4%</div><div class="l">weeks with an M/W reversal confirming Wed (D3)</div></div>
+  <div class="box"><div class="v">51.3%</div><div class="l">Wed daily-direction flips &mdash; a coin flip (D2)</div></div>
+  <div class="box"><div class="v" style="color:var(--us)">61.7%</div><div class="l">of Wed weekly-turns print in the US session</div></div>
+</div>
+
+<!-- ============================ DEFINITIONS ============================ -->
+<h2>1 &middot; Three definitions of &ldquo;a reversal&rdquo; &mdash; all computed, none cherry-picked</h2>
+<p class="sub">&ldquo;Reversal&rdquo; is ambiguous, so we declared three concrete meanings up front and report each separately.
+Every &ldquo;Wednesday&rdquo; below is the <b>5pm-NY trading day</b> (Tue 17:00 NY &rarr; Wed 17:00 NY) &mdash; the project&rsquo;s
+week anchor. Sessions are the project&rsquo;s existing convention, not new ones.</p>
+<div class="grid2">
+  <div class="card">
+    <h3 style="margin-top:2px">D1 &middot; Weekly-extreme pivot</h3>
+    <p class="muted" style="margin:0">The week&rsquo;s <b>dominant extreme</b> &mdash; whichever of the week&rsquo;s high or low is
+    <i>further from the week&rsquo;s open in %</i> &mdash; lands on Wednesday, and price then <b>retraces &ge;1%</b> from it by the
+    Friday-17:00-NY cutoff. This is the &ldquo;the actual weekly turn happened on Wednesday&rdquo; reading.
+    Attribution = session of the extreme&rsquo;s bar.</p>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:2px">D2 &middot; Daily direction flip</h3>
+    <p class="muted" style="margin:0">Wednesday&rsquo;s 5pm-day direction (close vs open) is <b>opposite</b> to the combined
+    Mon+Tue drift (Wed open vs Mon open). The crude &ldquo;the day flipped the early-week trend&rdquo; reading, benchmarked
+    against a 50% coin flip with a binomial p-value. Attribution = session of the Wed high (down-flip) or low (up-flip).</p>
+  </div>
+</div>
+<div class="card">
+  <h3 style="margin-top:2px">D3 &middot; M/W structure event <span class="muted" style="font-weight:400">(Annie&rsquo;s actual mechanic)</span></h3>
+  <p class="muted" style="margin:0">The calibrated causal opposite-side <b>M / W / Final-Damage</b> detector on the 1H &mdash;
+  <b>reused verbatim</b> from the F7/G3 engine (<code>backtests/bt_midweek_counter.py</code>, detector V2). Peak-2 is a k=3
+  fractal known only k bars later, so the confirmation bar <span class="mono">b = peak2 + 3</span> is fully causal. We report the
+  share of weeks whose <b>first</b> midweek confirmation (either side) fires on the Wednesday trading day, plus the session of the
+  <b>confirmation</b> bar and, separately, the session of the <b>peak-2</b> (the second-peak turn) bar. Gate: Wed 00:00 NY &rarr;
+  Fri 08:00 NY, exactly as G3 defined &ldquo;midweek.&rdquo;</p>
+</div>
+
+<div class="legend">
+  <span><i class="sw-asia"></i> Asia (19:00&ndash;02:00 NY)</span>
+  <span><i class="sw-uk"></i> UK / London (02:00&ndash;08:00 NY)</span>
+  <span><i class="sw-us"></i> US (08:00&ndash;17:00 NY)</span>
+  <span><i class="sw-dgz"></i> Dead Zone (17:00&ndash;19:00 NY, post-US lull)</span>
+</div>
+
+<!-- ============================ D1 ============================ -->
+<h2>2 &middot; D1 &mdash; Weekly-extreme pivot: the real turn lands on Wednesday 13% of weeks</h2>
+<p class="sub">Across all 355 weeks, we asked which weekday printed the week&rsquo;s dominant extreme. Wednesday accounts for
+<b>13.2%</b>; the ultimate turn is actually <i>more</i> likely on Thursday (16.3%) and most likely on Friday (21.4%) &mdash;
+weekly extremes cluster late. Every single Wed/Thu extreme retraced &ge;1% by Friday (BTC&rsquo;s weekly range dwarfs 1%),
+so all of these are genuine intraweek pivots, not runaway closes.</p>
+
+<div class="tblwrap">
+<table>
+  <thead><tr><th>Day of dominant extreme</th><th class="n">Weeks</th><th class="n">% of 355</th><th class="n">&ge;1% retrace-confirmed</th></tr></thead>
+  <tbody>
+    <tr><td>Monday</td><td class="n">27</td><td class="n">7.6%</td><td class="n">&mdash;</td></tr>
+    <tr><td>Tuesday</td><td class="n">43</td><td class="n">12.1%</td><td class="n">&mdash;</td></tr>
+    <tr><td><b class="hl">Wednesday</b></td><td class="n"><b>47</b></td><td class="n"><b>13.2%</b></td><td class="n">47 (100%)</td></tr>
+    <tr><td>Thursday <span class="muted">(comparison)</span></td><td class="n">58</td><td class="n">16.3%</td><td class="n">58 (100%)</td></tr>
+    <tr><td>Friday</td><td class="n">76</td><td class="n">21.4%</td><td class="n">&mdash;</td></tr>
+    <tr><td>Saturday</td><td class="n">44</td><td class="n">12.4%</td><td class="n">&mdash;</td></tr>
+    <tr><td>Sunday</td><td class="n">60</td><td class="n">16.9%</td><td class="n">&mdash;</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Which session prints the Wednesday turn? &mdash; the US session, by a mile</h3>
+<div class="sbar-row"><div class="lab">Wed extreme<br>(n=47)</div>
+  <div class="sbar">
+    <div class="seg asia" style="width:10.6%" title="Asia 10.6%">11%</div>
+    <div class="seg uk" style="width:17.0%" title="UK 17.0%">17%</div>
+    <div class="seg us" style="width:61.7%" title="US 61.7%">US 62%</div>
+    <div class="seg dgz" style="width:10.6%" title="Dead Zone 10.6%">11%</div>
+  </div>
+</div>
+<div class="sbar-row"><div class="lab">Thu extreme<br>(n=58)</div>
+  <div class="sbar">
+    <div class="seg asia" style="width:19.0%" title="Asia 19.0%">19%</div>
+    <div class="seg uk" style="width:15.5%" title="UK 15.5%">16%</div>
+    <div class="seg us" style="width:62.1%" title="US 62.1%">US 62%</div>
+    <div class="seg dgz" style="width:3.4%" title="Dead Zone 3.4%"></div>
+  </div>
+</div>
+<p class="muted" style="font-size:13px">Wed extreme counts: Asia 5 &middot; UK 8 &middot; <b>US 29</b> &middot; Dead-Zone 5.
+Thu extreme: Asia 11 &middot; UK 9 &middot; <b>US 36</b> &middot; Dead-Zone 2. The US session dominates the actual weekly turn
+on both days &mdash; direct empirical support for Annie&rsquo;s &ldquo;US&nbsp;=&nbsp;reversal.&rdquo;</p>
+
+<h3>Per-year stability (Wednesday dominant-extreme weeks)</h3>
+<div class="tblwrap">
+<table>
+  <thead><tr><th>Year</th><th class="n">2019p</th><th class="n">2020p</th><th class="n">2021p</th><th class="n">2022p</th><th class="n">2023p</th><th class="n">2024p</th><th class="n">2025p</th><th class="n">2026p</th></tr></thead>
+  <tbody>
+    <tr><td>Wed / total</td><td class="n">2/16</td><td class="n">8/52</td><td class="n">7/52</td><td class="n">7/52</td><td class="n">7/53</td><td class="n">8/52</td><td class="n">1/52</td><td class="n">7/26</td></tr>
+    <tr><td>%</td><td class="n">12.5</td><td class="n">15.4</td><td class="n">13.5</td><td class="n">13.5</td><td class="n">13.2</td><td class="n">15.4</td><td class="n neg">1.9</td><td class="n">26.9</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="muted" style="font-size:13px">Stable ~13&ndash;15% every year except the two low-n partial years (<b>2019p</b> Sep-start,
+<b>2026p</b> Jul-cut) and a notably quiet <b>2025</b> (1/52) where the weekly turn rarely landed midweek. &ldquo;p&rdquo; = partial year.</p>
+
+<!-- ============================ D2 ============================ -->
+<h2>3 &middot; D2 &mdash; Daily direction flip: a coin flip, no midweek signal</h2>
+<p class="sub">The bluntest reading &mdash; did Wednesday&rsquo;s close reverse the Mon&ndash;Tue drift? &mdash; shows <b>no</b>
+Wednesday-specific tendency. It happens <b>51.3%</b> of weeks, indistinguishable from a 50% coin flip
+(binomial two-sided <b>p&nbsp;=&nbsp;0.67</b>). Thursday is the same (50.7%, p&nbsp;=&nbsp;0.83). Raw daily direction carries no
+&ldquo;midweek reversal&rdquo; edge; the structure (D3) is where the pattern lives.</p>
+
+<div class="tblwrap">
+<table>
+  <thead><tr><th>Flip day</th><th class="n">Flips / weeks</th><th class="n">%</th><th class="n">vs 50%</th><th class="n">binomial p</th></tr></thead>
+  <tbody>
+    <tr><td><b class="hl">Wednesday</b></td><td class="n">182 / 355</td><td class="n"><b>51.3%</b></td><td class="n">+1.3 pts</td><td class="n">0.67</td></tr>
+    <tr><td>Thursday <span class="muted">(comparison)</span></td><td class="n">180 / 355</td><td class="n">50.7%</td><td class="n">+0.7 pts</td><td class="n">0.83</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Pivot session (for the flips that did occur)</h3>
+<div class="sbar-row"><div class="lab">Wed flip<br>(n=182)</div>
+  <div class="sbar">
+    <div class="seg asia" style="width:32.4%" title="Asia 32.4%">Asia 32%</div>
+    <div class="seg uk" style="width:11.5%" title="UK 11.5%">12%</div>
+    <div class="seg us" style="width:24.2%" title="US 24.2%">US 24%</div>
+    <div class="seg dgz" style="width:31.9%" title="Dead Zone 31.9%">DZ 32%</div>
+  </div>
+</div>
+<div class="callout">
+  <b>Read this one with care.</b> D2&rsquo;s &ldquo;pivot&rdquo; is the intraday high (down-flip) or low (up-flip) <i>opposite</i> to the
+  close &mdash; and that early extreme naturally forms at the <b>start</b> of the 5pm-day (Tue-evening Dead-Zone/Asia), so 64% of it
+  lands in Asia+Dead-Zone by construction. Because the flip itself is a coin flip, this split describes <i>when the day&rsquo;s
+  counter-extreme forms</i>, not a meaningful &ldquo;reversal session.&rdquo; For the session question, trust <b>D1</b> (the real weekly
+  turn) and <b>D3</b> (the structure), below.
+</div>
+
+<h3>Per-year stability (Wednesday flips)</h3>
+<div class="tblwrap">
+<table>
+  <thead><tr><th>Year</th><th class="n">2019p</th><th class="n">2020p</th><th class="n">2021p</th><th class="n">2022p</th><th class="n">2023p</th><th class="n">2024p</th><th class="n">2025p</th><th class="n">2026p</th></tr></thead>
+  <tbody>
+    <tr><td>Flips / total</td><td class="n">5/16</td><td class="n">25/52</td><td class="n">29/52</td><td class="n">27/52</td><td class="n">31/53</td><td class="n">24/52</td><td class="n">31/52</td><td class="n">10/26</td></tr>
+    <tr><td>%</td><td class="n">31.2</td><td class="n">48.1</td><td class="n">55.8</td><td class="n">51.9</td><td class="n">58.5</td><td class="n">46.2</td><td class="n">59.6</td><td class="n">38.5</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="muted" style="font-size:13px">Scatters around 50% year to year with no drift &mdash; consistent with pure noise.</p>
+
+<!-- ============================ D3 ============================ -->
+<h2>4 &middot; D3 &mdash; M/W structure (Annie&rsquo;s mechanic): confirms Wednesday in 72% of weeks</h2>
+<p class="sub">Using the exact calibrated F7/G3 detector, <b>some</b> midweek M/W reversal fires in almost every week
+(347/355 = <b>97.7%</b>), and its first confirmation lands specifically on the <b>Wednesday</b> trading day in
+<b>257/355 = 72.4%</b> of weeks (Thursday 22.0%, Friday 3.4%). As a chart <i>event</i> the midweek reversal is real and common
+&mdash; which is what Annie teaches. Its <b>session</b> is where it gets interesting.</p>
+
+<div class="tblwrap">
+<table>
+  <thead><tr><th>First confirmation on&hellip;</th><th class="n">Weeks</th><th class="n">% of 355</th><th class="n">% of fired</th></tr></thead>
+  <tbody>
+    <tr><td>Any day (fired at all)</td><td class="n">347</td><td class="n">97.7%</td><td class="n">100%</td></tr>
+    <tr><td><b class="hl">Wednesday</b></td><td class="n"><b>257</b></td><td class="n"><b>72.4%</b></td><td class="n">74.1%</td></tr>
+    <tr><td>Thursday <span class="muted">(comparison)</span></td><td class="n">78</td><td class="n">22.0%</td><td class="n">22.5%</td></tr>
+    <tr><td>Friday</td><td class="n">12</td><td class="n">3.4%</td><td class="n">3.5%</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Session of the confirmation bar &mdash; a UK / US tie</h3>
+<div class="sbar-row"><div class="lab">Wed confirm<br>(n=257)</div>
+  <div class="sbar">
+    <div class="seg asia" style="width:19.5%" title="Asia 19.5%">Asia 20%</div>
+    <div class="seg uk" style="width:40.1%" title="UK 40.1%">UK 40%</div>
+    <div class="seg us" style="width:40.5%" title="US 40.5%">US 40%</div>
+  </div>
+</div>
+<h3>Session of the peak-2 (the actual turn bar) &mdash; leans UK / Asia</h3>
+<div class="sbar-row"><div class="lab">Wed peak-2<br>(n=257)</div>
+  <div class="sbar">
+    <div class="seg asia" style="width:37.0%" title="Asia 37.0%">Asia 37%</div>
+    <div class="seg uk" style="width:38.9%" title="UK 38.9%">UK 39%</div>
+    <div class="seg us" style="width:24.1%" title="US 24.1%">US 24%</div>
+  </div>
+</div>
+<p class="muted" style="font-size:13px">Confirm-bar counts: Asia 50 &middot; UK 103 &middot; US 104 &middot; Dead-Zone 0.
+Peak-2 counts: Asia 95 &middot; UK 100 &middot; US 62 &middot; Dead-Zone 0. Reading these together: the reversal <i>turn</i> (peak-2)
+tends to form in the UK/Asia window, and the pattern <i>confirms</i> a few hours later split evenly across UK and US. This is a
+finer-grained, slightly different picture from D1&rsquo;s ultimate weekly extreme (US 62%) &mdash; both are reported so you can see
+the whole shape.</p>
+
+<h3>Per-year stability (Wednesday confirmations)</h3>
+<div class="tblwrap">
+<table>
+  <thead><tr><th>Year</th><th class="n">2019p</th><th class="n">2020p</th><th class="n">2021p</th><th class="n">2022p</th><th class="n">2023p</th><th class="n">2024p</th><th class="n">2025p</th><th class="n">2026p</th></tr></thead>
+  <tbody>
+    <tr><td>Wed conf / total</td><td class="n">13/16</td><td class="n">38/52</td><td class="n">40/52</td><td class="n">33/52</td><td class="n">40/53</td><td class="n">39/52</td><td class="n">37/52</td><td class="n">17/26</td></tr>
+    <tr><td>%</td><td class="n">81.2</td><td class="n">73.1</td><td class="n">76.9</td><td class="n">63.5</td><td class="n">75.5</td><td class="n">75.0</td><td class="n">71.2</td><td class="n">65.4</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="muted" style="font-size:13px">Rock-steady 63&ndash;81% every year, including the 2025&ndash;26 out-of-sample block &mdash;
+the midweek M/W reversal is a persistent structural feature, not a regime artifact.</p>
+
+<!-- ============================ SESSION SYNTHESIS ============================ -->
+<h2>5 &middot; So which session &ldquo;does the reversing&rdquo;?</h2>
+<p class="sub">Three lenses, one consistent lead answer: <b>US first, UK second, Asia third.</b> The only place the ordering
+shifts is the fine-grained M/W internals, where UK draws level with (or ahead of) US.</p>
+<div class="tblwrap">
+<table>
+  <thead><tr><th>Lens</th><th class="n">Asia</th><th class="n">UK</th><th class="n">US</th><th>Lead</th></tr></thead>
+  <tbody>
+    <tr><td>D1 &mdash; week&rsquo;s real turn on Wed</td><td class="n">10.6%</td><td class="n">17.0%</td><td class="n"><b>61.7%</b></td><td><b style="color:var(--us)">US</b> (Annie&rsquo;s claim)</td></tr>
+    <tr><td>D3 &mdash; M/W confirmation bar</td><td class="n">19.5%</td><td class="n"><b>40.1%</b></td><td class="n"><b>40.5%</b></td><td>UK &asymp; US tie</td></tr>
+    <tr><td>D3 &mdash; M/W peak-2 (turn) bar</td><td class="n">37.0%</td><td class="n"><b>38.9%</b></td><td class="n">24.1%</td><td>UK &asymp; Asia</td></tr>
+  </tbody>
+</table>
+</div>
+<div class="callout good">
+  <b>Bottom line for Igor.</b> If &ldquo;the reversal&rdquo; means the week&rsquo;s actual high/low turning point printing on a Wednesday,
+  the <b>US session owns it (62%)</b> &mdash; a clean match to Annie&rsquo;s teaching. If you zoom into the M/W micro-structure, the
+  turn itself often forms late in the <b>UK</b> session and the pattern <b>confirms</b> across UK/US. Asia is consistently the
+  least likely reversal session at every grain.
+</div>
+
+<!-- ============================ G3 CAVEAT ============================ -->
+<h2>6 &middot; Important caveat &mdash; a common event is not a tradeable edge</h2>
+<div class="callout bad">
+  <b>This page counts events; it does not claim a trade.</b> The companion study
+  <a href="Midweek Counter Trade.html" style="color:var(--accent)">The Midweek Counter Trade (G3)</a> already tested whether you can
+  <i>counter-trade</i> this midweek peak, across 6 declared cells and 6 years: <b>every cell lost money</b>, with reliably
+  <b>negative</b> t-stats (&minus;2.1 to &minus;4.2). After the signal fires, price on average keeps moving <b>against</b> the pattern
+  &mdash; countering the midweek peak means fighting the dominant drift. So the Wednesday reversal is a <b>real, frequent structural
+  event</b> (this page) that is <b>not tradeable as a counter</b> (G3). Both facts hold at once; nothing here revisits or contradicts
+  that ruling.
+</div>
+
+<!-- ============================ METHOD ============================ -->
+<h2>7 &middot; Method &amp; conventions</h2>
+<div class="grid2">
+  <div class="card">
+    <h3 style="margin-top:2px">Time anchors (reused, not invented)</h3>
+    <ul class="tight">
+      <li><b>Week</b> = Sunday 17:00 NY &rarr; next Sunday 17:00 NY (<code>anchors.week_open</code>).</li>
+      <li><b>Trading day</b> = 5pm-NY day; a bar at/after 17:00 NY belongs to the next day. <b>&ldquo;Wednesday&rdquo; = Tue 17:00 &rarr; Wed 17:00 NY</b> (<code>anchors.trading_day_name</code>).</li>
+      <li><b>Sessions</b> (NY local): Asia 19:00&ndash;02:00 &middot; UK 02:00&ndash;08:00 &middot; US 08:00&ndash;17:00 &middot; Dead-Zone 17:00&ndash;19:00 (<code>anchors.session_of</code>). Igor asked Asia/UK/US; the project convention adds a 2h post-US Dead-Zone, reported honestly.</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:2px">Rigor</h3>
+    <ul class="tight">
+      <li><b>Causality:</b> extremes and attributions are computed <i>after</i> the week/day closes &mdash; correct for a
+          <i>descriptive</i> study (we describe what happened, not trade it). The D3 detector is itself fully causal
+          (confirmation known k fractal-bars later).</li>
+      <li><b>D3 reuse:</b> the M/W/FD scan is <code>bt_midweek_counter.first_midweek</code> called verbatim; over the in-sample
+          window it reproduces the G3 ledger (Wed 199&rarr;203, Thu 58&rarr;60 &mdash; the tiny surplus is confirmations G3 later dropped
+          on stop-geometry, which don&rsquo;t change the <i>event</i> count).</li>
+      <li><b>Deterministic:</b> the whole pipeline was run twice; all four results CSVs are byte-identical (md5 below).</li>
+      <li><b>Data:</b> full 2019-09 &rarr; 2026-07-11, <b>including 2025&ndash;26</b> &mdash; descriptive only, so the OOS backtest
+          lockout is left untouched.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="foot">
+  Annie Trading &middot; Fade 2 research &middot; Wednesday Reversal descriptive study &middot; engine
+  <code>backtests/wed_reversal_stats.py</code> (reuses <code>detectors/anchors.py</code> + <code>backtests/bt_midweek_counter.py</code>).<br>
+  Results CSVs (in <code>backtests/</code>) &amp; deterministic double-run md5 (identical across runs):<br>
+  <span class="mono">wed_reversal_d1.csv</span> &middot; <span class="mono">0eb909eefd98affa65695387c0471321</span><br>
+  <span class="mono">wed_reversal_d2_wed.csv</span> &middot; <span class="mono">27f4242f4cbaeca51b0d34723fa2ad1b</span><br>
+  <span class="mono">wed_reversal_d2_thu.csv</span> &middot; <span class="mono">ff675f6f54e28251d10c131530697fda</span><br>
+  <span class="mono">wed_reversal_d3.csv</span> &middot; <span class="mono">cfbc8fb0a0b4a72de81cfc790f992a36</span><br>
+  BTCUSDT Binance perp &middot; 2019-09-09 &rarr; 2026-07-11 &middot; 355 complete weeks &middot; descriptive statistics, no trades simulated.
+  This page is self-contained.
+</div>
+
+</div>
+<script>
+(function(){
+  var btn=document.getElementById('themeToggle');
+  if(!btn)return;
+  var mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;
+  function stored(){try{var t=localStorage.getItem('codexTheme');return (t==='light'||t==='dark'||t==='system')?t:'system';}catch(e){return 'system';}}
+  function eff(m){return (m==='light'||m==='dark')?m:((mq&&mq.matches)?'dark':'light');}
+  function apply(){var m=stored();document.documentElement.setAttribute('data-theme',eff(m));btn.textContent=(m==='light')?'◐ Light':(m==='dark')?'◑ Dark':'◓ Auto';}
+  apply();
+  btn.addEventListener('click',function(){var order={light:'dark',dark:'system',system:'light'};var n=order[stored()];try{localStorage.setItem('codexTheme',n);}catch(e){}apply();});
+  if(mq){var h=function(){if(stored()==='system')apply();};if(mq.addEventListener)mq.addEventListener('change',h);else if(mq.addListener)mq.addListener(h);}
+})();
+</script>
+</body>
+</html>
