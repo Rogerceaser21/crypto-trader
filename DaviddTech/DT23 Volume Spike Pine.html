@@ -1,0 +1,748 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DT23 Volume-Spike Confirmation &mdash; Pine v6 (indicator + strategy)</title>
+<style>
+  :root{
+    --bg:#0e1117; --panel:#161b22; --panel2:#1c2230; --ink:#e6edf3; --muted:#9aa4b2;
+    --line:#2a3140; --accent:#6aa9ff; --up:#3fb950; --dn:#f85149; --warn:#e3b341; --m3:#26a69a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  .wrap{max-width:940px;margin:0 auto;padding:34px 22px 90px;}
+  header{border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:8px}
+  .eyebrow{letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:var(--accent);font-weight:700}
+  h1{font-size:30px;margin:8px 0 6px;line-height:1.2}
+  h2{font-size:21px;margin:38px 0 12px;padding-top:8px;border-top:1px solid var(--line)}
+  h3{font-size:16px;margin:22px 0 8px;color:var(--ink)}
+  p{color:var(--ink)}
+  .sub{color:var(--muted);font-size:15px;max-width:74ch}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:14px 0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:720px){.grid2{grid-template-columns:1fr}}
+  code,kbd{background:#0b0f16;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px}
+  kbd{color:var(--accent)}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:14px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--panel2);color:var(--muted);font-weight:600;font-size:12.5px;text-transform:uppercase;letter-spacing:.04em}
+  td.n{font-family:ui-monospace,Menlo,monospace;white-space:nowrap}
+  .statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:10px 0}
+  .stat{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .stat .v{font-size:23px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--ink)}
+  .stat .k{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+  .stat .v.good{color:var(--up)}
+  ol.steps{counter-reset:s;list-style:none;padding-left:0;margin:0}
+  ol.steps li{position:relative;padding:10px 0 10px 46px;border-bottom:1px solid var(--line)}
+  ol.steps li:last-child{border-bottom:0}
+  ol.steps li::before{counter-increment:s;content:counter(s);position:absolute;left:0;top:10px;
+    width:30px;height:30px;border-radius:50%;background:var(--accent);color:#0b0f16;font-weight:800;
+    display:flex;align-items:center;justify-content:center;font-size:14px}
+  .callout{border-left:4px solid var(--warn);background:rgba(227,179,65,.08);padding:12px 16px;border-radius:8px;margin:12px 0}
+  .callout.good{border-left-color:var(--m3);background:rgba(38,166,154,.08)}
+  .callout.bad{border-left-color:var(--dn);background:rgba(248,81,73,.09)}
+  .callout.feed{border-left-color:var(--accent);background:rgba(106,169,255,.10)}
+  .callout b{color:var(--ink)}
+  .feedbox{border:2px solid var(--dn);background:rgba(248,81,73,.11);border-radius:12px;padding:16px 20px;margin:18px 0}
+  .feedbox .lead{font-size:16px;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:8px;margin-bottom:6px}
+  .feedbox .lead .warnico{font-size:20px}
+  pre.src{background:#0b0f16;border:1px solid var(--line);border-radius:10px;padding:16px;overflow:auto;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.5;color:#c9d3e0;max-height:560px;white-space:pre}
+  .copybar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:14px 0 6px}
+  .btn{background:var(--accent);color:#0b0f16;border:0;border-radius:8px;padding:9px 16px;font-weight:700;cursor:pointer;font-size:14px}
+  .btn:active{transform:translateY(1px)}
+  .foot{color:var(--muted);font-size:12.5px;margin-top:50px;border-top:1px solid var(--line);padding-top:16px}
+  .muted{color:var(--muted)}
+  ul.tight{margin:6px 0 6px 0;padding-left:20px} ul.tight li{margin:4px 0}
+  .pill{display:inline-block;font-size:11px;font-weight:700;border-radius:20px;padding:2px 10px;color:#0b0f16;background:var(--up)}
+  .pill.no{background:var(--dn);color:#fff}
+  .mono{font-family:ui-monospace,Menlo,monospace}
+  /* ---- Theme toggle ---- */
+  html[data-theme="light"]{
+    --bg:#f7f9fc; --panel:#ffffff; --panel2:#eef1f6; --ink:#1a2230; --muted:#5b6472;
+    --line:#d7dde6; --accent:#2f6fe0; --up:#1e7d34; --dn:#c92c22; --warn:#a6740b; --m3:#178f83;
+  }
+  html[data-theme="light"] code, html[data-theme="light"] kbd{background:#eef1f5;color:var(--ink)}
+  html[data-theme="light"] pre.src{background:#eef1f5;color:#1a2230}
+  html[data-theme="light"] .callout{background:rgba(166,116,11,.10)}
+  html[data-theme="light"] .callout.good{background:rgba(23,143,131,.10)}
+  html[data-theme="light"] .callout.bad{background:rgba(201,44,34,.09)}
+  html[data-theme="light"] .callout.feed{background:rgba(47,111,224,.10)}
+  html[data-theme="light"] .feedbox{background:rgba(201,44,34,.08)}
+  html[data-theme="light"] .btn,
+  html[data-theme="light"] ol.steps li::before,
+  html[data-theme="light"] .pill{color:#fff}
+  .theme-toggle{position:fixed;top:16px;right:20px;z-index:100;background:var(--panel);
+    border:1px solid var(--line);color:var(--ink);border-radius:20px;padding:6px 14px;
+    font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.35);
+    font-family:inherit;letter-spacing:.02em}
+  html[data-theme="light"] .theme-toggle{box-shadow:0 2px 10px rgba(0,0,0,.10)}
+  .theme-toggle:active{transform:translateY(1px)}
+@media(max-width:560px){.theme-toggle{top:10px;right:12px;padding:6px 10px;font-size:12px}body{padding-top:44px}}
+</style>
+
+<script>
+(function(){try{var t=localStorage.getItem('codexTheme');var e=(t==='light'||t==='dark')?t:((window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light');document.documentElement.setAttribute('data-theme',e);}catch(e){}})();
+</script>
+
+</head>
+<body>
+
+<button type="button" id="themeToggle" class="theme-toggle" aria-label="Cycle theme: light, dark, or system">&#9683; Auto</button>
+<div class="wrap">
+<header>
+  <div class="eyebrow">DaviddTech &middot; DT23 Volume-Spike Confirmation &middot; Pine v6 port</div>
+  <h1>DT23 &ldquo;Volume-Spike Confirmation&rdquo; &mdash; Pine v6 (indicator + strategy)</h1>
+  <p class="sub">The validated DT23 Volume-Spike Confirmation &mdash; research archetype <span class="mono">v5F A3</span> &mdash; rebuilt as a
+  causal Pine&nbsp;v6 <b>indicator</b> plus a Strategy&nbsp;Tester <b>twin</b> with an identical signal core. BTC 4h <b>long-only</b> volume-confirmed
+  trend continuation: buy a strong-closing green bar on a genuine volume spike above <b>both</b> the 20- and 200-EMA; ride to a fixed 3R target, a
+  fixed ATR stop, or an EMA20 close-exit. Every decision, drawing and alert fires on <b>confirmed, closed bars only</b> &mdash; no repaint. This page
+  is the <b>copy of record</b> and the paste source for both files.</p>
+</header>
+
+<div class="feedbox">
+  <div class="lead"><span class="warnico">&#9888;</span> Volume feed &mdash; chart <span class="mono">BINANCE:BTCUSDT</span> perpetual, 4h &mdash; and nothing else.</div>
+  <p style="margin:0">This strategy is <b>volume-gated</b>, and volume is <b>exchange-local</b>. The entry test &mdash; <span class="mono">volume &gt; 2&times;&nbsp;SMA20(volume)</span> &mdash;
+  reads the raw feed, so a <b>borderline spike clears the gate on one exchange and not another</b>: the same code fires <i>different trades</i> on different
+  feeds. This is not hypothetical &mdash; it happened live on the Annie fade (2026-07-20): a Bybit vector fired a trade the Binance test feed rejected.
+  The DT23 edge was measured on <b><span class="mono">BINANCE:BTCUSDT</span> perpetual, 4h</b>. Chart <b>that exact feed</b> &mdash; any other exchange&rsquo;s volume will
+  <b>not</b> reproduce the record.</p>
+</div>
+
+<h2>1 &middot; Honest, in-sample stats (config of record)</h2>
+<p>Config of record = the report&rsquo;s <b>center cell</b> &mdash; the exact combination the DT23 verdict headlines: <span class="mono">volume_mult&nbsp;2.0 / atr_stop&nbsp;1.5 / reward&nbsp;3.0</span>,
+with <span class="mono">vSMA(20)</span>, <span class="mono">EMA(20)/EMA(200)</span>, <span class="mono">ATR(14)</span>. In-sample <b>2019-09&nbsp;&rarr;&nbsp;2024-12</b> (2025&ndash;26 locked out), our causal cost-honest engine, 1% risk, 0.05% fee + 0.02% slip per fill:</p>
+<div class="statgrid">
+  <div class="stat"><div class="v good">+0.335R</div><div class="k">per trade (center)</div></div>
+  <div class="stat"><div class="v">1.62</div><div class="k">profit factor</div></div>
+  <div class="stat"><div class="v">1.09</div><div class="k">Sharpe</div></div>
+  <div class="stat"><div class="v">161</div><div class="k">IS trades</div></div>
+  <div class="stat"><div class="v">37.9%</div><div class="k">win rate</div></div>
+  <div class="stat"><div class="v">2.497</div><div class="k">t-stat (center)</div></div>
+</div>
+<p class="muted" style="margin:8px 0 0">Surface-wide, and <b>not tail-driven</b>: <b>all 27</b> declared grid cells had positive expectancy and <b>22 of 27</b> were individually significant
+(t&nbsp;&ge;&nbsp;2.0). Best cell 2.0/1.5/2.0 reaches <b>t&nbsp;=&nbsp;2.933</b>. The single biggest winner is only <b>5.5%</b> of total R; drop the three fattest trades and the edge is
+<b>still +0.285R at t&nbsp;=&nbsp;2.13</b> &mdash; a distributional edge, not a lottery ticket. Max drawdown 10.3%. Weekly-R correlation to the rest of the book tops out at +0.447
+(DT3) &mdash; a genuinely new engine. These are the <b>numbers of record</b> from <span class="mono">backtests/bt_dt23_volume_spike.py</span> &mdash; NOT the chart&rsquo;s Strategy Tester.</p>
+
+<h2>2 &middot; What it does &amp; how it trades</h2>
+<div class="card">
+  <ul class="tight">
+    <li><b>Entry signal (5 conjuncts, closed 4h bar)</b> &mdash; <span class="mono">volume &gt; 2&times;vSMA20</span> (a volume spike) <b>AND</b> <span class="mono">close &gt; open</span> (green) <b>AND</b>
+      <span class="mono">upperHalf</span> (close in the upper half of the bar&rsquo;s range) <b>AND</b> <span class="mono">close &gt; EMA20</span> <b>AND</b> <span class="mono">close &gt; EMA200</span>. Long-only, flat only.</li>
+    <li><b>Fill</b> &mdash; the <b>open of the next 4h bar</b> after the confirmed signal (causal, no look-ahead).</li>
+    <li><b>Fixed stop</b> &mdash; <span class="mono">entry &minus; 1.5&times;ATR(14)</span>, with the ATR captured at the <b>signal bar</b> and frozen at entry (not trailing).</li>
+    <li><b>Fixed 3R target</b> &mdash; <span class="mono">entry + 3&times;(1.5&times;ATR) = entry + 4.5&times;ATR</span>. Caps every winner &mdash; the reason the tail stays flat.</li>
+    <li><b>EMA20 close-exit</b> &mdash; any closed 4h bar with <span class="mono">close &lt; EMA20</span> exits at market on the next open. Retires the trades that stall between stop and target.</li>
+    <li><b>Exit precedence</b> &mdash; the intrabar stop/target (fires mid-bar) takes priority over the same bar&rsquo;s close-exit (fires at the close). If one 4h bar&rsquo;s range covers
+      <b>both</b> stop and target, the <b>stop</b> is booked (worst case &mdash; a chart script cannot see the intrabar fill order; the engine&rsquo;s ambiguous&nbsp;=&nbsp;loss rule).</li>
+    <li><b>Sizing of record</b> &mdash; 1%-of-equity risk against <span class="mono">pendRisk = 1.5&times;ATR</span> (the author&rsquo;s 10%-equity compounding was stripped for the honest signal test).</li>
+  </ul>
+</div>
+<div class="card" style="margin-top:0">
+  <h3 style="margin-top:2px">On-chart marks &amp; the status panel</h3>
+  <ul class="tight">
+    <li><b>Fast / slow EMAs</b> (aqua EMA20 / orange EMA200) &mdash; the two trend gates the entry keys off.</li>
+    <li><b>Entry triangle</b> (green up) prints <b>at the signal bar</b> &mdash; the actionable moment; the fill is the next 4h open. A small label at the fill bar quotes entry / stop / target.</li>
+    <li><b>Stop line</b> (red) and <b>target line</b> (green) run for the life of each trade at the fixed levels.</li>
+    <li><b>Exit &times;</b> &mdash; red at a stop touch, green at a target touch, blue at the next-open fill of an EMA20 close-exit.</li>
+    <li><b>Status panel</b> (top-right) &mdash; last-confirmed machine state: position, entry, stop, target (3R), current vol ratio (spike / normal), EMA gate state, bars in trade. A read-out, not a bar-anchored drawing.</li>
+  </ul>
+</div>
+
+<div class="card" style="margin-top:0">
+  <h3 style="margin-top:2px">Two worked signals (from the frozen center ledger &mdash; hand-traced, fully causal)</h3>
+  <ul class="tight">
+    <li><b>Target win +2.96R.</b> Signal 2019-10-25 16:00 UTC: volume 73&thinsp;559.9 vs 2&times;vSMA 35&thinsp;888.1 (<b>ratio 4.10&times;</b>), green, closed in the upper half, above both EMAs &mdash; all five pass.
+      Enter next open 8633.45; stop 8324.33, target 9560.81 (<span class="mono">+3&times;1.5&times;ATR</span>). Price runs to the target the next bracket bar &mdash; a clean 3R win.</li>
+    <li><b>Stop loss &minus;1.03R.</b> The very next re-entry, signal 2019-10-26 00:00 UTC (ratio 4.38&times;), enters 9566.68; the move reverses and the fixed stop at 9092.96 books &minus;1.03R (just past &minus;1R from slippage + fees).
+      Consecutive high-volume signals are traded independently, flat-only, no overlap.</li>
+  </ul>
+</div>
+
+<h2>3 &middot; Fidelity &amp; no-repaint audit</h2>
+<div class="grid2">
+  <div class="card"><h3 style="margin-top:2px">Fidelity &mdash; the Python twin</h3>
+    <p style="margin:6px 0 0">A bar-by-bar Python mirror of <b>this Pine&rsquo;s</b> forward 4h state machine (<span class="mono">backtests/pine_mirror_dt23.py</span>, not a copy of the engine)
+    reproduces the frozen 161-trade center ledger <b>161 / 161 = 100%</b> exact &mdash; side, entry-time, exit-time and exit-reason all identical &mdash; with
+    <b>max&nbsp;|&Delta;R|&nbsp;=&nbsp;0.000000</b> and total R 53.9312 matching the reference to the cent. Even the both-touched (stop&nbsp;&amp;&nbsp;target in one bar) cases resolve
+    identically. Deterministic across double runs (md5 <span class="mono">04f7dfc7&hellip;</span>). <span class="pill">100% match</span></p></div>
+  <div class="card"><h3 style="margin-top:2px">No-repaint &mdash; both files</h3>
+    <p style="margin:6px 0 0">Grep-verified on both <span class="mono">.pine</span> files: <b>zero</b> <span class="mono">request.security</span>, <span class="mono">varip</span>, <span class="mono">timenow</span>,
+    <span class="mono">barstate.isrealtime</span> in executable code; every decision/drawing/order/alert gated by <span class="mono">barstate.isconfirmed</span>; drawings append-only
+    (<span class="mono">label.new</span> only) with <b>zero</b> <span class="mono">.set_*()</span> / <span class="mono">.delete()</span>; nothing positioned at a past bar. <span class="pill">no repaint</span></p></div>
+</div>
+<div class="tblwrap"><table><thead><tr><th>Audit check</th><th>Rule</th><th>Result</th></tr></thead><tbody>
+<tr><td>request.security / varip / timenow / isrealtime (executable)</td><td class="n">= 0</td><td class="n">0 / 0 / 0 / 0 &#9989;</td></tr>
+<tr><td>Decisions under <span class="mono">barstate.isconfirmed</span></td><td class="n">all</td><td class="n">all &#9989;</td></tr>
+<tr><td>Retro-mutation <span class="mono">.set_*()</span> / <span class="mono">.delete()</span></td><td class="n">= 0</td><td class="n">0 / 0 &#9989;</td></tr>
+<tr><td>Mirror match vs frozen center ledger</td><td class="n">&ge; 95%</td><td class="n">161/161 = 100% &#9989;</td></tr>
+<tr><td>Deterministic double run (mirror md5)</td><td class="n">identical</td><td class="n">04f7dfc7&hellip; = 04f7dfc7&hellip; &#9989;</td></tr>
+</tbody></table></div>
+
+<div class="callout bad">
+  <b>The 1-bar Strategy-Tester lag caveat &mdash; read before judging the Tester&rsquo;s P&amp;L.</b> The number of record is our Python backtest
+  (+0.335R center), which fills at the open of the bar <i>after</i> the confirmed spike and detects the stop/target intrabar on 1m granularity. The
+  Strategy-Tester twin submits its market order the moment that entry bar confirms, so TradingView fills it on the <b>following</b> open &mdash;
+  about one 4h bar later than the engine &mdash; and resolves the bracket on 4h bars. Stop/target levels use the engine geometry
+  (fill&nbsp;&minus;&nbsp;1.5&times;ATR / fill&nbsp;+&nbsp;4.5&times;ATR), sizing is 1% risk. TradingView also caps 4h history, so you see recent years, not the full 2019&ndash;2024 record. <b>The chart is for
+  SEEING the trades; the authoritative numbers are the backtest reports on this site.</b>
+</div>
+
+<h2>4 &middot; Install on TradingView</h2>
+<ol class="steps">
+  <li>Open a <b>BINANCE:BTCUSDT perpetual</b> chart on the <b>4-hour</b> timeframe &mdash; the exact feed and timeframe the edge was measured on. <b>Volume is exchange-local &mdash; do not substitute another exchange.</b></li>
+  <li>Load full history (scroll back to ~2019 or set a wide range) so the <b>EMA200</b> and the 20-bar volume SMA have room to seed &mdash; the first ~200 4h bars are a warm-up and do not trade.</li>
+  <li>Open <b>Pine Editor</b>, paste the <b>indicator</b> source (copy button below), <b>Save</b>, then <b>Add to chart</b>. It overlays the EMAs, marks entries/exits and shows the status panel.</li>
+  <li>For the Strategy Tester picture, add the <b>strategy</b> source as a second script &mdash; identical signals, plus the trade list and P&amp;L (mind the 1-bar Tester-lag caveat above).</li>
+  <li>To alert: right-click the chart &rarr; <b>Add alert</b> &rarr; Condition = this indicator &rarr; pick <b>&ldquo;LONG signal&rdquo;</b> or <b>&ldquo;exit&rdquo;</b> &rarr; <b>Once per bar close</b>. The entry alert fires on the spike bar; enter at the next 4h open.</li>
+  <li>Leave the signal knobs on their validated center defaults. They are exposed as inputs so you can inspect &mdash; not so you re-tune the edge.</li>
+</ol>
+
+<h2>5 &middot; Full Pine source &mdash; Indicator (<span class="mono">DT23_Volume_Spike_LIVE.pine</span>)</h2>
+<div class="copybar">
+  <span class="muted">Paste this whole block into the Pine Editor. This page is the copy of record.</span>
+  <button class="btn" id="copyBtnInd">Copy indicator source</button>
+</div>
+<pre class="src" id="pineInd">//@version=6
+// =============================================================================
+// DT23 "Volume-Spike Confirmation" — LIVE (indicator)  ·  research archetype v5F A3
+// -----------------------------------------------------------------------------
+// The VALIDATED DT23 Volume-Spike Confirmation, rebuilt as a causal Pine v6
+// indicator so the signal a live trader gets is the signal that was backtested.
+// It is a BTC 4h LONG-ONLY volume-confirmed trend-continuation: buy a strong-
+// closing green bar on a genuine volume spike while price sits above BOTH the fast
+// and slow trend EMAs; ride to a fixed 3R target, a fixed ATR stop, or an EMA20
+// close-exit — whichever comes first. Config of record = the report's CENTER cell
+// (the one that headlines the verdict): volume_mult 2.0 / atr_stop 1.5 / reward 3.0,
+// with vSMA(20), EMA(20)/EMA(200), ATR(14).
+//   In-sample 2019-09 -&gt; 2024-12 (2025-26 LOCKED OUT), our causal cost-honest
+//   engine: +0.335R/trade · PF 1.62 · Sharpe 1.09 · n=161 · WR 37.9% · t=2.497
+//   (center); best cell 2.0/1.5/2.0 t=2.933; ALL 27 grid cells expR&gt;0, 22/27
+//   t&gt;=2.0. The edge is NOT tail-driven: the single biggest winner is 5.5% of
+//   total R, drop the top 3 and it is still +0.285R / t=2.13. These are the
+//   NUMBERS OF RECORD from backtests/bt_dt23_volume_spike.py — NOT the chart's
+//   Strategy Tester (this file is an indicator; the strategy twin is separate).
+//
+// ⚠ VOLUME FEED — READ THIS: this strategy is VOLUME-GATED, and volume is
+// EXCHANGE-LOCAL. A borderline spike that clears volMult on one exchange's feed
+// does NOT clear it on another's, so the two feeds fire DIFFERENT trades from the
+// SAME code (proven live on the Annie fade 2026-07-20: a Bybit vector fired a
+// trade the Binance test feed rejected). The edge was measured on
+// BINANCE:BTCUSDT PERPETUAL, 4h — chart THAT EXACT feed, nothing else.
+//
+// HOW IT TRADES (per the frozen spec, replicated to the trade):
+//   · vsma   = ta.sma(volume, 20) ;  ema20 = ta.ema(close,20) ;  ema200 = ta.ema(close,200)
+//   · atr    = ta.atr(14) ;  upperHalf = close &gt;= low + 0.5*(high-low)
+//   · longCond (5 conjuncts, CLOSED 4h bar):  volume &gt; vsma*volMult  AND  close&gt;open
+//     AND upperHalf  AND  close&gt;ema20  AND  close&gt;ema200  — a volume spike, a green
+//     bar closing in the upper half, above BOTH trend EMAs. LONG-ONLY, flat-only.
+//   · FILL = the OPEN of the NEXT 4h bar after the confirmed signal (causal).
+//   · pendRisk = atr_stop*ATR(14), captured AT the signal bar and FROZEN at entry.
+//       stop   = entryRef - pendRisk           (FIXED from the fill, not trailing)
+//       target = entryRef + reward*pendRisk     (FIXED; center = entry + 4.5*ATR)
+//     Stop/target are tested intrabar on the chart 4h high/low. If one 4h bar's
+//     range covers BOTH, the STOP is booked (worst case — the engine's
+//     ambiguous=LOSS rule; a chart-TF script cannot see the 1m fill order).
+//   · EMA20 close-exit: on any closed 4h bar with close &lt; ema20, market-exit at the
+//     NEXT 4h open. The intrabar stop/target (mid-bar) takes precedence over the
+//     same bar's close-exit (at the close).
+//   · Sizing in the record is 1%-of-equity risk vs pendRisk (the author's 10%-equity
+//     compounding was stripped for the honest signal test).
+//
+// SIGNAL vs FILL (the 1-bar convention, so nothing looks late):
+//   The ENTRY ALERT + entry triangle fire AT THE SIGNAL BAR (the confirmed spike) —
+//   the actionable moment: a live trader places a market order on that close and
+//   fills at the NEXT 4h open (the record's entry_ref). The internal state machine
+//   records the fill on that next bar, where the stop/target lines begin. Exit
+//   ×-marks print at the bar the exit actually happens (stop/target = the touch bar;
+//   EMA-exit = the next-open fill bar).
+//
+// NO REPAINT (Igor's hard rules, audited):
+//   · EVERY decision, drawing and alert is gated by barstate.isconfirmed.
+//   · Chart timeframe ONLY — no request.security, no varip, no timenow, no
+//     barstate.isrealtime anywhere.
+//   · Drawings are APPEND-ONLY: label.new only; ZERO .set_*() and ZERO .delete().
+//     Nothing is ever positioned at a past bar — every mark prints at the confirmed
+//     bar the machine learned it; the stop/target lines and EMAs are causal plots.
+//     Printed marks never move or disappear.
+//   · The status panel is a read-out of the LAST-CONFIRMED state (barstate.islast),
+//     not a bar-anchored drawing — it cannot mutate history.
+//
+// FIDELITY: backtests/pine_mirror_dt23.py re-implements THIS file's exact forward
+// 4h state machine in Python and reproduces the frozen 161-trade center ledger
+// 161/161 = 100% (side + entry-time + exit-time + reason), max |dR| = 0.000000,
+// deterministic across double runs. The chart is for SEEING the trades; the
+// numbers of record are the backtest.
+// =============================================================================
+
+indicator("DT23 Volume-Spike — LIVE", overlay = true,
+     max_lines_count = 500, max_labels_count = 500, max_boxes_count = 500)
+
+// ----------------------------- Inputs ----------------------------------------
+gS = "Signal (validated CENTER defaults — do not change to trade the edge)"
+i_volMult = input.float(2.0, "Volume spike multiple (volume &gt; volMult x vSMA20)", minval = 0.1, step = 0.1, group = gS,
+     tooltip = "⚠ Volume is EXCHANGE-LOCAL. This gate fires when the bar's volume exceeds volMult x its 20-bar SMA. Because that test lives on the raw feed, a BORDERLINE spike clears it on one exchange and not another — the SAME code trades DIFFERENTLY across feeds (proven live on the Annie fade 2026-07-20: a Bybit vector fired a trade the Binance test feed rejected). The edge was measured on BINANCE:BTCUSDT PERPETUAL — chart THAT feed, nothing else.")
+i_atrStop = input.float(1.5, "ATR stop multiple (pendRisk = atrStop x ATR)", minval = 0.1, step = 0.1, group = gS)
+i_reward  = input.float(3.0, "Reward R (target = entry + reward x pendRisk)", minval = 0.1, step = 0.1, group = gS)
+i_vsmaLen = input.int(20,  "Volume-SMA length", minval = 2, group = gS)
+i_emaFast = input.int(20,  "Fast EMA length (trend gate + close-exit)", minval = 2, group = gS)
+i_emaSlow = input.int(200, "Slow EMA length (trend gate)", minval = 3, group = gS)
+i_atrLen  = input.int(14,  "ATR length", minval = 1, group = gS)
+i_warmup  = input.int(200, "Warm-up bars (skip until EMA200 is seeded)", minval = 0, group = gS,
+     tooltip = "The engine drops the first `emaSlow` (200) 4h bars while the long EMA settles. Keep &gt;= EMA200 length. Chart with full history from 2019-09 for an exact match to the record.")
+
+gV = "Visuals"
+i_showFast   = input.bool(true,  "Fast EMA(20)",  group = gV)
+i_showSlow   = input.bool(true,  "Slow EMA(200)", group = gV)
+i_showStop   = input.bool(true,  "Stop line while in a trade",   group = gV)
+i_showTgt    = input.bool(true,  "Target line while in a trade", group = gV)
+i_showEntries= input.bool(true,  "Entry triangles + labels", group = gV)
+i_showExits  = input.bool(true,  "Exit ×-marks", group = gV)
+i_showState  = input.bool(true,  "Status panel (top-right)", group = gV)
+
+// ----------------------------- Per-bar indicators ----------------------------
+// Computed EVERY bar in global scope so ta.* history stays intact; only READ
+// inside the confirmed block, so all DECISIONS use closed-bar values.
+vsmaV   = ta.sma(volume, i_vsmaLen)
+ema20v  = ta.ema(close, i_emaFast)
+ema200v = ta.ema(close, i_emaSlow)
+atrv    = ta.atr(i_atrLen)
+vratio  = not na(vsmaV) and vsmaV &gt; 0 ? volume / vsmaV : na
+upperHalf = close &gt;= low + 0.5 * (high - low)
+// 5-conjunct entry gate on the CLOSED bar
+longCond = not na(vratio) and vratio &gt; i_volMult and close &gt; open and upperHalf and close &gt; ema20v and close &gt; ema200v
+
+plot(i_showFast ? ema20v  : na, "Fast EMA(20)",  color = color.new(color.aqua, 0),   linewidth = 1)
+plot(i_showSlow ? ema200v : na, "Slow EMA(200)", color = color.new(color.orange, 0), linewidth = 2)
+
+// ----------------------------- Persistent state ------------------------------
+// Pure running state (no arrays, no look-back), exactly like the Python mirror
+// pine_mirror_dt23.run_state_machine — forward only.
+var int   state    = 0            // 0 flat / 1 long (LONG-ONLY)
+var float entryRef = na           // entry fill (== open of the fill bar)
+var float stopP    = na           // FIXED stop = entryRef - pendRisk
+var float tpP      = na           // FIXED target = entryRef + reward*pendRisk
+var float entryAtr = na           // ATR at the signal bar (frozen)
+var float pendRisk = na           // atrStop * entryAtr (frozen risk unit)
+var int   sigBI    = na
+var int   entryBI  = na
+var int   barsIn   = 0
+var bool  pendClose = false       // EMA20 close-exit armed at b-1 -&gt; fills at open[b]
+
+var bool  pendEntry = false       // longCond fired on the PREVIOUS confirmed bar
+var float pendAtr   = na
+var int   pendSig   = na
+
+// per-bar event flags (reset each bar; drive marks + alerts)
+signalLong    = false             // gated LONG spike, AT the signal bar (actionable)
+enterLongFill = false             // LONG fill recorded, AT the fill bar
+exitStopEv    = false             // fixed stop hit, AT the touch bar
+exitTgtEv     = false             // fixed target hit, AT the touch bar
+exitEmaEv     = false             // EMA20 close-exit, AT the next-open bar
+float exitPx  = na
+
+// process CONFIRMED bars only -&gt; no repaint, deterministic
+if barstate.isconfirmed
+    // (1) pending EMA20 close-exit armed at b-1 -&gt; market fill at THIS open ------
+    if state == 1 and pendClose
+        exitEmaEv := true
+        exitPx := open
+        state := 0
+        pendClose := false
+
+    // (2) resolve a pending ENTRY armed at b-1 -&gt; fill at THIS open (if flat) ----
+    if pendEntry and state == 0
+        entryRef := open
+        entryAtr := pendAtr
+        pendRisk := i_atrStop * entryAtr
+        stopP    := entryRef - pendRisk
+        tpP      := entryRef + i_reward * pendRisk
+        sigBI    := pendSig
+        entryBI  := bar_index
+        barsIn   := 0
+        state    := pendRisk &gt; 0 ? 1 : 0
+        if state == 1
+            enterLongFill := true
+    pendEntry := false
+
+    // (3) intrabar FIXED stop/target on THIS bar (incl. the fill bar) -----------
+    if state == 1
+        stopHit = low &lt;= stopP
+        tpHit   = high &gt;= tpP
+        if stopHit and tpHit
+            exitStopEv := true                   // both-in-range -&gt; worst case = STOP
+            exitPx := stopP
+            state := 0
+        else if stopHit
+            exitStopEv := true
+            exitPx := stopP
+            state := 0
+        else if tpHit
+            exitTgtEv := true
+            exitPx := tpP
+            state := 0
+
+    // (4) still open at the CLOSE &amp; close &lt; ema20 -&gt; arm EMA-exit for b+1 -------
+    if state == 1 and close &lt; ema20v
+        pendClose := true
+
+    if state != 0
+        barsIn := barsIn + 1
+
+    // (5) flat at the CLOSE -&gt; longCond arms the entry for b+1 ------------------
+    if state == 0 and longCond and bar_index &gt;= i_warmup and (not na(atrv)) and i_atrStop * atrv &gt; 0
+        signalLong := true
+        pendEntry  := true
+        pendAtr    := atrv
+        pendSig    := bar_index
+
+    // ---- causal, append-only drawings (nothing positioned at a past bar) ------
+    if i_showEntries and enterLongFill
+        label.new(bar_index, low, text = "LONG " + str.tostring(entryRef, format.mintick) + "  · stop " + str.tostring(stopP, format.mintick) + " · tgt " + str.tostring(tpP, format.mintick),
+             style = label.style_label_up, color = color.new(color.green, 0), textcolor = color.white, size = size.tiny)
+
+// ----------------------------- Marks (causal plots) --------------------------
+plotshape(i_showEntries and signalLong, title = "LONG signal (fill next open)", style = shape.triangleup, location = location.belowbar, color = color.new(color.green, 0), size = size.tiny)
+plotshape(i_showExits and exitStopEv ? exitPx : na, title = "Stop exit",   style = shape.xcross, location = location.absolute, color = color.new(color.red, 0),   size = size.tiny)
+plotshape(i_showExits and exitTgtEv  ? exitPx : na, title = "Target exit", style = shape.xcross, location = location.absolute, color = color.new(color.green, 0), size = size.tiny)
+plotshape(i_showExits and exitEmaEv  ? exitPx : na, title = "EMA20 close-exit", style = shape.xcross, location = location.absolute, color = color.new(color.blue, 0), size = size.tiny)
+
+// stop / target lines only while a position is open (causal step lines; end at exit)
+plot(i_showStop and state != 0 ? stopP : na, "Stop",   color = color.new(color.red, 0),   style = plot.style_linebr, linewidth = 1)
+plot(i_showTgt  and state != 0 ? tpP   : na, "Target", color = color.new(color.green, 0), style = plot.style_linebr, linewidth = 1)
+
+// ----------------------------- Alerts ----------------------------------------
+// Entry alert fires AT THE SIGNAL BAR (the confirmed spike) — the actionable
+// moment; the fill is the next 4h open. Exit alert fires when the machine flattens.
+anyExit = exitStopEv or exitTgtEv or exitEmaEv
+alertcondition(signalLong, title = "DT23 Volume-Spike — LONG signal",
+     message = "DT23 Volume-Spike: LONG volume-spike confirmed on {{ticker}} 4h at {{time}} — enter at the NEXT 4h open. Stop = fill - 1.5xATR(14); target = fill + 4.5xATR(14). ⚠ volume is exchange-local — chart BINANCE:BTCUSDT perp ONLY.")
+alertcondition(anyExit, title = "DT23 Volume-Spike — exit",
+     message = "DT23 Volume-Spike: position exit on {{ticker}} 4h at {{time}} (fixed ATR stop, 3R target, or EMA20 close-exit).")
+
+// ----------------------------- Status panel ----------------------------------
+// Read-out of the LAST-CONFIRMED machine state. State vars mutate only inside
+// barstate.isconfirmed, so intrabar ticks cannot change what this shows.
+var table st = table.new(position.top_right, 2, 7,
+     bgcolor = color.new(color.black, 15), border_width = 1,
+     border_color = color.new(color.gray, 60), frame_width = 1,
+     frame_color = color.new(color.gray, 40))
+
+if i_showState and barstate.islast
+    posTxt  = state == 1 ? "LONG open" : "flat"
+    entTxt  = state != 0 and not na(entryRef) ? str.tostring(entryRef, format.mintick) : "—"
+    stopTxt = state != 0 and not na(stopP) ? str.tostring(stopP, format.mintick) : "—"
+    tgtTxt  = state != 0 and not na(tpP) ? str.tostring(tpP, format.mintick) : "—"
+    vrTxt   = na(vratio) ? "—" : str.tostring(vratio, "#.00") + "x" +
+         (vratio &gt; i_volMult ? " · SPIKE" : " · normal")
+    gateTxt = close &gt; ema20v and close &gt; ema200v ? "above both EMAs (eligible)" :
+         close &gt; ema200v ? "above EMA200 only" : "below EMA200 (blocked)"
+    barsTxt = state != 0 ? str.tostring(barsIn) : "—"
+    _hd = color.new(color.silver, 20)
+    _tx = color.white
+    table.cell(st, 0, 0, "DT23 position", text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 0, posTxt,          text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 1, "entry (fill)",  text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 1, entTxt,          text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 2, "stop",          text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 2, stopTxt,         text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 3, "target (3R)",   text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 3, tgtTxt,          text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 4, "vol ratio",     text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 4, vrTxt,           text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 5, "EMA gate",      text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 5, gateTxt,         text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 6, "bars in trade", text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 6, barsTxt,         text_color = _tx, text_size = size.small, text_halign = text.align_left)
+</pre>
+
+<h2>6 &middot; Full Pine source &mdash; Strategy twin (<span class="mono">DT23_Volume_Spike_Strategy.pine</span>)</h2>
+<div class="copybar">
+  <span class="muted">Identical signal core; adds strategy.* orders for the Tester. Paste as a separate script.</span>
+  <button class="btn" id="copyBtnStrat">Copy strategy source</button>
+</div>
+<pre class="src" id="pineStrat">//@version=6
+// =============================================================================
+// DT23 "Volume-Spike Confirmation" — Strategy (Tester twin)  ·  research v5F A3
+// -----------------------------------------------------------------------------
+// strategy() twin of "DT23 Volume-Spike — LIVE" so TradingView's Strategy Tester
+// shows every trade: entry/exit arrows, trade list, P&amp;L. The SIGNAL CORE is
+// IDENTICAL to the indicator (and to backtests/pine_mirror_dt23.py, which
+// reproduces the frozen 161-trade center ledger 161/161 = 100%).
+//
+// Config of record = the report's CENTER cell: volume_mult 2.0 / atr_stop 1.5 /
+// reward 3.0, with vSMA(20), EMA(20)/EMA(200), ATR(14). LONG-ONLY, flat-only.
+// In-sample 2019-09 -&gt; 2024-12 (2025-26 LOCKED OUT), our causal cost-honest engine:
+// +0.335R/trade · PF 1.62 · Sharpe 1.09 · n=161 · WR 37.9% · t=2.497. Those are the
+// NUMBERS OF RECORD (backtests/bt_dt23_volume_spike.py).
+//
+// ⚠ VOLUME FEED — READ THIS: this strategy is VOLUME-GATED, and volume is
+// EXCHANGE-LOCAL. A borderline spike that clears volMult on one exchange's feed
+// does NOT clear it on another's — the SAME code trades DIFFERENTLY across feeds
+// (proven live on the Annie fade 2026-07-20: a Bybit vector fired a trade the
+// Binance test feed rejected). Chart BINANCE:BTCUSDT PERPETUAL, 4h — nothing else.
+//
+// HOW FILLS WORK IN THE TESTER — the 1-bar Strategy-Tester lag caveat (read before
+// judging its P&amp;L): the record's fill is the OPEN of the bar AFTER the confirmed
+// spike. This strategy submits its market order the moment that entry (fill) bar
+// confirms, so the Tester fills on the FOLLOWING open — about one 4h bar later than
+// the engine's fill. The FIXED stop/target bracket (strategy.exit stop=/limit=)
+// hangs off the engine geometry (fill -/+ pendRisk, pendRisk = 1.5xATR(14) frozen
+// at the signal bar); the EMA20 close-exit is a strategy.close at the next open.
+// Sizing is 1%-of-equity risk vs pendRisk. TradingView also caps 4h history, so you
+// see recent years, not the full 2019-2024 record. The Tester is for SEEING the
+// trades; the numbers of record are the backtest reports on the site (+0.335R
+// center), NOT this chart's delayed-fill P&amp;L.
+//
+// NO REPAINT (Igor's hard rules, audited): every decision, drawing, order and alert
+// is gated by barstate.isconfirmed; chart timeframe ONLY (no request.security, varip,
+// timenow, barstate.isrealtime); drawings APPEND-ONLY (label.new only; ZERO
+// .set_*()/.delete()); nothing positioned at a past bar; the status panel is a
+// last-confirmed read-out. Identical signal core to the indicator.
+// =============================================================================
+
+strategy("DT23 Volume-Spike — Strategy", overlay = true,
+     initial_capital = 10000, currency = currency.USD,
+     commission_type = strategy.commission.percent, commission_value = 0.05,
+     slippage = 2, pyramiding = 0,
+     max_lines_count = 500, max_labels_count = 500, max_boxes_count = 500)
+
+// ----------------------------- Inputs ----------------------------------------
+gS = "Signal (validated CENTER defaults — do not change to trade the edge)"
+i_volMult = input.float(2.0, "Volume spike multiple (volume &gt; volMult x vSMA20)", minval = 0.1, step = 0.1, group = gS,
+     tooltip = "⚠ Volume is EXCHANGE-LOCAL. This gate fires when the bar's volume exceeds volMult x its 20-bar SMA. Because that test lives on the raw feed, a BORDERLINE spike clears it on one exchange and not another — the SAME code trades DIFFERENTLY across feeds (proven live on the Annie fade 2026-07-20: a Bybit vector fired a trade the Binance test feed rejected). The edge was measured on BINANCE:BTCUSDT PERPETUAL — chart THAT feed, nothing else.")
+i_atrStop = input.float(1.5, "ATR stop multiple (pendRisk = atrStop x ATR)", minval = 0.1, step = 0.1, group = gS)
+i_reward  = input.float(3.0, "Reward R (target = entry + reward x pendRisk)", minval = 0.1, step = 0.1, group = gS)
+i_vsmaLen = input.int(20,  "Volume-SMA length", minval = 2, group = gS)
+i_emaFast = input.int(20,  "Fast EMA length (trend gate + close-exit)", minval = 2, group = gS)
+i_emaSlow = input.int(200, "Slow EMA length (trend gate)", minval = 3, group = gS)
+i_atrLen  = input.int(14,  "ATR length", minval = 1, group = gS)
+i_warmup  = input.int(200, "Warm-up bars (skip until EMA200 is seeded)", minval = 0, group = gS,
+     tooltip = "The engine drops the first `emaSlow` (200) 4h bars while the long EMA settles. Keep &gt;= EMA200 length. Chart with full history from 2019-09 for an exact match to the record.")
+
+gR = "Strategy sizing"
+i_riskPct = input.float(1.0, "Risk per trade (% of equity)", minval = 0.01, maxval = 10.0, step = 0.1, group = gR)
+
+gV = "Visuals"
+i_showFast   = input.bool(true,  "Fast EMA(20)",  group = gV)
+i_showSlow   = input.bool(true,  "Slow EMA(200)", group = gV)
+i_showStop   = input.bool(true,  "Stop line while in a trade",   group = gV)
+i_showTgt    = input.bool(true,  "Target line while in a trade", group = gV)
+i_showEntries= input.bool(true,  "Entry triangles + labels", group = gV)
+i_showExits  = input.bool(true,  "Exit ×-marks", group = gV)
+i_showState  = input.bool(true,  "Status panel (top-right)", group = gV)
+
+// ----------------------------- Per-bar indicators ----------------------------
+// Computed EVERY bar in global scope so ta.* history stays intact; only READ
+// inside the confirmed block, so all DECISIONS use closed-bar values.
+vsmaV   = ta.sma(volume, i_vsmaLen)
+ema20v  = ta.ema(close, i_emaFast)
+ema200v = ta.ema(close, i_emaSlow)
+atrv    = ta.atr(i_atrLen)
+vratio  = not na(vsmaV) and vsmaV &gt; 0 ? volume / vsmaV : na
+upperHalf = close &gt;= low + 0.5 * (high - low)
+// 5-conjunct entry gate on the CLOSED bar
+longCond = not na(vratio) and vratio &gt; i_volMult and close &gt; open and upperHalf and close &gt; ema20v and close &gt; ema200v
+
+plot(i_showFast ? ema20v  : na, "Fast EMA(20)",  color = color.new(color.aqua, 0),   linewidth = 1)
+plot(i_showSlow ? ema200v : na, "Slow EMA(200)", color = color.new(color.orange, 0), linewidth = 2)
+
+// ----------------------------- Persistent state ------------------------------
+// Pure running state (no arrays, no look-back), exactly like the Python mirror
+// pine_mirror_dt23.run_state_machine — forward only. IDENTICAL to the indicator.
+var int   state    = 0            // 0 flat / 1 long (LONG-ONLY)
+var float entryRef = na           // entry fill (== open of the fill bar)
+var float stopP    = na           // FIXED stop = entryRef - pendRisk
+var float tpP      = na           // FIXED target = entryRef + reward*pendRisk
+var float entryAtr = na
+var float pendRisk = na
+var int   sigBI    = na
+var int   entryBI  = na
+var int   barsIn   = 0
+var bool  pendClose = false
+
+var bool  pendEntry = false
+var float pendAtr   = na
+var int   pendSig   = na
+
+// per-bar event flags (reset each bar; drive marks + alerts + orders)
+signalLong    = false
+enterLongFill = false
+exitStopEv    = false
+exitTgtEv     = false
+exitEmaEv     = false
+float exitPx  = na
+
+// process CONFIRMED bars only -&gt; no repaint, deterministic
+if barstate.isconfirmed
+    // (1) pending EMA20 close-exit armed at b-1 -&gt; market fill at THIS open ------
+    if state == 1 and pendClose
+        exitEmaEv := true
+        exitPx := open
+        state := 0
+        pendClose := false
+
+    // (2) resolve a pending ENTRY armed at b-1 -&gt; fill at THIS open (if flat) ----
+    if pendEntry and state == 0
+        entryRef := open
+        entryAtr := pendAtr
+        pendRisk := i_atrStop * entryAtr
+        stopP    := entryRef - pendRisk
+        tpP      := entryRef + i_reward * pendRisk
+        sigBI    := pendSig
+        entryBI  := bar_index
+        barsIn   := 0
+        state    := pendRisk &gt; 0 ? 1 : 0
+        if state == 1
+            enterLongFill := true
+    pendEntry := false
+
+    // (3) intrabar FIXED stop/target on THIS bar (incl. the fill bar) -----------
+    if state == 1
+        stopHit = low &lt;= stopP
+        tpHit   = high &gt;= tpP
+        if stopHit and tpHit
+            exitStopEv := true                   // both-in-range -&gt; worst case = STOP
+            exitPx := stopP
+            state := 0
+        else if stopHit
+            exitStopEv := true
+            exitPx := stopP
+            state := 0
+        else if tpHit
+            exitTgtEv := true
+            exitPx := tpP
+            state := 0
+
+    // (4) still open at the CLOSE &amp; close &lt; ema20 -&gt; arm EMA-exit for b+1 -------
+    if state == 1 and close &lt; ema20v
+        pendClose := true
+
+    if state != 0
+        barsIn := barsIn + 1
+
+    // (5) flat at the CLOSE -&gt; longCond arms the entry for b+1 ------------------
+    if state == 0 and longCond and bar_index &gt;= i_warmup and (not na(atrv)) and i_atrStop * atrv &gt; 0
+        signalLong := true
+        pendEntry  := true
+        pendAtr    := atrv
+        pendSig    := bar_index
+
+    // ---- causal, append-only drawings (nothing positioned at a past bar) ------
+    if i_showEntries and enterLongFill
+        label.new(bar_index, low, text = "LONG " + str.tostring(entryRef, format.mintick) + "  · stop " + str.tostring(stopP, format.mintick) + " · tgt " + str.tostring(tpP, format.mintick),
+             style = label.style_label_up, color = color.new(color.green, 0), textcolor = color.white, size = size.tiny)
+
+    // ---- STRATEGY ORDERS (submitted at the fill bar -&gt; Tester fills next open;
+    //      the documented 1-bar Tester lag). FIXED stop/target bracket refreshed
+    //      each held bar; the EMA20 close-exit flattens at the next open. --------
+    if enterLongFill and not na(pendRisk)
+        q = pendRisk &gt; 0 ? strategy.equity * i_riskPct / 100.0 / pendRisk : 0.0
+        if q &gt; 0
+            strategy.entry("DT23", strategy.long, qty = q, comment = "vol-spike long")
+    // FIXED stop + 3R target bracket while a position is open
+    if state == 1 and not na(stopP) and not na(tpP)
+        strategy.exit("bracket", "DT23", stop = stopP, limit = tpP, comment = "ATR stop / 3R target")
+    // EMA20 close-exit -&gt; flatten at the next open
+    if exitEmaEv
+        strategy.close("DT23", comment = "EMA20 close-exit")
+
+// ----------------------------- Marks (causal plots) --------------------------
+plotshape(i_showEntries and signalLong, title = "LONG signal (fill next open)", style = shape.triangleup, location = location.belowbar, color = color.new(color.green, 0), size = size.tiny)
+plotshape(i_showExits and exitStopEv ? exitPx : na, title = "Stop exit",   style = shape.xcross, location = location.absolute, color = color.new(color.red, 0),   size = size.tiny)
+plotshape(i_showExits and exitTgtEv  ? exitPx : na, title = "Target exit", style = shape.xcross, location = location.absolute, color = color.new(color.green, 0), size = size.tiny)
+plotshape(i_showExits and exitEmaEv  ? exitPx : na, title = "EMA20 close-exit", style = shape.xcross, location = location.absolute, color = color.new(color.blue, 0), size = size.tiny)
+
+// stop / target lines only while a position is open (causal step lines; end at exit)
+plot(i_showStop and state != 0 ? stopP : na, "Stop",   color = color.new(color.red, 0),   style = plot.style_linebr, linewidth = 1)
+plot(i_showTgt  and state != 0 ? tpP   : na, "Target", color = color.new(color.green, 0), style = plot.style_linebr, linewidth = 1)
+
+// ----------------------------- Alerts ----------------------------------------
+anyExit = exitStopEv or exitTgtEv or exitEmaEv
+alertcondition(signalLong, title = "DT23 Volume-Spike — LONG signal",
+     message = "DT23 Volume-Spike: LONG volume-spike confirmed on {{ticker}} 4h at {{time}} — enter at the NEXT 4h open. Stop = fill - 1.5xATR(14); target = fill + 4.5xATR(14). ⚠ volume is exchange-local — chart BINANCE:BTCUSDT perp ONLY.")
+alertcondition(anyExit, title = "DT23 Volume-Spike — exit",
+     message = "DT23 Volume-Spike: position exit on {{ticker}} 4h at {{time}} (fixed ATR stop, 3R target, or EMA20 close-exit).")
+
+// ----------------------------- Status panel ----------------------------------
+var table st = table.new(position.top_right, 2, 7,
+     bgcolor = color.new(color.black, 15), border_width = 1,
+     border_color = color.new(color.gray, 60), frame_width = 1,
+     frame_color = color.new(color.gray, 40))
+
+if i_showState and barstate.islast
+    posTxt  = state == 1 ? "LONG open" : "flat"
+    entTxt  = state != 0 and not na(entryRef) ? str.tostring(entryRef, format.mintick) : "—"
+    stopTxt = state != 0 and not na(stopP) ? str.tostring(stopP, format.mintick) : "—"
+    tgtTxt  = state != 0 and not na(tpP) ? str.tostring(tpP, format.mintick) : "—"
+    vrTxt   = na(vratio) ? "—" : str.tostring(vratio, "#.00") + "x" +
+         (vratio &gt; i_volMult ? " · SPIKE" : " · normal")
+    gateTxt = close &gt; ema20v and close &gt; ema200v ? "above both EMAs (eligible)" :
+         close &gt; ema200v ? "above EMA200 only" : "below EMA200 (blocked)"
+    barsTxt = state != 0 ? str.tostring(barsIn) : "—"
+    _hd = color.new(color.silver, 20)
+    _tx = color.white
+    table.cell(st, 0, 0, "DT23 position", text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 0, posTxt,          text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 1, "entry (fill)",  text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 1, entTxt,          text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 2, "stop",          text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 2, stopTxt,         text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 3, "target (3R)",   text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 3, tgtTxt,          text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 4, "vol ratio",     text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 4, vrTxt,           text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 5, "EMA gate",      text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 5, gateTxt,         text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 6, "bars in trade", text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 6, barsTxt,         text_color = _tx, text_size = size.small, text_halign = text.align_left)
+</pre>
+
+<div class="foot">
+  DaviddTech &middot; <span class="mono">DT23_Volume_Spike_LIVE.pine</span> + <span class="mono">DT23_Volume_Spike_Strategy.pine</span> &middot; causal Pine&nbsp;v6 port of the validated
+  &ldquo;v5F A3&rdquo; Volume-Spike Confirmation. Config of record: center cell 2.0/1.5/3.0, vSMA20 / EMA20 / EMA200 / ATR14, +0.335R / PF 1.62 / t 2.497, IS 2019-09&rarr;2024-12 (2025&ndash;26 locked out).
+  Fidelity 161/161 = 100% vs the frozen center ledger (<span class="mono">backtests/pine_mirror_dt23.py</span>); no-repaint audited; deterministic. Tested feed BINANCE:BTCUSDT perp, 4h. Self-contained.
+</div>
+</div>
+
+
+<script>
+  function wireCopy(btnId, preId){
+    var btn=document.getElementById(btnId);
+    var pre=document.getElementById(preId);
+    if(!btn||!pre)return;
+    btn.addEventListener('click',function(){
+      var txt=pre.innerText;
+      function done(){var o=btn.textContent;btn.textContent='Copied!';setTimeout(function(){btn.textContent=o;},1400);}
+      if(navigator.clipboard&&navigator.clipboard.writeText){
+        navigator.clipboard.writeText(txt).then(done,function(){fallback();});
+      }else{fallback();}
+      function fallback(){
+        var r=document.createRange();r.selectNodeContents(pre);
+        var s=window.getSelection();s.removeAllRanges();s.addRange(r);
+        try{document.execCommand('copy');done();}catch(e){}
+      }
+    });
+  }
+  wireCopy('copyBtnInd','pineInd');
+  wireCopy('copyBtnStrat','pineStrat');
+</script>
+<script>
+(function(){
+  var btn=document.getElementById('themeToggle');
+  if(!btn)return;
+  var mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;
+  function stored(){try{var t=localStorage.getItem('codexTheme');return (t==='light'||t==='dark'||t==='system')?t:'system';}catch(e){return 'system';}}
+  function eff(m){return (m==='light'||m==='dark')?m:((mq&&mq.matches)?'dark':'light');}
+  function apply(){var m=stored();document.documentElement.setAttribute('data-theme',eff(m));btn.textContent=(m==='light')?'◐ Light':(m==='dark')?'◑ Dark':'◓ Auto';}
+  apply();
+  btn.addEventListener('click',function(){var order={light:'dark',dark:'system',system:'light'};var n=order[stored()];try{localStorage.setItem('codexTheme',n);}catch(e){}apply();});
+  if(mq){var h=function(){if(stored()==='system')apply();};if(mq.addEventListener)mq.addEventListener('change',h);else if(mq.addListener)mq.addListener(h);}
+})();
+</script>
+
+</body>
+</html>
