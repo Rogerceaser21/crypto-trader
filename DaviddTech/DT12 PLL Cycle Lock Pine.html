@@ -1,0 +1,860 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DT12 ETH PLL Cycle-Lock &mdash; Pine v6 (indicator + strategy)</title>
+<style>
+  :root{
+    --bg:#0e1117; --panel:#161b22; --panel2:#1c2230; --ink:#e6edf3; --muted:#9aa4b2;
+    --line:#2a3140; --accent:#6aa9ff; --up:#3fb950; --dn:#f85149; --warn:#e3b341; --m3:#26a69a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  .wrap{max-width:940px;margin:0 auto;padding:34px 22px 90px;}
+  header{border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:8px}
+  .eyebrow{letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:var(--accent);font-weight:700}
+  h1{font-size:30px;margin:8px 0 6px;line-height:1.2}
+  h2{font-size:21px;margin:38px 0 12px;padding-top:8px;border-top:1px solid var(--line)}
+  h3{font-size:16px;margin:22px 0 8px;color:var(--ink)}
+  p{color:var(--ink)}
+  .sub{color:var(--muted);font-size:15px;max-width:74ch}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:14px 0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:720px){.grid2{grid-template-columns:1fr}}
+  code,kbd{background:#0b0f16;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px}
+  kbd{color:var(--accent)}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:14px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--panel2);color:var(--muted);font-weight:600;font-size:12.5px;text-transform:uppercase;letter-spacing:.04em}
+  td.n{font-family:ui-monospace,Menlo,monospace;white-space:nowrap}
+  .statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:10px 0}
+  .stat{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .stat .v{font-size:23px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--ink)}
+  .stat .k{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+  .stat .v.good{color:var(--up)}
+  .stat .v.bad{color:var(--dn)}
+  ol.steps{counter-reset:s;list-style:none;padding-left:0;margin:0}
+  ol.steps li{position:relative;padding:10px 0 10px 46px;border-bottom:1px solid var(--line)}
+  ol.steps li:last-child{border-bottom:0}
+  ol.steps li::before{counter-increment:s;content:counter(s);position:absolute;left:0;top:10px;
+    width:30px;height:30px;border-radius:50%;background:var(--accent);color:#0b0f16;font-weight:800;
+    display:flex;align-items:center;justify-content:center;font-size:14px}
+  .callout{border-left:4px solid var(--warn);background:rgba(227,179,65,.08);padding:12px 16px;border-radius:8px;margin:12px 0}
+  .callout.good{border-left-color:var(--m3);background:rgba(38,166,154,.08)}
+  .callout.bad{border-left-color:var(--dn);background:rgba(248,81,73,.09)}
+  .callout.feed{border-left-color:var(--accent);background:rgba(106,169,255,.10)}
+  .callout b{color:var(--ink)}
+  pre.src{background:#0b0f16;border:1px solid var(--line);border-radius:10px;padding:16px;overflow:auto;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.5;color:#c9d3e0;max-height:560px;white-space:pre}
+  .copybar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:14px 0 6px}
+  .btn{background:var(--accent);color:#0b0f16;border:0;border-radius:8px;padding:9px 16px;font-weight:700;cursor:pointer;font-size:14px}
+  .btn:active{transform:translateY(1px)}
+  .foot{color:var(--muted);font-size:12.5px;margin-top:50px;border-top:1px solid var(--line);padding-top:16px}
+  .muted{color:var(--muted)}
+  ul.tight{margin:6px 0 6px 0;padding-left:20px} ul.tight li{margin:4px 0}
+  .pill{display:inline-block;font-size:11px;font-weight:700;border-radius:20px;padding:2px 10px;color:#0b0f16;background:var(--up)}
+  .pill.no{background:var(--dn);color:#fff}
+  .mono{font-family:ui-monospace,Menlo,monospace}
+  /* ---- Theme toggle ---- */
+  html[data-theme="light"]{
+    --bg:#f7f9fc; --panel:#ffffff; --panel2:#eef1f6; --ink:#1a2230; --muted:#5b6472;
+    --line:#d7dde6; --accent:#2f6fe0; --up:#1e7d34; --dn:#c92c22; --warn:#a6740b; --m3:#178f83;
+  }
+  html[data-theme="light"] code, html[data-theme="light"] kbd{background:#eef1f5;color:var(--ink)}
+  html[data-theme="light"] pre.src{background:#eef1f5;color:#1a2230}
+  html[data-theme="light"] .callout{background:rgba(166,116,11,.10)}
+  html[data-theme="light"] .callout.good{background:rgba(23,143,131,.10)}
+  html[data-theme="light"] .callout.bad{background:rgba(201,44,34,.09)}
+  html[data-theme="light"] .callout.feed{background:rgba(47,111,224,.10)}
+  html[data-theme="light"] .btn,
+  html[data-theme="light"] ol.steps li::before,
+  html[data-theme="light"] .pill{color:#fff}
+  .theme-toggle{position:fixed;top:16px;right:20px;z-index:100;background:var(--panel);
+    border:1px solid var(--line);color:var(--ink);border-radius:20px;padding:6px 14px;
+    font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.35);
+    font-family:inherit;letter-spacing:.02em}
+  html[data-theme="light"] .theme-toggle{box-shadow:0 2px 10px rgba(0,0,0,.10)}
+  .theme-toggle:active{transform:translateY(1px)}
+@media(max-width:560px){.theme-toggle{top:10px;right:12px;padding:6px 10px;font-size:12px}body{padding-top:44px}}
+</style>
+
+<script>
+(function(){try{var t=localStorage.getItem('codexTheme');var e=(t==='light'||t==='dark')?t:((window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light');document.documentElement.setAttribute('data-theme',e);}catch(e){}})();
+</script>
+
+</head>
+<body>
+
+<button type="button" id="themeToggle" class="theme-toggle" aria-label="Cycle theme: light, dark, or system">&#9683; Auto</button>
+<div class="wrap">
+<header>
+  <div class="eyebrow">DaviddTech &middot; DT12 ETH PLL Cycle-Lock &middot; Pine v6 port</div>
+  <h1>DT12 &ldquo;ETH PLL Cycle-Lock&rdquo; &mdash; Pine v6 (indicator + strategy)</h1>
+  <p class="sub">The validated DT12 ETH PLL Cycle-Lock &mdash; DaviddTech&rsquo;s library strategy <span class="mono">PLL inv p96 lock1.2</span> &mdash; rebuilt as a
+  causal Pine&nbsp;v6 <b>indicator</b> plus a Strategy&nbsp;Tester <b>twin</b> with an identical signal core. A <b>phase-locked loop</b> (from signal-processing) locks onto the dominant
+  ~128-bar price cycle on <b>ETH&nbsp;1h</b> and trades the sine zero-crossings, gated by lock quality, with a hard <b>&plusmn;4% stop / +12% target</b> bracket. Every decision, drawing and
+  alert fires on <b>confirmed, closed bars only</b> &mdash; no repaint. This page is the <b>copy of record</b> and the paste source for both files.</p>
+</header>
+
+<div class="callout bad" style="margin-top:16px">
+  <b>cp&nbsp;=&nbsp;128 is the ONLY validated setting; 96 fails Monte&nbsp;Carlo.</b> The author ships <span class="mono">centerPeriod&nbsp;=&nbsp;96</span>. At 96 the system is
+  only marginal (t&nbsp;0.98, DD&nbsp;18.5%) and <b>fails Monte&nbsp;Carlo outright &mdash; 16.2% risk-of-ruin</b>, tail-fragile and <b>not deployable</b>. The edge is real only at the longer
+  <b>128-bar (~5.3-day) cycle</b> (MC ruin&nbsp;0.97%). The <span class="mono">centerPeriod</span> input defaults to <b>128</b> and its tooltip carries this same warning. <b>Do not change it to trade the edge.</b>
+</div>
+
+<div class="callout feed">
+  <b>Tested feed &mdash; chart this exact one: <span class="mono">BINANCE:ETHUSDT</span> perpetual, 1h.</b> Not BTC, not Bybit, not spot. The PLL is a from-bar-0
+  recursion locked to a <i>price-local</i> cycle: a different exchange&rsquo;s or instrument&rsquo;s prices phase differently and will <b>not</b> reproduce the record. Chart the same feed the
+  backtest used, on the <b>1-hour</b> timeframe, with <b>full history from 2019-11</b> so the recursion lines up. (Same lesson as the Annie&nbsp;V3 Bybit-vs-Binance divergence.)
+</div>
+
+<h2>1 &middot; Honest, in-sample stats (validated cp=128 config)</h2>
+<p>Config of record = the report&rsquo;s <b>validated cp=128 cell</b> &mdash; the best-t cell that headlines the DT12 verdict: <span class="mono">centerPeriod&nbsp;128 / lockThresh&nbsp;1.4 / stop&nbsp;4% / target&nbsp;12%</span>.
+In-sample <b>2019-11&nbsp;&rarr;&nbsp;2024-12</b> (2025&ndash;26 locked out), our causal cost-honest engine, flat 1% risk, 0.05% fee + 0.02% slip per fill:</p>
+<div class="statgrid">
+  <div class="stat"><div class="v good">+0.281R</div><div class="k">per trade (cp=128)</div></div>
+  <div class="stat"><div class="v">1.57</div><div class="k">profit factor</div></div>
+  <div class="stat"><div class="v">1.16</div><div class="k">Sharpe</div></div>
+  <div class="stat"><div class="v">151</div><div class="k">IS trades</div></div>
+  <div class="stat"><div class="v">43.7%</div><div class="k">win rate</div></div>
+  <div class="stat"><div class="v">2.23</div><div class="k">t-stat</div></div>
+  <div class="stat"><div class="v good">6.6%</div><div class="k">max drawdown</div></div>
+  <div class="stat"><div class="v good">0.97%</div><div class="k">Monte-Carlo ruin</div></div>
+</div>
+<p class="muted" style="margin:8px 0 0">A <b>contiguous plateau, not a lucky spike</b>: the edge grows monotonically with cycle length &mdash; every cp=64 cell is negative, every cp=96 cell only marginal, and
+<b>all nine cp=128 cells positive</b> (5 of 9 clear t&nbsp;&ge;&nbsp;2.0). At 128 <b>both legs turn positive</b> (long +0.282R / short +0.279R). Independent <b>Jesse replay matched all 151/151</b> trades within +0.010R.
+These are the <b>numbers of record</b> from <span class="mono">backtests/bt_dt12_eth_pll.py</span> &mdash; NOT the chart&rsquo;s Strategy Tester.</p>
+<div class="callout"><b>Read the asterisk with the headline.</b> DT12 is &ldquo;validated with an asterisk&rdquo;: it survives only in its 128-bar region (the shipped 96-bar default fails Monte&nbsp;Carlo),
+and the 128-region&rsquo;s own best cell sits <i>at</i>, not comfortably above, the significance bar (t&nbsp;2.23). A locked 2025&ndash;26 out-of-sample confirmation on the 128 region is the decisive next gate before any capital.</div>
+
+<h2>2 &middot; What it does &amp; how it trades</h2>
+<div class="card">
+  <ul class="tight">
+    <li><b>Detrended oscillator</b> &mdash; <span class="mono">osc = nz(close &minus; SMA200)</span>, RMS-normalised: <span class="mono">norm = osc / oscRms</span>. This strips the trend and leaves the cycle.</li>
+    <li><b>Phase-locked loop</b> &mdash; a recursive PLL locks its <span class="mono">phase</span> and <span class="mono">frequency</span> onto the ~128-bar cycle; <span class="mono">sinP = sin(phase)</span> is the reconstructed cycle wave, and <span class="mono">lockQ</span> measures how cleanly it is locked.</li>
+    <li><b>Entry signal</b> &mdash; <span class="mono">ta.crossover(sinP, 0)</span> for longs, <span class="mono">ta.crossunder(sinP, 0)</span> for shorts, on a <b>closed</b> 1h bar.</li>
+    <li><b>Lock gate</b> &mdash; an entry opens <b>only when <span class="mono">lockQ &gt; 1.4</span></b> and the PLL is warmed up (bar&nbsp;&gt;&nbsp;300). Weak-lock crosses are ignored for entries.</li>
+    <li><b>Opposite zero-cross always closes</b> the open position at the next open &mdash; <b>even when unlocked</b>. A close + open on the same bar is a reversal.</li>
+    <li><b>Fill</b> &mdash; the <b>open of the next 1h bar</b> after the confirmed signal (causal, no look-ahead).</li>
+    <li><b>Hard bracket</b> &mdash; long: stop = fill&nbsp;&times;&nbsp;(1&minus;4%), target = fill&nbsp;&times;&nbsp;(1+12%); short mirrored. Fires on <b>any</b> bar from entry onward, detected on the chart 1h high/low. The hard stop is what caps the ETH short tail that destroyed the stop-less DT10/DT11.</li>
+    <li><b>Ambiguous bar = STOP</b> &mdash; if one 1h bar spans <b>both</b> the stop and the target, this chart-TF script books the <b>stop</b> (worst case) &mdash; TradingView&rsquo;s OCO default and the engine&rsquo;s &ldquo;ambiguous = loss&rdquo; rule. On the cp=128 ledger <b>no exit bar spanned both</b>, so the mirror still reproduces it 151/151.</li>
+    <li><b>Sizing of record</b> &mdash; flat 1%-of-equity risk against the 4% stop distance (the strategy twin sizes the same way).</li>
+  </ul>
+</div>
+<div class="card" style="margin-top:0">
+  <h3 style="margin-top:2px">On-chart marks &amp; the status panel</h3>
+  <ul class="tight">
+    <li><b>Entry triangle</b> (green up / red down) prints <b>at the signal bar</b> &mdash; the actionable ready&amp;locked zero-cross; the fill is the next 1h open. A small label at the fill bar quotes entry, stop and target.</li>
+    <li><b>Stop line</b> (red) and <b>target line</b> (lime) run for the life of each trade at the fixed &plusmn;% bracket.</li>
+    <li><b>Exit &times;</b> &mdash; red at a stop hit, lime at a target hit, blue at the next-open fill of an opposite zero-cross exit.</li>
+    <li><b>Optional pane</b> &mdash; <span class="mono">sinP</span> (the cycle wave) and <span class="mono">lockQ</span> in the data window, purely informational (never a decision input).</li>
+    <li><b>Status panel</b> (top-right) &mdash; last-confirmed machine state: position, side, entry, stop, target, <span class="mono">lockQ</span> (locked/unlocked), and the cycle <span class="mono">sinP</span> (up-half / down-half). A read-out, not a bar-anchored drawing.</li>
+  </ul>
+</div>
+
+<h2>3 &middot; Fidelity &amp; no-repaint audit</h2>
+<div class="grid2">
+  <div class="card"><h3 style="margin-top:2px">Fidelity &mdash; the Python twin</h3>
+    <p style="margin:6px 0 0">A bar-by-bar Python mirror of <b>this Pine&rsquo;s</b> PLL recursion <i>and</i> forward 1h state machine (<span class="mono">backtests/pine_mirror_dt12.py</span>, not a copy of the engine)
+    (1) reproduces the engine&rsquo;s PLL internals <b>bar-exact</b> (max abs diff <b>1.1e-14</b> on norm/phase/sinP/lockQ) and (2) reproduces the frozen 151-trade cp=128 ledger
+    <b>151 / 151 = 100%</b> exact &mdash; side, entry-time, exit-time and exit-reason all identical &mdash; with <b>max&nbsp;|&Delta;R|&nbsp;=&nbsp;0.000000</b> and total R 42.3679 to the reference.
+    Deterministic across double runs (md5 <span class="mono">855f5323&hellip;</span>). <span class="pill">100% match</span></p></div>
+  <div class="card"><h3 style="margin-top:2px">No-repaint &mdash; both files</h3>
+    <p style="margin:6px 0 0">Grep-verified on both <span class="mono">.pine</span> files: <b>zero</b> <span class="mono">request.security</span>, <span class="mono">varip</span>, <span class="mono">timenow</span>,
+    <span class="mono">barstate.isrealtime</span> in executable code; the PLL <span class="mono">var</span> state and every decision/drawing/order/alert gated by <span class="mono">barstate.isconfirmed</span>
+    (advances once per closed bar); drawings append-only (<span class="mono">label.new</span> only) with <b>zero</b> <span class="mono">.set_*()</span> / <span class="mono">.delete()</span>; nothing positioned at a past bar. <span class="pill">no repaint</span></p></div>
+</div>
+<div class="tblwrap"><table><thead><tr><th>Audit check</th><th>Rule</th><th>Result</th></tr></thead><tbody>
+<tr><td>request.security / varip / timenow / isrealtime (executable)</td><td class="n">= 0</td><td class="n">0 / 0 / 0 / 0 &#9989;</td></tr>
+<tr><td>PLL state + decisions under <span class="mono">barstate.isconfirmed</span></td><td class="n">all</td><td class="n">all &#9989;</td></tr>
+<tr><td>Retro-mutation <span class="mono">.set_*()</span> / <span class="mono">.delete()</span></td><td class="n">= 0</td><td class="n">0 / 0 &#9989;</td></tr>
+<tr><td>PLL internals bar-exact (mirror vs engine)</td><td class="n">&le; 1e-9</td><td class="n">1.1e-14 &#9989;</td></tr>
+<tr><td>Mirror match vs frozen cp=128 ledger</td><td class="n">&ge; 95%</td><td class="n">151/151 = 100% &#9989;</td></tr>
+<tr><td>Deterministic double run (mirror md5)</td><td class="n">identical</td><td class="n">855f5323&hellip; = 855f5323&hellip; &#9989;</td></tr>
+</tbody></table></div>
+<p class="muted" style="margin:8px 0 0">Why the match is exact despite the chart-TF bracket: every market fill is the next 1h open (a 1h open <i>is</i> its first 1m open), and a bracket&rsquo;s exit <b>bar</b> is timeframe-invariant
+(a 1h high is the max of its 1m highs). Only a bar that spans <b>both</b> levels could differ &mdash; the engine used 1m to tie-break, the Pine takes the stop &mdash; and on the cp=128 ledger <b>zero</b> exit bars did that. So the Pine is byte-for-byte here and strictly more conservative in general.</p>
+
+<div class="callout bad">
+  <b>The 1-bar Strategy-Tester lag caveat &mdash; read before judging the Tester&rsquo;s P&amp;L.</b> The number of record is our Python backtest
+  (+0.281R at cp=128), which fills at the open of the bar <i>after</i> the confirmed zero-cross. The Strategy-Tester twin submits its market order the moment that entry bar confirms, so
+  TradingView fills it on the <b>following</b> open &mdash; about one 1h bar later than the engine. Bracket levels use the engine geometry (fill&nbsp;&plusmn;4%&nbsp;/&nbsp;+12%), sizing is 1% risk,
+  and when a bar spans both levels TradingView assumes the stop (matching the engine). TradingView also needs <b>full history</b> for the PLL recursion and caps 1h history, so you may see fewer years than
+  the full 2019&ndash;2024 record. <b>The chart is for SEEING the trades; the authoritative numbers are the backtest reports on this site.</b>
+</div>
+
+<h2>4 &middot; Install on TradingView</h2>
+<ol class="steps">
+  <li>Open a <b>BINANCE:ETHUSDT perpetual</b> chart on the <b>1-hour</b> timeframe &mdash; the exact feed and timeframe the edge was measured on.</li>
+  <li>Load <b>full history</b> (scroll back to ~2019-11 or set a wide range). The PLL is a recursion from bar&nbsp;0; the first ~300 1h bars are a warm-up and do not trade, and a truncated chart will lock differently.</li>
+  <li>Open <b>Pine Editor</b>, paste the <b>indicator</b> source (copy button below), <b>Save</b>, then <b>Add to chart</b>. It marks entries/exits, draws the &plusmn;% bracket and shows the status panel.</li>
+  <li>For the Strategy Tester picture, add the <b>strategy</b> source as a second script &mdash; identical signals, plus the trade list and P&amp;L (mind the 1-bar Tester-lag caveat above).</li>
+  <li>To alert: right-click the chart &rarr; <b>Add alert</b> &rarr; Condition = this indicator &rarr; pick <b>&ldquo;LONG signal&rdquo;</b>, <b>&ldquo;SHORT signal&rdquo;</b>, <b>&ldquo;entry (either side)&rdquo;</b> or <b>&ldquo;exit&rdquo;</b> &rarr; <b>Once per bar close</b>. Entry alerts fire on the ready&amp;locked zero-cross bar; enter at the next 1h open.</li>
+  <li>Leave <span class="mono">centerPeriod</span> on <b>128</b>. It is exposed as an input so you can inspect &mdash; not so you re-tune it. <b>96 fails Monte&nbsp;Carlo.</b></li>
+</ol>
+
+<h2>5 &middot; Full Pine source &mdash; Indicator (<span class="mono">DT12_PLL_CycleLock_LIVE.pine</span>)</h2>
+<div class="copybar">
+  <span class="muted">Paste this whole block into the Pine Editor. This page is the copy of record.</span>
+  <button class="btn" id="copyBtnInd">Copy indicator source</button>
+</div>
+<pre class="src" id="pineInd">//@version=6
+// =============================================================================
+// DT12 "ETH PLL Cycle-Lock" — LIVE (indicator)   ·   DaviddTech "PLL inv p96 lock1.2" port
+// -----------------------------------------------------------------------------
+// The VALIDATED DT12 ETH PLL Cycle-Lock, rebuilt as a causal Pine v6 indicator so
+// the signal a live trader gets is the signal that was backtested. It is a
+// phase-locked loop (PLL, from signal-processing) that locks onto the dominant
+// ~centerPeriod-bar price cycle on ETH 1h and trades the sine zero-crossings,
+// gated by lock quality, with a hard ±% stop/target bracket.
+//
+//   *** cp = 128 IS THE ONLY VALIDATED SETTING. ***
+//   The author-shipped default centerPeriod = 96 FAILS Monte Carlo (16.2%
+//   risk-of-ruin) and is NOT deployable. The edge is real only at the longer
+//   128-bar (~5.3-day) cycle. Do not change centerPeriod off 128 to trade this.
+//
+// Config of record = the report's VALIDATED cp=128 cell (the BEST-t cell that
+// headlines the verdict): centerPeriod 128 / lockThresh 1.4 / stop 4% / target 12%.
+//   In-sample 2019-11 -&gt; 2024-12 (2025-26 LOCKED OUT), our causal cost-honest
+//   engine: +0.281R/trade · PF 1.57 · Sharpe 1.16 · n=151 · WR 43.7% · t=2.23 ·
+//   maxDD 6.6% · Monte-Carlo ruin 0.97%. These are the NUMBERS OF RECORD from
+//   backtests/bt_dt12_eth_pll.py — NOT the chart's Strategy Tester (this file is
+//   an indicator; the strategy twin is separate).
+//
+// TESTED FEED — READ THIS: the edge was measured on BINANCE:ETHUSDT PERPETUAL,
+// 1h. Chart THAT EXACT feed — not BTC, not Bybit, not spot. The PLL is a
+// from-bar-0 recursion locked to a price-local cycle; a different exchange's or
+// instrument's prices phase differently and will not reproduce the record.
+// (Same lesson as the Annie V3 Bybit-vs-Binance divergence.)
+//
+// HOW IT TRADES (per the frozen spec, replicated to the trade):
+//   · A detrended, RMS-normalised oscillator norm = nz(close - SMA200) / oscRms.
+//   · A PLL locks phase/frequency onto the centerPeriod cycle; sinP = sin(phase).
+//   · longSig  = ta.crossover(sinP, 0)   on a CLOSED 1h bar.
+//   · shortSig = ta.crossunder(sinP, 0)  on a CLOSED 1h bar.
+//   · lock gate: an entry opens ONLY when lockQ &gt; lockThresh AND bar_index &gt; 300
+//     (ready). An OPPOSITE zero-cross ALWAYS closes the open position — even
+//     unlocked (a same-bar close + open = a reversal).
+//   · FILL = the OPEN of the NEXT 1h bar after the confirmed signal (causal).
+//   · Hard bracket from the fill: long stop = fill·(1-4%), target = fill·(1+12%);
+//     short mirrored. The bracket fires on ANY bar from entry onward (incl. the
+//     entry bar), detected on the chart 1h high/low.
+//   · Sizing in the record is 1%-of-equity FLAT risk vs the 4% stop distance.
+//
+// AMBIGUOUS BRACKET BAR = STOP (worst case): when a single 1h bar's range spans
+//   BOTH the stop and the target, this chart-TF script books the STOP — exactly
+//   TradingView's OCO default and the engine's "ambiguous = loss" rule. (The
+//   engine used the 1m candles inside the hour to tie-break; a chart-TF Pine
+//   cannot see 1m, so it takes the worst case and is STRICTLY MORE CONSERVATIVE.
+//   On the cp=128 ledger no exit bar spanned both levels, so the mirror still
+//   reproduces it 151/151 — see backtests/pine_mirror_dt12.py.)
+//
+// SIGNAL vs FILL (the 1-bar convention, so nothing looks late):
+//   The ENTRY ALERT + entry triangle fire AT THE SIGNAL BAR (the confirmed sinP
+//   zero-cross that is ready &amp; locked) — the actionable moment: a live trader
+//   places a market order on that close and fills at the NEXT 1h open (the
+//   record's entry_ref, where the bracket lines begin). Exit ×-marks print at the
+//   bar the exit actually happens (bracket = the breach bar; zero-cross = the
+//   next-open fill bar).
+//
+// NO REPAINT (Igor's hard rules, audited):
+//   · EVERY decision, drawing and alert is gated by barstate.isconfirmed. The PLL
+//     `var` state advances once per CLOSED bar only, so intrabar ticks never
+//     mutate the recursion.
+//   · Chart timeframe ONLY — no request.security, no varip, no timenow, no
+//     barstate.isrealtime anywhere.
+//   · Drawings are APPEND-ONLY: label.new only; ZERO .set_*() and ZERO .delete()
+//     calls. Nothing is ever positioned at a past bar — every mark prints at the
+//     confirmed bar the machine learned it; the bracket lines are causal plots.
+//   · The status panel is a read-out of the LAST-CONFIRMED state (barstate.islast),
+//     not a bar-anchored drawing — it cannot mutate history.
+//
+// FULL HISTORY REQUIRED: the PLL is a recursion from bar 0. For an exact match to
+//   the record, chart the FULL history from 2019-11 so bar_index and the phase
+//   evolution line up with the engine (the first ~300 bars are warm-up and do not
+//   trade). On a truncated chart the lock will differ.
+//
+// FIDELITY: backtests/pine_mirror_dt12.py re-implements THIS file's PLL recursion
+//   AND forward 1h state machine in Python and (1) reproduces the engine's PLL
+//   internals bar-exact (max abs diff 1.1e-14) and (2) reproduces the frozen
+//   151-trade cp=128 ledger 151/151 = 100% (side + entry-time + exit-time +
+//   reason), max |dR| = 0.000000, deterministic across double runs. The chart is
+//   for SEEING the trades; the numbers of record are the backtest.
+// =============================================================================
+
+indicator("DT12 ETH PLL Cycle-Lock — LIVE", overlay = true,
+     max_lines_count = 500, max_labels_count = 500, max_boxes_count = 500)
+
+// ----------------------------- Inputs ----------------------------------------
+gS = "Signal (validated cp=128 defaults — do not change to trade the edge)"
+i_centerPeriod = input.int(128, "centerPeriod (locked cycle length, bars)", minval = 8, group = gS,
+     tooltip = "cp=128 is the ONLY validated setting; 96 fails Monte Carlo (16.2% risk-of-ruin). The edge is real only at the longer 128-bar (~5.3-day) cycle. Do not change this to trade the edge.")
+i_lockThresh   = input.float(1.4, "lockThresh (min lock quality to enter)", minval = 0.1, step = 0.1, group = gS)
+i_slPct        = input.float(4.0, "Stop %",   minval = 0.1, step = 0.1, group = gS)
+i_tpPct        = input.float(12.0,"Target %", minval = 0.1, step = 0.1, group = gS)
+i_detrend      = input.int(200, "Detrend / RMS length (fixed)", minval = 10, group = gS)
+i_loopBW       = input.float(0.04, "PLL loop bandwidth (fixed)", minval = 0.001, step = 0.001, group = gS)
+i_lpfAlpha     = input.float(0.15, "PLL LPF alpha (fixed)", minval = 0.001, step = 0.001, group = gS)
+i_warm         = input.int(205, "Warm-up bars (PLL starts locking after this)", minval = 0, group = gS,
+     tooltip = "warmedUp = bar_index &gt; detrend+5 = 205. Below this the PLL free-runs; keep = detrend+5.")
+i_ready        = input.int(300, "Ready bars (no entries before this)", minval = 0, group = gS,
+     tooltip = "ready = bar_index &gt; detrend+100 = 300. Chart full history from 2019-11 so bar_index lines up with the record.")
+
+gV = "Visuals"
+i_showOsc     = input.bool(false, "Plot sinP / lockQ in a pane (informational)", group = gV)
+i_showStop    = input.bool(true,  "Stop line while in a trade", group = gV)
+i_showTarget  = input.bool(true,  "Target line while in a trade", group = gV)
+i_showEntries = input.bool(true,  "Entry triangles + labels", group = gV)
+i_showExits   = input.bool(true,  "Exit ×-marks", group = gV)
+i_showState   = input.bool(true,  "Status panel (top-right)", group = gV)
+
+// ----------------------------- Detrended RMS oscillator ----------------------
+// Computed EVERY bar in global scope so ta.* history stays intact; only READ
+// inside the confirmed block, so all DECISIONS use closed-bar values.
+trend  = ta.sma(close, i_detrend)
+osc    = nz(close - trend)                               // nz -&gt; 0 during SMA warmup
+oscsq  = osc * osc
+oscRms = math.sqrt(math.max(nz(ta.sma(oscsq, i_detrend)), 1e-10))   // 1e-10 floor on the MEAN
+norm   = osc / oscRms
+
+twoPi   = 2.0 * math.pi
+nomFreq = twoPi / i_centerPeriod
+fMax    = nomFreq * 2.0
+fMin    = nomFreq * 0.4
+Kp      = 1.4142 * i_loopBW
+Ki      = i_loopBW * i_loopBW
+
+// ----------------------------- Persistent PLL + trade state ------------------
+// Pure running state (no arrays, no look-back) — the exact recursion the engine
+// evolves bar-by-bar from bar 0. Advanced ONLY under barstate.isconfirmed.
+var float phase      = 0.0
+var float integrator = 0.0
+var float iLpf       = 0.0
+var float qLpf       = 0.0
+var float sinPrev    = 0.0            // sinP of the previous confirmed bar (for the cross)
+
+var int   state    = 0               // 0 flat / +1 long / -1 short
+var float entryRef = na              // entry fill (== open of the fill bar)
+var float stopP    = na
+var float targP    = na
+var int   entryBI  = na
+var int   barsIn   = 0
+var float lockAtSig= na              // lockQ at the entry signal bar
+
+var int   pendDir   = 0              // a sinP zero-cross fired on the PREVIOUS confirmed bar
+var bool  pendReady = false          // was bar ready (bar_index&gt;300) at that signal bar?
+var bool  pendLock  = false          // was lockQ &gt; lockThresh at that signal bar?
+
+// live read-outs for the status panel (updated each confirmed bar)
+var float lockQv = 0.0
+var float sinPv  = 0.0
+
+// per-bar event flags (reset each bar; drive marks + alerts)
+signalLong   = false                 // gated LONG entry signal, AT the signal bar (actionable)
+signalShort  = false                 // gated SHORT entry signal, AT the signal bar (actionable)
+crossExitSig = false                 // opposite zero-cross while in a trade, AT the signal bar
+enterLongFill  = false               // LONG fill recorded, AT the fill bar
+enterShortFill = false               // SHORT fill recorded, AT the fill bar
+exitBrkStop  = false                 // stop bracket hit, AT the breach bar
+exitBrkTp    = false                 // target bracket hit, AT the breach bar
+exitCrossEv  = false                 // zero-cross close, AT the next-open fill bar
+float exitPx = na
+
+// process CONFIRMED bars only -&gt; no repaint, deterministic
+if barstate.isconfirmed
+    // (1) resolve the pending signal (from bar b-1) at THIS bar's OPEN ----------
+    // opposite zero-cross ALWAYS closes; a ready&amp;locked signal opens; both = reversal.
+    if pendDir != 0
+        if state != 0 and state == -pendDir
+            exitCrossEv := true
+            exitPx := open
+            state := 0
+        if pendReady and pendLock and ((pendDir == 1 and state &lt;= 0) or (pendDir == -1 and state &gt;= 0))
+            entryRef := open
+            stopP := pendDir == 1 ? entryRef * (1.0 - i_slPct / 100.0) : entryRef * (1.0 + i_slPct / 100.0)
+            targP := pendDir == 1 ? entryRef * (1.0 + i_tpPct / 100.0) : entryRef * (1.0 - i_tpPct / 100.0)
+            entryBI := bar_index
+            barsIn  := 0
+            state   := pendDir
+            if pendDir == 1
+                enterLongFill := true
+            else
+                enterShortFill := true
+        pendDir   := 0
+        pendReady := false
+        pendLock  := false
+
+    // (2) intrabar bracket check on THIS 1h bar (incl. entry bar). Both-touch -&gt;
+    //     STOP (worst case; ambiguous = loss). Bracket takes priority over the
+    //     close-based zero-cross on the same bar.
+    if state != 0 and not na(stopP)
+        stopHit = state == 1 ? low &lt;= stopP : high &gt;= stopP
+        tpHit   = state == 1 ? high &gt;= targP : low &lt;= targP
+        if stopHit
+            exitBrkStop := true
+            exitPx := stopP
+            state := 0
+        else if tpHit
+            exitBrkTp := true
+            exitPx := targP
+            state := 0
+
+    if state != 0
+        barsIn := barsIn + 1
+
+    // (3) advance the PLL recursion at the CLOSE of this bar --------------------
+    warmed = bar_index &gt; i_warm
+    cosRef = math.cos(phase)
+    sinRef = math.sin(phase)
+    iInst = warmed ? norm * cosRef : 0.0
+    qInst = warmed ? -norm * sinRef : 0.0
+    iLpf := iLpf + i_lpfAlpha * (iInst - iLpf)
+    qLpf := qLpf + i_lpfAlpha * (qInst - qLpf)
+    denom = math.sqrt(iLpf * iLpf + qLpf * qLpf) + iLpf
+    phaseErr = denom &gt; 1e-10 ? 2.0 * math.atan(qLpf / denom) : (qLpf &gt;= 0 ? math.pi : -math.pi)
+    integrator := warmed ? integrator + Ki * phaseErr : 0.0
+    freqRaw = nomFreq + Kp * phaseErr + integrator
+    freqClamped = math.min(fMax, math.max(fMin, freqRaw))
+    if freqClamped != freqRaw
+        integrator := freqClamped - nomFreq - Kp * phaseErr
+    phase := phase + freqClamped
+    if phase &gt;= twoPi
+        phase := phase - twoPi
+    if phase &lt; 0.0
+        phase := phase + twoPi
+    lockQ = math.sqrt(iLpf * iLpf + qLpf * qLpf) / 0.7071
+    sinP  = math.sin(phase)
+    lockQv := lockQ
+    sinPv  := sinP
+
+    // (4) detect the sinP zero-cross at the CLOSE of this bar -&gt; arm for b+1 -----
+    longSig  = bar_index &gt;= 1 and sinPrev &lt;= 0.0 and sinP &gt; 0.0
+    shortSig = bar_index &gt;= 1 and sinPrev &gt;= 0.0 and sinP &lt; 0.0
+    rdy = (bar_index &gt; i_warm) and (bar_index &gt; i_ready)
+    lk  = lockQ &gt; i_lockThresh
+    if (state == 1 and shortSig) or (state == -1 and longSig)
+        crossExitSig := true
+    if longSig
+        signalLong := rdy and lk
+        pendDir   := 1
+        pendReady := rdy
+        pendLock  := lk
+    else if shortSig
+        signalShort := rdy and lk
+        pendDir   := -1
+        pendReady := rdy
+        pendLock  := lk
+    sinPrev := sinP
+
+    // ---- causal, append-only drawings (nothing positioned at a past bar) -------
+    if i_showEntries and enterLongFill
+        label.new(bar_index, low, text = "LONG " + str.tostring(entryRef, format.mintick) + "  · stop " + str.tostring(stopP, format.mintick) + " · tgt " + str.tostring(targP, format.mintick),
+             style = label.style_label_up, color = color.new(color.green, 0), textcolor = color.white, size = size.tiny)
+    if i_showEntries and enterShortFill
+        label.new(bar_index, high, text = "SHORT " + str.tostring(entryRef, format.mintick) + "  · stop " + str.tostring(stopP, format.mintick) + " · tgt " + str.tostring(targP, format.mintick),
+             style = label.style_label_down, color = color.new(color.red, 0), textcolor = color.white, size = size.tiny)
+
+// ----------------------------- Marks (causal plots) --------------------------
+plotshape(i_showEntries and signalLong,  title = "LONG signal (fill next open)",  style = shape.triangleup,   location = location.belowbar, color = color.new(color.green, 0), size = size.tiny)
+plotshape(i_showEntries and signalShort, title = "SHORT signal (fill next open)", style = shape.triangledown, location = location.abovebar, color = color.new(color.red, 0),   size = size.tiny)
+plotshape(i_showExits and exitBrkStop ? exitPx : na, title = "Stop exit",   style = shape.xcross, location = location.absolute, color = color.new(color.red, 0),   size = size.tiny)
+plotshape(i_showExits and exitBrkTp   ? exitPx : na, title = "Target exit", style = shape.xcross, location = location.absolute, color = color.new(color.lime, 0),  size = size.tiny)
+plotshape(i_showExits and exitCrossEv ? exitPx : na, title = "Zero-cross exit", style = shape.xcross, location = location.absolute, color = color.new(color.blue, 0), size = size.tiny)
+
+// bracket lines only while a position is open (causal step lines; end at the exit)
+plot(i_showStop   and state != 0 ? stopP : na, "Stop",   color = color.new(color.red, 0),  style = plot.style_linebr, linewidth = 1)
+plot(i_showTarget and state != 0 ? targP : na, "Target", color = color.new(color.lime, 0), style = plot.style_linebr, linewidth = 1)
+
+// optional informational pane: sinP + lockQ (never a decision input; read-only)
+plot(i_showOsc ? sinPv : na, "sinP (cycle)", color = color.new(color.aqua, 0), display = display.data_window)
+plot(i_showOsc ? lockQv : na, "lockQ", color = color.new(color.orange, 0), display = display.data_window)
+
+// ----------------------------- Alerts ----------------------------------------
+// Entry alerts fire AT THE SIGNAL BAR (the confirmed ready&amp;locked zero-cross) —
+// the actionable moment; the fill is the next 1h open.
+eitherEntry = signalLong or signalShort
+anyExit     = crossExitSig or exitBrkStop or exitBrkTp
+alertcondition(signalLong,  title = "DT12 PLL — LONG signal",
+     message = "DT12 ETH PLL Cycle-Lock: LONG sinP zero-cross confirmed &amp; locked on {{ticker}} 1h at {{time}} — enter at the NEXT 1h open. Stop -4% / target +12%. Chart BINANCE:ETHUSDT perp, cp=128.")
+alertcondition(signalShort, title = "DT12 PLL — SHORT signal",
+     message = "DT12 ETH PLL Cycle-Lock: SHORT sinP zero-cross confirmed &amp; locked on {{ticker}} 1h at {{time}} — enter at the NEXT 1h open. Stop +4% / target -12%. Chart BINANCE:ETHUSDT perp, cp=128.")
+alertcondition(eitherEntry, title = "DT12 PLL — entry (either side)",
+     message = "DT12 ETH PLL Cycle-Lock entry signal confirmed on {{ticker}} 1h at {{time}} — fill at the next 1h open. cp=128 only.")
+alertcondition(anyExit, title = "DT12 PLL — exit",
+     message = "DT12 ETH PLL Cycle-Lock: position exit on {{ticker}} 1h at {{time}} (opposite zero-cross -&gt; next open, or the ±% bracket hit).")
+
+// ----------------------------- Status panel ----------------------------------
+// Read-out of the LAST-CONFIRMED machine state. State vars mutate only inside
+// barstate.isconfirmed, so intrabar ticks cannot change what this shows.
+var table st = table.new(position.top_right, 2, 7,
+     bgcolor = color.new(color.black, 15), border_width = 1,
+     border_color = color.new(color.gray, 60), frame_width = 1,
+     frame_color = color.new(color.gray, 40))
+
+if i_showState and barstate.islast
+    posTxt  = state == 1 ? "LONG open" : state == -1 ? "SHORT open" : "flat"
+    sideTxt = state == 1 ? "long" : state == -1 ? "short" : "—"
+    entTxt  = state != 0 and not na(entryRef) ? str.tostring(entryRef, format.mintick) : "—"
+    stopTxt = state != 0 and not na(stopP) ? str.tostring(stopP, format.mintick) : "—"
+    targTxt = state != 0 and not na(targP) ? str.tostring(targP, format.mintick) : "—"
+    lockTxt = str.tostring(lockQv, "#.###") + (lockQv &gt; i_lockThresh ? "  (locked)" : "  (unlocked)")
+    cycTxt  = str.tostring(sinPv, "#.###") + (sinPv &gt;= 0 ? "  ▲ up-half" : "  ▼ down-half")
+    _hd = color.new(color.silver, 20)
+    _tx = color.white
+    table.cell(st, 0, 0, "DT12 position", text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 0, posTxt,          text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 1, "side",          text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 1, sideTxt,         text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 2, "entry",         text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 2, entTxt,          text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 3, "stop",          text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 3, stopTxt,         text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 4, "target",        text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 4, targTxt,         text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 5, "lockQ",         text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 5, lockTxt,         text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 6, "cycle sinP",    text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 6, cycTxt,          text_color = _tx, text_size = size.small, text_halign = text.align_left)
+</pre>
+
+<h2>6 &middot; Full Pine source &mdash; Strategy twin (<span class="mono">DT12_PLL_CycleLock_Strategy.pine</span>)</h2>
+<div class="copybar">
+  <span class="muted">Identical signal core; adds strategy.* orders for the Tester. Paste as a separate script.</span>
+  <button class="btn" id="copyBtnStrat">Copy strategy source</button>
+</div>
+<pre class="src" id="pineStrat">//@version=6
+// =============================================================================
+// DT12 "ETH PLL Cycle-Lock" — Strategy (Tester twin)   ·   DaviddTech "PLL inv p96 lock1.2"
+// -----------------------------------------------------------------------------
+// strategy() twin of "DT12 ETH PLL Cycle-Lock — LIVE" so TradingView's Strategy
+// Tester shows every trade: entry/exit arrows, trade list, P&amp;L. The SIGNAL CORE
+// is IDENTICAL to the indicator (and to backtests/pine_mirror_dt12.py, which
+// reproduces the frozen 151-trade cp=128 ledger 151/151 = 100%).
+//
+//   *** cp = 128 IS THE ONLY VALIDATED SETTING. ***
+//   The author-shipped default centerPeriod = 96 FAILS Monte Carlo (16.2%
+//   risk-of-ruin). Do not change centerPeriod off 128 to trade this.
+//
+// Config of record = the report's VALIDATED cp=128 cell: centerPeriod 128 /
+// lockThresh 1.4 / stop 4% / target 12%. In-sample 2019-11 -&gt; 2024-12 (2025-26
+// LOCKED OUT), our causal cost-honest engine: +0.281R/trade · PF 1.57 · Sharpe
+// 1.16 · n=151 · WR 43.7% · t=2.23 · maxDD 6.6% · MC ruin 0.97%. Those are the
+// NUMBERS OF RECORD (backtests/bt_dt12_eth_pll.py).
+//
+// TESTED FEED — READ THIS: chart BINANCE:ETHUSDT PERPETUAL, 1h — not BTC, not
+// Bybit, not spot. The PLL is a price-local from-bar-0 recursion; a different
+// exchange/instrument phases differently and will not reproduce the record.
+//
+// HOW FILLS WORK IN THE TESTER — the 1-bar Strategy-Tester lag caveat (read
+// before judging its P&amp;L): the record's fill is the OPEN of the bar AFTER the
+// confirmed zero-cross. This strategy submits its market order the moment that
+// entry (fill) bar confirms, so the Tester fills on the FOLLOWING open — about
+// one 1h bar later than the engine's fill. Bracket LEVELS use the engine geometry
+// (fill ±4% stop / ±12% target); sizing is 1%-of-equity risk vs the stop
+// distance. When a bar spans both bracket levels TradingView assumes the STOP
+// (worst case) — matching the engine's "ambiguous = loss" rule. TradingView also
+// caps 1h history (and needs full history for the PLL recursion), so the Tester
+// shows recent years, not the full 2019-2024 record. The Tester is for SEEING the
+// trades; the numbers of record are the backtest reports on the site (+0.281R),
+// NOT this chart's delayed-fill P&amp;L.
+//
+// NO REPAINT (Igor's hard rules, audited): every decision, drawing, order and
+// alert is gated by barstate.isconfirmed (the PLL `var` state advances once per
+// CLOSED bar only); chart timeframe ONLY (no request.security, varip, timenow,
+// barstate.isrealtime); drawings APPEND-ONLY (label.new only; ZERO .set_*()/
+// .delete()); nothing positioned at a past bar; the status panel is a
+// last-confirmed read-out. Identical signal core to the indicator.
+// =============================================================================
+
+strategy("DT12 ETH PLL Cycle-Lock — Strategy", overlay = true,
+     initial_capital = 10000, currency = currency.USD,
+     commission_type = strategy.commission.percent, commission_value = 0.05,
+     slippage = 2, max_lines_count = 500, max_labels_count = 500, max_boxes_count = 500)
+
+// ----------------------------- Inputs ----------------------------------------
+gS = "Signal (validated cp=128 defaults — do not change to trade the edge)"
+i_centerPeriod = input.int(128, "centerPeriod (locked cycle length, bars)", minval = 8, group = gS,
+     tooltip = "cp=128 is the ONLY validated setting; 96 fails Monte Carlo (16.2% risk-of-ruin). The edge is real only at the longer 128-bar (~5.3-day) cycle. Do not change this to trade the edge.")
+i_lockThresh   = input.float(1.4, "lockThresh (min lock quality to enter)", minval = 0.1, step = 0.1, group = gS)
+i_slPct        = input.float(4.0, "Stop %",   minval = 0.1, step = 0.1, group = gS)
+i_tpPct        = input.float(12.0,"Target %", minval = 0.1, step = 0.1, group = gS)
+i_detrend      = input.int(200, "Detrend / RMS length (fixed)", minval = 10, group = gS)
+i_loopBW       = input.float(0.04, "PLL loop bandwidth (fixed)", minval = 0.001, step = 0.001, group = gS)
+i_lpfAlpha     = input.float(0.15, "PLL LPF alpha (fixed)", minval = 0.001, step = 0.001, group = gS)
+i_warm         = input.int(205, "Warm-up bars (PLL starts locking after this)", minval = 0, group = gS,
+     tooltip = "warmedUp = bar_index &gt; detrend+5 = 205. Below this the PLL free-runs; keep = detrend+5.")
+i_ready        = input.int(300, "Ready bars (no entries before this)", minval = 0, group = gS,
+     tooltip = "ready = bar_index &gt; detrend+100 = 300. Chart full history from 2019-11 so bar_index lines up with the record.")
+
+gR = "Strategy sizing"
+i_riskPct = input.float(1.0, "Risk per trade (% of equity)", minval = 0.01, maxval = 10.0, step = 0.1, group = gR)
+
+gV = "Visuals"
+i_showStop    = input.bool(true,  "Stop line while in a trade", group = gV)
+i_showTarget  = input.bool(true,  "Target line while in a trade", group = gV)
+i_showEntries = input.bool(true,  "Entry triangles + labels", group = gV)
+i_showExits   = input.bool(true,  "Exit ×-marks", group = gV)
+i_showState   = input.bool(true,  "Status panel (top-right)", group = gV)
+
+// ----------------------------- Detrended RMS oscillator ----------------------
+// Computed EVERY bar in global scope so ta.* history stays intact; only READ
+// inside the confirmed block, so all DECISIONS use closed-bar values.
+trend  = ta.sma(close, i_detrend)
+osc    = nz(close - trend)
+oscsq  = osc * osc
+oscRms = math.sqrt(math.max(nz(ta.sma(oscsq, i_detrend)), 1e-10))
+norm   = osc / oscRms
+
+twoPi   = 2.0 * math.pi
+nomFreq = twoPi / i_centerPeriod
+fMax    = nomFreq * 2.0
+fMin    = nomFreq * 0.4
+Kp      = 1.4142 * i_loopBW
+Ki      = i_loopBW * i_loopBW
+
+// ----------------------------- Persistent PLL + trade state ------------------
+// IDENTICAL to the indicator. Advanced ONLY under barstate.isconfirmed.
+var float phase      = 0.0
+var float integrator = 0.0
+var float iLpf       = 0.0
+var float qLpf       = 0.0
+var float sinPrev    = 0.0
+
+var int   state    = 0               // 0 flat / +1 long / -1 short
+var float entryRef = na
+var float stopP    = na
+var float targP    = na
+var int   entryBI  = na
+var int   barsIn   = 0
+
+var int   pendDir   = 0
+var bool  pendReady = false
+var bool  pendLock  = false
+
+var float lockQv = 0.0
+var float sinPv  = 0.0
+
+// per-bar event flags (reset each bar; drive marks + alerts + orders)
+signalLong   = false
+signalShort  = false
+crossExitSig = false
+enterLongFill  = false
+enterShortFill = false
+exitBrkStop  = false
+exitBrkTp    = false
+exitCrossEv  = false
+float exitPx = na
+
+// process CONFIRMED bars only -&gt; no repaint, deterministic
+if barstate.isconfirmed
+    // (1) resolve the pending signal (from bar b-1) at THIS bar's OPEN ----------
+    if pendDir != 0
+        if state != 0 and state == -pendDir
+            exitCrossEv := true
+            exitPx := open
+            state := 0
+        if pendReady and pendLock and ((pendDir == 1 and state &lt;= 0) or (pendDir == -1 and state &gt;= 0))
+            entryRef := open
+            stopP := pendDir == 1 ? entryRef * (1.0 - i_slPct / 100.0) : entryRef * (1.0 + i_slPct / 100.0)
+            targP := pendDir == 1 ? entryRef * (1.0 + i_tpPct / 100.0) : entryRef * (1.0 - i_tpPct / 100.0)
+            entryBI := bar_index
+            barsIn  := 0
+            state   := pendDir
+            if pendDir == 1
+                enterLongFill := true
+            else
+                enterShortFill := true
+        pendDir   := 0
+        pendReady := false
+        pendLock  := false
+
+    // (2) intrabar bracket check on THIS 1h bar (incl. entry bar). Both-touch -&gt;
+    //     STOP (worst case; ambiguous = loss).
+    if state != 0 and not na(stopP)
+        stopHit = state == 1 ? low &lt;= stopP : high &gt;= stopP
+        tpHit   = state == 1 ? high &gt;= targP : low &lt;= targP
+        if stopHit
+            exitBrkStop := true
+            exitPx := stopP
+            state := 0
+        else if tpHit
+            exitBrkTp := true
+            exitPx := targP
+            state := 0
+
+    if state != 0
+        barsIn := barsIn + 1
+
+    // (3) advance the PLL recursion at the CLOSE of this bar --------------------
+    warmed = bar_index &gt; i_warm
+    cosRef = math.cos(phase)
+    sinRef = math.sin(phase)
+    iInst = warmed ? norm * cosRef : 0.0
+    qInst = warmed ? -norm * sinRef : 0.0
+    iLpf := iLpf + i_lpfAlpha * (iInst - iLpf)
+    qLpf := qLpf + i_lpfAlpha * (qInst - qLpf)
+    denom = math.sqrt(iLpf * iLpf + qLpf * qLpf) + iLpf
+    phaseErr = denom &gt; 1e-10 ? 2.0 * math.atan(qLpf / denom) : (qLpf &gt;= 0 ? math.pi : -math.pi)
+    integrator := warmed ? integrator + Ki * phaseErr : 0.0
+    freqRaw = nomFreq + Kp * phaseErr + integrator
+    freqClamped = math.min(fMax, math.max(fMin, freqRaw))
+    if freqClamped != freqRaw
+        integrator := freqClamped - nomFreq - Kp * phaseErr
+    phase := phase + freqClamped
+    if phase &gt;= twoPi
+        phase := phase - twoPi
+    if phase &lt; 0.0
+        phase := phase + twoPi
+    lockQ = math.sqrt(iLpf * iLpf + qLpf * qLpf) / 0.7071
+    sinP  = math.sin(phase)
+    lockQv := lockQ
+    sinPv  := sinP
+
+    // (4) detect the sinP zero-cross at the CLOSE of this bar -&gt; arm for b+1 -----
+    longSig  = bar_index &gt;= 1 and sinPrev &lt;= 0.0 and sinP &gt; 0.0
+    shortSig = bar_index &gt;= 1 and sinPrev &gt;= 0.0 and sinP &lt; 0.0
+    rdy = (bar_index &gt; i_warm) and (bar_index &gt; i_ready)
+    lk  = lockQ &gt; i_lockThresh
+    if (state == 1 and shortSig) or (state == -1 and longSig)
+        crossExitSig := true
+    if longSig
+        signalLong := rdy and lk
+        pendDir   := 1
+        pendReady := rdy
+        pendLock  := lk
+    else if shortSig
+        signalShort := rdy and lk
+        pendDir   := -1
+        pendReady := rdy
+        pendLock  := lk
+    sinPrev := sinP
+
+    // ---- causal, append-only drawings (nothing positioned at a past bar) -------
+    if i_showEntries and enterLongFill
+        label.new(bar_index, low, text = "LONG " + str.tostring(entryRef, format.mintick) + "  · stop " + str.tostring(stopP, format.mintick) + " · tgt " + str.tostring(targP, format.mintick),
+             style = label.style_label_up, color = color.new(color.green, 0), textcolor = color.white, size = size.tiny)
+    if i_showEntries and enterShortFill
+        label.new(bar_index, high, text = "SHORT " + str.tostring(entryRef, format.mintick) + "  · stop " + str.tostring(stopP, format.mintick) + " · tgt " + str.tostring(targP, format.mintick),
+             style = label.style_label_down, color = color.new(color.red, 0), textcolor = color.white, size = size.tiny)
+
+    // ---- STRATEGY ORDERS (submitted at the fill bar -&gt; Tester fills next open;
+    //      the documented 1-bar Tester lag). Bracket = engine geometry; 1% risk. -
+    //      An opposite-direction entry auto-reverses the open position. -----------
+    if enterLongFill and not na(stopP)
+        sd = math.abs(entryRef - stopP)
+        q  = sd &gt; 0 ? strategy.equity * i_riskPct / 100.0 / sd : 0.0
+        if q &gt; 0
+            strategy.entry("DT12", strategy.long, qty = q, comment = "long")
+            strategy.exit("bracket", "DT12", stop = stopP, limit = targP, comment = "±% bracket")
+    else if enterShortFill and not na(stopP)
+        sd = math.abs(entryRef - stopP)
+        q  = sd &gt; 0 ? strategy.equity * i_riskPct / 100.0 / sd : 0.0
+        if q &gt; 0
+            strategy.entry("DT12", strategy.short, qty = q, comment = "short")
+            strategy.exit("bracket", "DT12", stop = stopP, limit = targP, comment = "±% bracket")
+    else if exitCrossEv
+        // opposite zero-cross closed the position with NO new entry (not ready/locked)
+        strategy.close("DT12", comment = "opposite zero-cross")
+
+// ----------------------------- Marks (causal plots) --------------------------
+plotshape(i_showEntries and signalLong,  title = "LONG signal (fill next open)",  style = shape.triangleup,   location = location.belowbar, color = color.new(color.green, 0), size = size.tiny)
+plotshape(i_showEntries and signalShort, title = "SHORT signal (fill next open)", style = shape.triangledown, location = location.abovebar, color = color.new(color.red, 0),   size = size.tiny)
+plotshape(i_showExits and exitBrkStop ? exitPx : na, title = "Stop exit",   style = shape.xcross, location = location.absolute, color = color.new(color.red, 0),   size = size.tiny)
+plotshape(i_showExits and exitBrkTp   ? exitPx : na, title = "Target exit", style = shape.xcross, location = location.absolute, color = color.new(color.lime, 0),  size = size.tiny)
+plotshape(i_showExits and exitCrossEv ? exitPx : na, title = "Zero-cross exit", style = shape.xcross, location = location.absolute, color = color.new(color.blue, 0), size = size.tiny)
+
+plot(i_showStop   and state != 0 ? stopP : na, "Stop",   color = color.new(color.red, 0),  style = plot.style_linebr, linewidth = 1)
+plot(i_showTarget and state != 0 ? targP : na, "Target", color = color.new(color.lime, 0), style = plot.style_linebr, linewidth = 1)
+
+// ----------------------------- Alerts ----------------------------------------
+eitherEntry = signalLong or signalShort
+anyExit     = crossExitSig or exitBrkStop or exitBrkTp
+alertcondition(signalLong,  title = "DT12 PLL — LONG signal",
+     message = "DT12 ETH PLL Cycle-Lock: LONG sinP zero-cross confirmed &amp; locked on {{ticker}} 1h at {{time}} — enter at the NEXT 1h open. Stop -4% / target +12%. Chart BINANCE:ETHUSDT perp, cp=128.")
+alertcondition(signalShort, title = "DT12 PLL — SHORT signal",
+     message = "DT12 ETH PLL Cycle-Lock: SHORT sinP zero-cross confirmed &amp; locked on {{ticker}} 1h at {{time}} — enter at the NEXT 1h open. Stop +4% / target -12%. Chart BINANCE:ETHUSDT perp, cp=128.")
+alertcondition(eitherEntry, title = "DT12 PLL — entry (either side)",
+     message = "DT12 ETH PLL Cycle-Lock entry signal confirmed on {{ticker}} 1h at {{time}} — fill at the next 1h open. cp=128 only.")
+alertcondition(anyExit, title = "DT12 PLL — exit",
+     message = "DT12 ETH PLL Cycle-Lock: position exit on {{ticker}} 1h at {{time}} (opposite zero-cross -&gt; next open, or the ±% bracket hit).")
+
+// ----------------------------- Status panel ----------------------------------
+var table st = table.new(position.top_right, 2, 7,
+     bgcolor = color.new(color.black, 15), border_width = 1,
+     border_color = color.new(color.gray, 60), frame_width = 1,
+     frame_color = color.new(color.gray, 40))
+
+if i_showState and barstate.islast
+    posTxt  = state == 1 ? "LONG open" : state == -1 ? "SHORT open" : "flat"
+    sideTxt = state == 1 ? "long" : state == -1 ? "short" : "—"
+    entTxt  = state != 0 and not na(entryRef) ? str.tostring(entryRef, format.mintick) : "—"
+    stopTxt = state != 0 and not na(stopP) ? str.tostring(stopP, format.mintick) : "—"
+    targTxt = state != 0 and not na(targP) ? str.tostring(targP, format.mintick) : "—"
+    lockTxt = str.tostring(lockQv, "#.###") + (lockQv &gt; i_lockThresh ? "  (locked)" : "  (unlocked)")
+    cycTxt  = str.tostring(sinPv, "#.###") + (sinPv &gt;= 0 ? "  ▲ up-half" : "  ▼ down-half")
+    _hd = color.new(color.silver, 20)
+    _tx = color.white
+    table.cell(st, 0, 0, "DT12 position", text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 0, posTxt,          text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 1, "side",          text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 1, sideTxt,         text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 2, "entry",         text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 2, entTxt,          text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 3, "stop",          text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 3, stopTxt,         text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 4, "target",        text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 4, targTxt,         text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 5, "lockQ",         text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 5, lockTxt,         text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 6, "cycle sinP",    text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 6, cycTxt,          text_color = _tx, text_size = size.small, text_halign = text.align_left)
+</pre>
+
+<div class="foot">
+  DaviddTech &middot; <span class="mono">DT12_PLL_CycleLock_LIVE.pine</span> + <span class="mono">DT12_PLL_CycleLock_Strategy.pine</span> &middot; causal Pine&nbsp;v6 port of the validated
+  &ldquo;PLL inv p96 lock1.2&rdquo; ETH PLL Cycle-Lock. Config of record: cp=128 cell 128/1.4/4%/12%, +0.281R / PF 1.57 / t 2.23 / MC ruin 0.97%, IS 2019-11&rarr;2024-12 (2025&ndash;26 locked out).
+  <b>cp=128 is the only validated setting; 96 fails Monte&nbsp;Carlo.</b> Fidelity 151/151 = 100% vs the frozen cp=128 ledger, PLL internals bar-exact (<span class="mono">backtests/pine_mirror_dt12.py</span>);
+  no-repaint audited; deterministic. Tested feed BINANCE:ETHUSDT perp, 1h. Self-contained.
+</div>
+</div>
+
+
+<script>
+  function wireCopy(btnId, preId){
+    var btn=document.getElementById(btnId);
+    var pre=document.getElementById(preId);
+    if(!btn||!pre)return;
+    btn.addEventListener('click',function(){
+      var txt=pre.innerText;
+      function done(){var o=btn.textContent;btn.textContent='Copied!';setTimeout(function(){btn.textContent=o;},1400);}
+      if(navigator.clipboard&&navigator.clipboard.writeText){
+        navigator.clipboard.writeText(txt).then(done,function(){fallback();});
+      }else{fallback();}
+      function fallback(){
+        var r=document.createRange();r.selectNodeContents(pre);
+        var s=window.getSelection();s.removeAllRanges();s.addRange(r);
+        try{document.execCommand('copy');done();}catch(e){}
+      }
+    });
+  }
+  wireCopy('copyBtnInd','pineInd');
+  wireCopy('copyBtnStrat','pineStrat');
+</script>
+<script>
+(function(){
+  var btn=document.getElementById('themeToggle');
+  if(!btn)return;
+  var mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;
+  function stored(){try{var t=localStorage.getItem('codexTheme');return (t==='light'||t==='dark'||t==='system')?t:'system';}catch(e){return 'system';}}
+  function eff(m){return (m==='light'||m==='dark')?m:((mq&&mq.matches)?'dark':'light');}
+  function apply(){var m=stored();document.documentElement.setAttribute('data-theme',eff(m));btn.textContent=(m==='light')?'◐ Light':(m==='dark')?'◑ Dark':'◓ Auto';}
+  apply();
+  btn.addEventListener('click',function(){var order={light:'dark',dark:'system',system:'light'};var n=order[stored()];try{localStorage.setItem('codexTheme',n);}catch(e){}apply();});
+  if(mq){var h=function(){if(stored()==='system')apply();};if(mq.addEventListener)mq.addEventListener('change',h);else if(mq.addListener)mq.addListener(h);}
+})();
+</script>
+
+</body>
+</html>
