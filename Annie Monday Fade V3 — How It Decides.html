@@ -203,6 +203,11 @@ would re-commit first.</figcaption></figure>
 <tr><td class='n'>2026-07-20 14:00</td><td>volume &lt; 200%, opened already below EMA (no cross)</td></tr>
 <tr><td class='n'>2026-07-20 14:15</td><td>volume &lt; 200%, opened already below EMA (no cross)</td></tr>
 </tbody></table></div>
+<div class="callout bad"><b>Feed warning (learned live, Mon Jul 20).</b> On Igor's <b>Bybit</b> chart the 13:45 UTC red vector carried
+<b>2.17&times;</b> volume &rarr; L1 &rarr; retest &rarr; SHORT entered 14:30 UTC. On <b>Binance</b> &mdash; the feed every backtest ran on &mdash; the
+same candle was <b>under the 2.0&times;</b> gate and the machine kept waiting. Volume is exchange-local, so borderline candles can fire on one
+exchange and not another. <b>The +0.347R evidence belongs to the Binance-perp feed: run the indicator on BINANCE:BTCUSDT perp to trade the
+tested system.</b></div>
 <div class="callout"><b>This is the honest cost of causality.</b> A human eye scrolls back and "sees" the peak instantly &mdash; that is
 hindsight. Measured: hindsight +0.382R, live streaming +0.347R, wait-for-confirmation +0.041R (dead). The machine trades the only version
 a live trader can actually execute.</div>
