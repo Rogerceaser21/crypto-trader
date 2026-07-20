@@ -438,8 +438,7 @@ if i_showState and barstate.islast
     tgtTxt  = state != 0 and not na(tpP) ? str.tostring(tpP, format.mintick) : "—"
     vrTxt   = na(vratio) ? "—" : str.tostring(vratio, "#.00") + "x" +
          (vratio &gt; i_volMult ? " · SPIKE" : " · normal")
-    gateTxt = close &gt; ema20v and close &gt; ema200v ? "above both EMAs (eligible)" :
-         close &gt; ema200v ? "above EMA200 only" : "below EMA200 (blocked)"
+    gateTxt = close &gt; ema20v and close &gt; ema200v ? "above both EMAs (eligible)" : close &gt; ema200v ? "above EMA200 only" : "below EMA200 (blocked)"
     barsTxt = state != 0 ? str.tostring(barsIn) : "—"
     _hd = color.new(color.silver, 20)
     _tx = color.white
@@ -680,8 +679,7 @@ if i_showState and barstate.islast
     tgtTxt  = state != 0 and not na(tpP) ? str.tostring(tpP, format.mintick) : "—"
     vrTxt   = na(vratio) ? "—" : str.tostring(vratio, "#.00") + "x" +
          (vratio &gt; i_volMult ? " · SPIKE" : " · normal")
-    gateTxt = close &gt; ema20v and close &gt; ema200v ? "above both EMAs (eligible)" :
-         close &gt; ema200v ? "above EMA200 only" : "below EMA200 (blocked)"
+    gateTxt = close &gt; ema20v and close &gt; ema200v ? "above both EMAs (eligible)" : close &gt; ema200v ? "above EMA200 only" : "below EMA200 (blocked)"
     barsTxt = state != 0 ? str.tostring(barsIn) : "—"
     _hd = color.new(color.silver, 20)
     _tx = color.white
