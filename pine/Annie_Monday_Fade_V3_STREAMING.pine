@@ -21,6 +21,15 @@
 // entry fills on the NEXT 15m open (rt+1), and both are drawn at their true bars.
 // No request.security, no future references.
 //
+// V3.1 VISUAL LAYER (2026-07-20, Igor's order — signals UNCHANGED): gray "peak?"
+// labels print AT the confirmed bar where the machine (re)commits its running
+// extreme — a causal, append-only trail: old labels never move or delete; a newer
+// extreme simply adds a new label (the honest streaming belief history). Plus a
+// top-right STATUS PANEL showing the last-confirmed machine state (box, phase,
+// side, peak, Monday gate, early window) and a "peak committed" alert. The commit
+// bar IS the extreme bar (a new extreme can only be set by the bar that just
+// closed), so the label appears the moment the machine knows — zero retro-drawing.
+//
 // THE SETUP (per week, Sun 17:00 NY → next Sun 17:00 NY):
 //   Weekend box (Fri17:00→Sun17:00 NY close range) → an early-week (Sun/Mon/Tue)
 //   spike OUT of the box. STREAMING: the faded side is the side of the RUNNING
@@ -77,6 +86,8 @@ i_showEntry  = input.bool(true,  "Entry arrow", group = gV)
 i_showStopTP = input.bool(true,  "Stop / TP lines", group = gV)
 i_showExt    = input.bool(true,  "Weekly-extreme line", group = gV)
 i_showEma    = input.bool(true,  "50-EMA", group = gV)
+i_showLivePeak = input.bool(true, "Live peak-commit trail (gray, causal)", group = gV)
+i_showState  = input.bool(true,  "Status panel (top-right)", group = gV)
 
 // derived tolerances (fractions)
 touchTol = i_touchTol / 100.0
@@ -162,6 +173,7 @@ var float armRetestEma = na
 // signal outputs (for alerts)
 longFired  = false
 shortFired = false
+peakCommitted = false            // true on the bar the machine (re)commits its peak
 
 // process only CONFIRMED bars -> no repaint, deterministic
 if barstate.isconfirmed
@@ -292,6 +304,15 @@ if barstate.isconfirmed
                     chainDead := false
                     l1Found   := false
                     c2latch   := false
+                    peakCommitted := true
+                    // live peak trail: the commit bar IS the extreme bar, so this
+                    // label prints causally at bar close and is NEVER moved/deleted.
+                    // A later, bigger extreme adds a NEW label; the trail stays.
+                    if i_showLivePeak
+                        label.new(time, extPrice, text = fadeDir == -1 ? "▲ peak?" : "▼ peak?",
+                             xloc = xloc.bar_time,
+                             style = fadeDir == -1 ? label.style_label_down : label.style_label_up,
+                             color = color.new(color.gray, 55), textcolor = color.white, size = size.tiny)
 
     // ======================================================================
     // (3) CHAIN step for THIS bar: L1 -> retest -> ARM (forward only)
@@ -347,6 +368,57 @@ alertcondition(shortFired, title = "Annie Monday Fade V3 — SHORT entry",
      message = "Annie Monday Fade V3 STREAMING: SHORT entry on BTCUSDT 15m at {{time}} (fade Monday spike-high; stop=running weekly high +0.05%, TP set in inputs)")
 alertcondition(entryFired, title = "Annie Monday Fade V3 — entry (either side)",
      message = "Annie Monday Fade V3 STREAMING entry confirmed on BTCUSDT 15m at {{time}}")
+alertcondition(peakCommitted, title = "Annie Monday Fade V3 — peak committed (streaming)",
+     message = "Annie Monday Fade V3 STREAMING: machine committed a running peak on BTCUSDT 15m at {{time}} — now hunting L1 vector + retest. NOTE: a newer extreme can re-commit (streaming); entry alert is the trade signal.")
 
 plotshape(longFired,  title = "LONG entry (alert bar)",  style = shape.triangleup,   location = location.belowbar, color = color.new(color.green, 0), size = size.tiny)
 plotshape(shortFired, title = "SHORT entry (alert bar)", style = shape.triangledown, location = location.abovebar, color = color.new(color.red, 0),   size = size.tiny)
+
+// ----------------------------- Status panel -----------------------------------
+// HUD of the LAST-CONFIRMED machine state. State vars mutate only inside
+// barstate.isconfirmed, so intrabar ticks cannot change what this shows — the
+// panel is a read-out, not a bar-anchored drawing: zero history mutation.
+var table st = table.new(position.top_right, 2, 6,
+     bgcolor = color.new(color.black, 15), border_width = 1,
+     border_color = color.new(color.gray, 60), frame_width = 1,
+     frame_color = color.new(color.gray, 40))
+
+if i_showState and barstate.islast
+    boxOkS  = not na(boxTop) and not na(boxBot) and boxTop > boxBot
+    phase = "waiting spike out of box"
+    if entryTaken
+        phase := "ENTERED — week decided"
+    else if armed
+        phase := "ARMED — fills next 15m open"
+    else if committed and not chainDead and l1Found
+        phase := "L1 ✓ — hunting retest"
+    else if committed and not chainDead
+        phase := "peak ✓ — waiting L1 vector"
+    else if committed and chainDead and time <= earlyEndTs
+        phase := "chain dead — waiting new extreme"
+    else if time > earlyEndTs
+        phase := committed ? "chain dead — window closed" : "no spike — window closed"
+    sideTxt = fadeDir == -1 ? "SHORT (fade spike-high)" : fadeDir == 1 ? "LONG (fade spike-low)" : "—"
+    peakTxt = committed ? str.tostring(extPrice, format.mintick) : "—"
+    monTxt  = "—"
+    if committed
+        _eh = hour(extT, i_tz)
+        _ed = dayofweek(extT, i_tz)
+        _isMon = (_eh < i_openHour and _ed == 2) or (_eh >= i_openHour and _ed == 1)
+        monTxt := _isMon ? "Mon ✓ (tradeable)" : i_mondayOnly ? "not Mon → gate blocks entry" : "not Mon (gate off)"
+    winTxt = time <= earlyEndTs ? "OPEN (to Tue 17:00 NY)" : "closed"
+    boxTxt = boxOkS ? str.tostring(boxBot, format.mintick) + " – " + str.tostring(boxTop, format.mintick) : "no box (need Fri–Sun closes)"
+    _hd = color.new(color.silver, 20)
+    _tx = color.white
+    table.cell(st, 0, 0, "V3 state",      text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 0, phase,           text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 1, "side",          text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 1, sideTxt,         text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 2, "peak",          text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 2, peakTxt,         text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 3, "Monday gate",   text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 3, monTxt,          text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 4, "early window",  text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 4, winTxt,          text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 5, "weekend box",   text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 5, boxTxt,          text_color = _tx, text_size = size.small, text_halign = text.align_left)
