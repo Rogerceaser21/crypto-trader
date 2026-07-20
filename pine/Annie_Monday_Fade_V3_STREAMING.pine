@@ -21,14 +21,21 @@
 // entry fills on the NEXT 15m open (rt+1), and both are drawn at their true bars.
 // No request.security, no future references.
 //
-// V3.1 VISUAL LAYER (2026-07-20, Igor's order — signals UNCHANGED): gray "peak?"
-// labels print AT the confirmed bar where the machine (re)commits its running
-// extreme — a causal, append-only trail: old labels never move or delete; a newer
-// extreme simply adds a new label (the honest streaming belief history). Plus a
-// top-right STATUS PANEL showing the last-confirmed machine state (box, phase,
-// side, peak, Monday gate, early window) and a "peak committed" alert. The commit
-// bar IS the extreme bar (a new extreme can only be set by the bar that just
-// closed), so the label appears the moment the machine knows — zero retro-drawing.
+// V3.2 FULLY-CAUSAL DISPLAY (2026-07-20, Igor's order — signals UNCHANGED):
+// EVERY mark prints AT the confirmed bar where the machine learned it, and no
+// drawing is ever positioned at a past bar:
+//   · gray "peak?" trail at each commit bar (the commit bar IS the extreme bar),
+//     THROTTLED: re-label only on side flip or when the committed extreme moved
+//     >= i_trailThrottle beyond the last labeled one (kills trend-day label spam;
+//     commits themselves are NOT throttled — logic identical);
+//   · yellow L1 box at the L1 bar the moment it qualifies;
+//   · blue "retest" tag at the retest bar the moment it completes;
+//   · entry label at the entry bar (peak price quoted in its text instead of a
+//     backwards-drawn marker), stop/TP/extreme lines projected FORWARD only.
+// Plus the top-right STATUS PANEL (last-confirmed machine state) and a "peak
+// committed" alert that fires on labeled commits. The V3.0/3.1 entry-time habit
+// of drawing the resolved peak/L1/retest back at their historical bars is GONE —
+// Igor's rule: nothing retro-positioned, ever. Old labels never move or delete.
 //
 // THE SETUP (per week, Sun 17:00 NY → next Sun 17:00 NY):
 //   Weekend box (Fri17:00→Sun17:00 NY close range) → an early-week (Sun/Mon/Tue)
@@ -79,7 +86,6 @@ i_mondayOnly = input.bool(true, "Monday-spike only (the validated edge)", group 
 
 gV = "Visuals"
 i_showBox    = input.bool(true,  "Weekend box", group = gV)
-i_showPeak   = input.bool(true,  "Spike-peak marker", group = gV)
 i_showL1     = input.bool(true,  "L1 vector highlight", group = gV)
 i_showRetest = input.bool(true,  "Retest marker", group = gV)
 i_showEntry  = input.bool(true,  "Entry arrow", group = gV)
@@ -87,6 +93,7 @@ i_showStopTP = input.bool(true,  "Stop / TP lines", group = gV)
 i_showExt    = input.bool(true,  "Weekly-extreme line", group = gV)
 i_showEma    = input.bool(true,  "50-EMA", group = gV)
 i_showLivePeak = input.bool(true, "Live peak-commit trail (gray, causal)", group = gV)
+i_trailThrottle = input.float(0.25, "Trail re-label threshold (% move of extreme)", minval = 0.0, step = 0.05, group = gV)
 i_showState  = input.bool(true,  "Status panel (top-right)", group = gV)
 
 // derived tolerances (fractions)
@@ -173,7 +180,11 @@ var float armRetestEma = na
 // signal outputs (for alerts)
 longFired  = false
 shortFired = false
-peakCommitted = false            // true on the bar the machine (re)commits its peak
+peakCommitted = false            // true on the bar a LABELED peak commit prints (throttled)
+
+// trail throttle state (display only — never read by signal logic)
+var float lastLblP   = na
+var int   lastLblDir = 0
 
 // process only CONFIRMED bars -> no repaint, deterministic
 if barstate.isconfirmed
@@ -200,6 +211,8 @@ if barstate.isconfirmed
         l1Bar     := 0
         c2latch   := false
         armed     := false
+        lastLblP  := na
+        lastLblDir:= 0
         if i_showBox and not na(boxTop) and not na(boxBot)
             box.new(weekOpenTs - 2 * DAY_MS, boxTop, weekOpenTs, boxBot, xloc = xloc.bar_time,
                  border_color = color.new(color.gray, 40), bgcolor = color.new(color.gray, 90))
@@ -238,24 +251,15 @@ if barstate.isconfirmed
                             longFired := true
                         else
                             shortFired := true
-                        // ---- draw the whole resolved setup at its true bars ----
-                        if i_showPeak
-                            label.new(armExtT, armExtPrice, text = armFadeDir == -1 ? "▲ peak" : "▼ peak",
-                                 xloc = xloc.bar_time, style = armFadeDir == -1 ? label.style_label_down : label.style_label_up,
-                                 color = color.new(color.gray, 20), textcolor = color.white, size = size.tiny)
-                        if i_showL1
-                            box.new(armL1T, armL1H, armL1T + 15 * 60000, armL1L, xloc = xloc.bar_time,
-                                 border_color = color.new(color.yellow, 0), bgcolor = color.new(color.yellow, 80))
-                        if i_showRetest
-                            label.new(armRetestT, armRetestEma, text = "retest", xloc = xloc.bar_time,
-                                 style = label.style_label_center, color = color.new(color.blue, 30),
-                                 textcolor = color.white, size = size.tiny)
+                        // ---- causal entry drawing: everything at THIS bar or
+                        //      projected forward; nothing positioned at past bars ----
                         if i_showEntry
-                            label.new(time, entryRef, text = armFadeDir == -1 ? "SHORT" : "LONG",
+                            label.new(time, entryRef,
+                                 text = (armFadeDir == -1 ? "SHORT" : "LONG") + " (peak " + str.tostring(armExtPrice, format.mintick) + ")",
                                  xloc = xloc.bar_time, style = armFadeDir == -1 ? label.style_label_down : label.style_label_up,
                                  color = color.new(dirCol, 0), textcolor = color.white, size = size.small)
                         if i_showExt
-                            line.new(armExtT, armWick, friEndTs, armWick, xloc = xloc.bar_time,
+                            line.new(time, armWick, friEndTs, armWick, xloc = xloc.bar_time,
                                  color = color.new(color.gray, 20), width = 1, style = line.style_dotted)
                         if i_showStopTP
                             line.new(time, stopP, friEndTs, stopP, xloc = xloc.bar_time,
@@ -304,15 +308,23 @@ if barstate.isconfirmed
                     chainDead := false
                     l1Found   := false
                     c2latch   := false
-                    peakCommitted := true
-                    // live peak trail: the commit bar IS the extreme bar, so this
-                    // label prints causally at bar close and is NEVER moved/deleted.
-                    // A later, bigger extreme adds a NEW label; the trail stays.
-                    if i_showLivePeak
-                        label.new(time, extPrice, text = fadeDir == -1 ? "▲ peak?" : "▼ peak?",
-                             xloc = xloc.bar_time,
-                             style = fadeDir == -1 ? label.style_label_down : label.style_label_up,
-                             color = color.new(color.gray, 55), textcolor = color.white, size = size.tiny)
+                    // live peak trail (display only, THROTTLED): label the commit
+                    // bar (== the extreme bar) causally, but only on the first
+                    // commit of the week, a side flip, or when the extreme moved
+                    // >= i_trailThrottle beyond the last LABELED one. Commits and
+                    // chain resets are NOT throttled — the signal logic above ran
+                    // in full either way. Labels are never moved or deleted.
+                    doLbl = na(lastLblP) or fadeDir != lastLblDir or
+                         math.abs(extPrice - lastLblP) / lastLblP >= i_trailThrottle / 100.0
+                    if doLbl
+                        peakCommitted := true
+                        lastLblP   := extPrice
+                        lastLblDir := fadeDir
+                        if i_showLivePeak
+                            label.new(time, extPrice, text = fadeDir == -1 ? "▲ peak?" : "▼ peak?",
+                                 xloc = xloc.bar_time,
+                                 style = fadeDir == -1 ? label.style_label_down : label.style_label_up,
+                                 color = color.new(color.gray, 55), textcolor = color.white, size = size.tiny)
 
     // ======================================================================
     // (3) CHAIN step for THIS bar: L1 -> retest -> ARM (forward only)
@@ -333,6 +345,13 @@ if barstate.isconfirmed
                 l1Low   := low
                 l1High  := high
                 c2latch := false
+                // causal L1 mark: printed AT the L1 bar the moment it qualifies
+                if i_showL1
+                    box.new(time, high, time + 15 * 60000, low, xloc = xloc.bar_time,
+                         border_color = color.new(color.yellow, 0), bgcolor = color.new(color.yellow, 80))
+                    label.new(time, low, text = "L1", xloc = xloc.bar_time,
+                         style = label.style_label_up, color = color.new(color.yellow, 40),
+                         textcolor = color.black, size = size.tiny)
         else if bar_index > l1Bar
             if bar_index >= l1Bar + i_span
                 chainDead := true                      // no retest within span
@@ -358,6 +377,11 @@ if barstate.isconfirmed
                         armL1L       := l1Low
                         armRetestT   := time
                         armRetestEma := ema50
+                        // causal retest mark: printed AT the retest bar, now
+                        if i_showRetest
+                            label.new(time, ema50, text = "retest", xloc = xloc.bar_time,
+                                 style = label.style_label_center, color = color.new(color.blue, 30),
+                                 textcolor = color.white, size = size.tiny)
 
 entryFired = longFired or shortFired
 

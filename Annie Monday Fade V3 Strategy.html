@@ -203,6 +203,13 @@ not the whole 2019&ndash;2024 record. The numbers of record are the streaming ba
 //
 // TP is an INPUT (default 2.5R, selectable 1.9 / 2.5 / 3.0). PVSRA 200%-class
 // vector: volume ≥ 2.0× ta.sma(volume[1],10). Chart: BTCUSDT perp, 15m.
+//
+// V3.2 FULLY-CAUSAL DISPLAY (2026-07-20, Igor's order — signals UNCHANGED, same
+// layer as the indicator): every mark prints AT the confirmed bar the machine
+// learned it — throttled gray "peak?" trail at commit bars, yellow L1 box at the
+// L1 bar, blue retest tag at the retest bar, entry label (peak price in text) at
+// the entry bar, lines projected forward only. Nothing retro-positioned, nothing
+// moved or deleted. Plus the status panel and the "peak committed" alert.
 // =============================================================================
 
 strategy("Annie Monday Fade — Strategy V3", overlay = true,
@@ -234,13 +241,15 @@ i_riskPct  = input.float(1.0, "Risk per trade (% of equity)", minval = 0.01, max
 
 gV = "Visuals"
 i_showBox    = input.bool(true,  "Weekend box", group = gV)
-i_showPeak   = input.bool(true,  "Spike-peak marker", group = gV)
 i_showL1     = input.bool(true,  "L1 vector highlight", group = gV)
 i_showRetest = input.bool(true,  "Retest marker", group = gV)
 i_showEntry  = input.bool(true,  "Entry arrow", group = gV)
 i_showStopTP = input.bool(true,  "Stop / TP lines", group = gV)
 i_showExt    = input.bool(true,  "Weekly-extreme line", group = gV)
 i_showEma    = input.bool(true,  "50-EMA", group = gV)
+i_showLivePeak = input.bool(true, "Live peak-commit trail (gray, causal)", group = gV)
+i_trailThrottle = input.float(0.25, "Trail re-label threshold (% move of extreme)", minval = 0.0, step = 0.05, group = gV)
+i_showState  = input.bool(true,  "Status panel (top-right)", group = gV)
 
 // derived tolerances (fractions)
 touchTol = i_touchTol / 100.0
@@ -320,9 +329,14 @@ var float armRetestEma = na
 
 longFired  = false
 shortFired = false
+peakCommitted = false            // true on the bar a LABELED peak commit prints (throttled)
 oStopP = 0.0
 oTpP   = 0.0
 oSd    = 0.0
+
+// trail throttle state (display only — never read by signal logic)
+var float lastLblP   = na
+var int   lastLblDir = 0
 
 if barstate.isconfirmed
     // --- New week bootstrap ---
@@ -348,6 +362,8 @@ if barstate.isconfirmed
         l1Bar     := 0
         c2latch   := false
         armed     := false
+        lastLblP  := na
+        lastLblDir:= 0
         if i_showBox and not na(boxTop) and not na(boxBot)
             box.new(weekOpenTs - 2 * DAY_MS, boxTop, weekOpenTs, boxBot, xloc = xloc.bar_time,
                  border_color = color.new(color.gray, 40), bgcolor = color.new(color.gray, 90))
@@ -384,23 +400,15 @@ if barstate.isconfirmed
                         else
                             shortFired := true
                         dirCol = armFadeDir == -1 ? color.red : color.green
-                        if i_showPeak
-                            label.new(armExtT, armExtPrice, text = armFadeDir == -1 ? "▲ peak" : "▼ peak",
-                                 xloc = xloc.bar_time, style = armFadeDir == -1 ? label.style_label_down : label.style_label_up,
-                                 color = color.new(color.gray, 20), textcolor = color.white, size = size.tiny)
-                        if i_showL1
-                            box.new(armL1T, armL1H, armL1T + 15 * 60000, armL1L, xloc = xloc.bar_time,
-                                 border_color = color.new(color.yellow, 0), bgcolor = color.new(color.yellow, 80))
-                        if i_showRetest
-                            label.new(armRetestT, armRetestEma, text = "retest", xloc = xloc.bar_time,
-                                 style = label.style_label_center, color = color.new(color.blue, 30),
-                                 textcolor = color.white, size = size.tiny)
+                        // ---- causal entry drawing: everything at THIS bar or
+                        //      projected forward; nothing positioned at past bars ----
                         if i_showEntry
-                            label.new(time, entryRef, text = armFadeDir == -1 ? "SHORT (engine bar)" : "LONG (engine bar)",
+                            label.new(time, entryRef,
+                                 text = (armFadeDir == -1 ? "SHORT (engine bar" : "LONG (engine bar") + ", peak " + str.tostring(armExtPrice, format.mintick) + ")",
                                  xloc = xloc.bar_time, style = armFadeDir == -1 ? label.style_label_down : label.style_label_up,
                                  color = color.new(dirCol, 0), textcolor = color.white, size = size.small)
                         if i_showExt
-                            line.new(armExtT, armWick, friEndTs, armWick, xloc = xloc.bar_time,
+                            line.new(time, armWick, friEndTs, armWick, xloc = xloc.bar_time,
                                  color = color.new(color.gray, 20), width = 1, style = line.style_dotted)
                         if i_showStopTP
                             line.new(time, stopP, friEndTs, stopP, xloc = xloc.bar_time,
@@ -446,6 +454,18 @@ if barstate.isconfirmed
                     chainDead := false
                     l1Found   := false
                     c2latch   := false
+                    // throttled causal peak trail (display only; commits never throttled)
+                    doLbl = na(lastLblP) or fadeDir != lastLblDir or
+                         math.abs(extPrice - lastLblP) / lastLblP &gt;= i_trailThrottle / 100.0
+                    if doLbl
+                        peakCommitted := true
+                        lastLblP   := extPrice
+                        lastLblDir := fadeDir
+                        if i_showLivePeak
+                            label.new(time, extPrice, text = fadeDir == -1 ? "▲ peak?" : "▼ peak?",
+                                 xloc = xloc.bar_time,
+                                 style = fadeDir == -1 ? label.style_label_down : label.style_label_up,
+                                 color = color.new(color.gray, 55), textcolor = color.white, size = size.tiny)
 
     // (3) CHAIN step: L1 -&gt; retest -&gt; ARM (forward only)
     if committed and not chainDead and not armed and not entryTaken and bar_index &gt;= extBar
@@ -464,6 +484,13 @@ if barstate.isconfirmed
                 l1Low   := low
                 l1High  := high
                 c2latch := false
+                // causal L1 mark: printed AT the L1 bar the moment it qualifies
+                if i_showL1
+                    box.new(time, high, time + 15 * 60000, low, xloc = xloc.bar_time,
+                         border_color = color.new(color.yellow, 0), bgcolor = color.new(color.yellow, 80))
+                    label.new(time, low, text = "L1", xloc = xloc.bar_time,
+                         style = label.style_label_up, color = color.new(color.yellow, 40),
+                         textcolor = color.black, size = size.tiny)
         else if bar_index &gt; l1Bar
             if bar_index &gt;= l1Bar + i_span
                 chainDead := true
@@ -488,6 +515,11 @@ if barstate.isconfirmed
                         armL1L       := l1Low
                         armRetestT   := time
                         armRetestEma := ema50
+                        // causal retest mark: printed AT the retest bar, now
+                        if i_showRetest
+                            label.new(time, ema50, text = "retest", xloc = xloc.bar_time,
+                                 style = label.style_label_center, color = color.new(color.blue, 30),
+                                 textcolor = color.white, size = size.tiny)
 
     // --- STRATEGY ORDERS (market submitted at the engine entry bar; risk-sized) ---
     if (longFired or shortFired) and oSd &gt; 0
@@ -509,9 +541,60 @@ alertcondition(longFired, title = "Annie Monday Fade V3 — LONG entry",
      message = "Annie Monday Fade V3 Strategy: LONG entry on BTCUSDT 15m at {{time}}")
 alertcondition(shortFired, title = "Annie Monday Fade V3 — SHORT entry",
      message = "Annie Monday Fade V3 Strategy: SHORT entry on BTCUSDT 15m at {{time}}")
+alertcondition(peakCommitted, title = "Annie Monday Fade V3 — peak committed (streaming)",
+     message = "Annie Monday Fade V3 Strategy: machine committed a running peak on BTCUSDT 15m at {{time}} — now hunting L1 vector + retest. NOTE: a newer extreme can re-commit (streaming); entry alert is the trade signal.")
 
 plotshape(longFired,  title = "LONG entry (signal bar)",  style = shape.triangleup,   location = location.belowbar, color = color.new(color.green, 0), size = size.tiny)
 plotshape(shortFired, title = "SHORT entry (signal bar)", style = shape.triangledown, location = location.abovebar, color = color.new(color.red, 0),   size = size.tiny)
+
+// ----------------------------- Status panel -----------------------------------
+// HUD of the LAST-CONFIRMED machine state. State vars mutate only inside
+// barstate.isconfirmed, so intrabar ticks cannot change what this shows — the
+// panel is a read-out, not a bar-anchored drawing: zero history mutation.
+var table st = table.new(position.top_right, 2, 6,
+     bgcolor = color.new(color.black, 15), border_width = 1,
+     border_color = color.new(color.gray, 60), frame_width = 1,
+     frame_color = color.new(color.gray, 40))
+
+if i_showState and barstate.islast
+    boxOkS  = not na(boxTop) and not na(boxBot) and boxTop &gt; boxBot
+    phase = "waiting spike out of box"
+    if entryTaken
+        phase := "ENTERED — week decided"
+    else if armed
+        phase := "ARMED — fills next 15m open"
+    else if committed and not chainDead and l1Found
+        phase := "L1 ✓ — hunting retest"
+    else if committed and not chainDead
+        phase := "peak ✓ — waiting L1 vector"
+    else if committed and chainDead and time &lt;= earlyEndTs
+        phase := "chain dead — waiting new extreme"
+    else if time &gt; earlyEndTs
+        phase := committed ? "chain dead — window closed" : "no spike — window closed"
+    sideTxt = fadeDir == -1 ? "SHORT (fade spike-high)" : fadeDir == 1 ? "LONG (fade spike-low)" : "—"
+    peakTxt = committed ? str.tostring(extPrice, format.mintick) : "—"
+    monTxt  = "—"
+    if committed
+        _eh = hour(extT, i_tz)
+        _ed = dayofweek(extT, i_tz)
+        _isMon = (_eh &lt; i_openHour and _ed == 2) or (_eh &gt;= i_openHour and _ed == 1)
+        monTxt := _isMon ? "Mon ✓ (tradeable)" : i_mondayOnly ? "not Mon → gate blocks entry" : "not Mon (gate off)"
+    winTxt = time &lt;= earlyEndTs ? "OPEN (to Tue 17:00 NY)" : "closed"
+    boxTxt = boxOkS ? str.tostring(boxBot, format.mintick) + " – " + str.tostring(boxTop, format.mintick) : "no box (need Fri–Sun closes)"
+    _hd = color.new(color.silver, 20)
+    _tx = color.white
+    table.cell(st, 0, 0, "V3 state",      text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 0, phase,           text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 1, "side",          text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 1, sideTxt,         text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 2, "peak",          text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 2, peakTxt,         text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 3, "Monday gate",   text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 3, monTxt,          text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 4, "early window",  text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 4, winTxt,          text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 5, "weekend box",   text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 5, boxTxt,          text_color = _tx, text_size = size.small, text_halign = text.align_left)
 </pre>
 
 <div class="foot">
