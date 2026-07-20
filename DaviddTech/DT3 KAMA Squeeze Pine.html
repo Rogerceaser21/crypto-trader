@@ -1,0 +1,838 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DT3 KAMA + Squeeze &mdash; Pine v6 (indicator + strategy)</title>
+<style>
+  :root{
+    --bg:#0e1117; --panel:#161b22; --panel2:#1c2230; --ink:#e6edf3; --muted:#9aa4b2;
+    --line:#2a3140; --accent:#6aa9ff; --up:#3fb950; --dn:#f85149; --warn:#e3b341; --m3:#26a69a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  .wrap{max-width:940px;margin:0 auto;padding:34px 22px 90px;}
+  header{border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:8px}
+  .eyebrow{letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:var(--accent);font-weight:700}
+  h1{font-size:30px;margin:8px 0 6px;line-height:1.2}
+  h2{font-size:21px;margin:38px 0 12px;padding-top:8px;border-top:1px solid var(--line)}
+  h3{font-size:16px;margin:22px 0 8px;color:var(--ink)}
+  p{color:var(--ink)}
+  .sub{color:var(--muted);font-size:15px;max-width:74ch}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:14px 0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:720px){.grid2{grid-template-columns:1fr}}
+  code,kbd{background:#0b0f16;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px}
+  kbd{color:var(--accent)}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:14px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--panel2);color:var(--muted);font-weight:600;font-size:12.5px;text-transform:uppercase;letter-spacing:.04em}
+  td.n{font-family:ui-monospace,Menlo,monospace;white-space:nowrap}
+  .statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:10px 0}
+  .stat{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .stat .v{font-size:23px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--ink)}
+  .stat .k{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+  .stat .v.good{color:var(--up)}
+  ol.steps{counter-reset:s;list-style:none;padding-left:0;margin:0}
+  ol.steps li{position:relative;padding:10px 0 10px 46px;border-bottom:1px solid var(--line)}
+  ol.steps li:last-child{border-bottom:0}
+  ol.steps li::before{counter-increment:s;content:counter(s);position:absolute;left:0;top:10px;
+    width:30px;height:30px;border-radius:50%;background:var(--accent);color:#0b0f16;font-weight:800;
+    display:flex;align-items:center;justify-content:center;font-size:14px}
+  .callout{border-left:4px solid var(--warn);background:rgba(227,179,65,.08);padding:12px 16px;border-radius:8px;margin:12px 0}
+  .callout.good{border-left-color:var(--m3);background:rgba(38,166,154,.08)}
+  .callout.bad{border-left-color:var(--dn);background:rgba(248,81,73,.09)}
+  .callout.feed{border-left-color:var(--accent);background:rgba(106,169,255,.10)}
+  .callout b{color:var(--ink)}
+  pre.src{background:#0b0f16;border:1px solid var(--line);border-radius:10px;padding:16px;overflow:auto;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.5;color:#c9d3e0;max-height:560px;white-space:pre}
+  .copybar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:14px 0 6px}
+  .btn{background:var(--accent);color:#0b0f16;border:0;border-radius:8px;padding:9px 16px;font-weight:700;cursor:pointer;font-size:14px}
+  .btn:active{transform:translateY(1px)}
+  .foot{color:var(--muted);font-size:12.5px;margin-top:50px;border-top:1px solid var(--line);padding-top:16px}
+  .muted{color:var(--muted)}
+  ul.tight{margin:6px 0 6px 0;padding-left:20px} ul.tight li{margin:4px 0}
+  .pill{display:inline-block;font-size:11px;font-weight:700;border-radius:20px;padding:2px 10px;color:#0b0f16;background:var(--up)}
+  .pill.no{background:var(--dn);color:#fff}
+  .mono{font-family:ui-monospace,Menlo,monospace}
+  html[data-theme="light"]{
+    --bg:#f7f9fc; --panel:#ffffff; --panel2:#eef1f6; --ink:#1a2230; --muted:#5b6472;
+    --line:#d7dde6; --accent:#2f6fe0; --up:#1e7d34; --dn:#c92c22; --warn:#a6740b; --m3:#178f83;
+  }
+  html[data-theme="light"] code, html[data-theme="light"] kbd{background:#eef1f5;color:var(--ink)}
+  html[data-theme="light"] pre.src{background:#eef1f5;color:#1a2230}
+  html[data-theme="light"] .callout{background:rgba(166,116,11,.10)}
+  html[data-theme="light"] .callout.good{background:rgba(23,143,131,.10)}
+  html[data-theme="light"] .callout.bad{background:rgba(201,44,34,.09)}
+  html[data-theme="light"] .callout.feed{background:rgba(47,111,224,.10)}
+  html[data-theme="light"] .btn,
+  html[data-theme="light"] ol.steps li::before,
+  html[data-theme="light"] .pill{color:#fff}
+  .theme-toggle{position:fixed;top:16px;right:20px;z-index:100;background:var(--panel);
+    border:1px solid var(--line);color:var(--ink);border-radius:20px;padding:6px 14px;
+    font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.35);
+    font-family:inherit;letter-spacing:.02em}
+  html[data-theme="light"] .theme-toggle{box-shadow:0 2px 10px rgba(0,0,0,.10)}
+  .theme-toggle:active{transform:translateY(1px)}
+@media(max-width:560px){.theme-toggle{top:10px;right:12px;padding:6px 10px;font-size:12px}body{padding-top:44px}}
+</style>
+
+<script>
+(function(){try{var t=localStorage.getItem('codexTheme');var e=(t==='light'||t==='dark')?t:((window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light');document.documentElement.setAttribute('data-theme',e);}catch(e){}})();
+</script>
+
+</head>
+<body>
+
+<button type="button" id="themeToggle" class="theme-toggle" aria-label="Cycle theme: light, dark, or system">&#9683; Auto</button>
+<div class="wrap">
+<header>
+  <div class="eyebrow">DaviddTech &middot; DT3 KAMA + Squeeze &middot; Pine v6 port</div>
+  <h1>DT3 &ldquo;Flagship KAMA + Squeeze&rdquo; &mdash; Pine v6 (indicator + strategy)</h1>
+  <p class="sub">The validated DT3 KAMA&nbsp;+&nbsp;Squeeze &mdash; DaviddTech&rsquo;s <span class="mono">KAMA Final Video Replication</span> flagship &mdash; rebuilt as a
+  causal Pine&nbsp;v6 <b>indicator</b> plus a Strategy&nbsp;Tester <b>twin</b> with an identical signal core. A BTC 1h <b>long-only</b> trend-follower:
+  wait for a Bollinger/Keltner <b>squeeze to release</b> with rising momentum, price above a rising <b>Kaufman Adaptive MA</b> and a tight efficiency
+  ratio; ride the move out on a momentum-flip forced exit or a wide ATR trail, with a fixed ATR initial stop underneath. Every decision, drawing and
+  alert fires on <b>confirmed, closed bars only</b> &mdash; no repaint. This page is the <b>copy of record</b> and the paste source for both files.</p>
+</header>
+
+<div class="callout feed" style="margin-top:16px">
+  <b>Tested feed &mdash; chart this exact one: <span class="mono">BINANCE:BTCUSDT</span> perpetual, 1h.</b> The edge was measured on Binance
+  BTCUSDT-perp candles. The squeeze-release&nbsp;+&nbsp;KAMA&nbsp;+&nbsp;momentum stack is <i>price/volatility-local</i>: a different exchange&rsquo;s
+  candles release the squeeze and cross the KAMA at slightly different bars and will <b>not</b> reproduce the record. Chart the same feed the backtest
+  used. (Same lesson as the Annie&nbsp;V3 Bybit-vs-Binance divergence.)
+</div>
+
+<div class="callout bad" style="margin-top:14px">
+  <b>The &ldquo;+1451%&rdquo; is a leverage illusion &mdash; the honest number is +0.282R/trade.</b> DaviddTech&rsquo;s video headline for this system
+  (PF&nbsp;2.42 / Sharpe&nbsp;1.5 / <b>+1451%</b> / 110&nbsp;trades / 3y) is <b>selection-only context, not evidence.</b> That +1451% comes from
+  <b>10&times; margin</b> stacked with vol-regime position-size multipliers up to <b>7.4&times;</b> &mdash; a sizing illusion, not signal quality. We
+  test the <b>signal</b> at honest sizing: flat <b>1%-equity risk</b> vs the initial stop, <b>no leverage, no regime multipliers</b>. The regime-sizing
+  model exists in the source and is deliberately <b>not</b> tested here. Honest per-trade edge: <b>+0.282R</b>.
+</div>
+
+<div class="callout" style="margin-top:14px">
+  <b>Tail caveat &mdash; a fat-tail bet, not a steady grind (read before sizing).</b> Center total = <b>+68.1R</b> over 242 trades, but the
+  <b>single largest trade contributes 13.06R = 19.2%</b> of it and the top-3 are ~45%. Win rate is only <b>33%</b>. Remove just the biggest winner and
+  the center t-stat drops <b>2.10&nbsp;&rarr;&nbsp;1.85</b> (below 2.0). This is genuine trend-following behaviour &mdash; the edge lives in the right
+  tail. Position it as a right-tail bet, not a metronome.
+</div>
+
+<h2>1 &middot; Honest, in-sample stats (config of record)</h2>
+<p>Config of record = the report&rsquo;s <b>center cell</b> &mdash; the exact combination the DT3 verdict headlines: <span class="mono">efficiencyLength&nbsp;32 / minEff&nbsp;0.20 / initial-stop&nbsp;2.8&times;ATR / trail&nbsp;5&times;ATR</span>,
+squeeze length&nbsp;16 (BB&nbsp;2.0 / KC&nbsp;1.5), momentum length&nbsp;16, ATR(14). In-sample <b>2019-09&nbsp;&rarr;&nbsp;2024-12</b> (2025&ndash;26 locked out), our causal cost-honest engine, 1% risk, 0.05% fee + 0.02% slip per fill:</p>
+<div class="statgrid">
+  <div class="stat"><div class="v good">+0.282R</div><div class="k">per trade (center)</div></div>
+  <div class="stat"><div class="v">1.56</div><div class="k">profit factor</div></div>
+  <div class="stat"><div class="v">1.10</div><div class="k">Sharpe</div></div>
+  <div class="stat"><div class="v">242</div><div class="k">IS trades</div></div>
+  <div class="stat"><div class="v">33.1%</div><div class="k">win rate</div></div>
+  <div class="stat"><div class="v">2.10</div><div class="k">t-stat (center)</div></div>
+</div>
+<p class="muted" style="margin:8px 0 0">Surface-wide, not a lone spike: <b>all 36</b> declared grid cells had positive expectancy (range +0.159 to +0.512), 20 of them individually
+significant (t&nbsp;&ge;&nbsp;2.0). Center-region mean expR <b>+0.293</b> (all 8 axis-neighbour cells &gt;0). Best cell 24/0.20/(2.4,4) reaches <b>t&nbsp;=&nbsp;2.56</b>, but read the
+<b>whole positive surface</b>, not the best cell. Max drawdown 12.1%. These are the <b>numbers of record</b> from <span class="mono">backtests/bt_dt3_kama_squeeze.py</span> &mdash; NOT the chart&rsquo;s Strategy Tester.</p>
+
+<h2>2 &middot; What it does &amp; how it trades</h2>
+<div class="card">
+  <ul class="tight">
+    <li><b>KAMA</b> &mdash; a Kaufman Adaptive MA rolled by hand from the efficiency ratio (<span class="mono">|&Delta;<sub>L</sub>close| / &Sigma;|&Delta;close|</span>): smooth in chop, fast in trend. Entries need <b>close above a rising KAMA</b>.</li>
+    <li><b>Squeeze release</b> &mdash; Bollinger Bands compress <b>fully inside</b> the Keltner Channel (a volatility squeeze); the entry trigger is the bar the squeeze <b>lets go</b> after being held &ge;2 bars.</li>
+    <li><b>Momentum gate</b> &mdash; a 16-bar LSMA of price vs its mid/mean composite must be <b>positive and rising</b>.</li>
+    <li><b>Efficiency gate</b> &mdash; the efficiency ratio must exceed <b>0.20</b> (a directional, non-choppy move).</li>
+    <li><b>Fill</b> &mdash; the <b>open of the next 1h bar</b> after the confirmed signal (causal). Long-only, flat-only (no pyramiding).</li>
+    <li><b>Initial stop</b> &mdash; <b>2.8&times;ATR(14)</b> below the <b>signal-bar close</b>, <b>frozen</b> for the life of the trade. Detected on the chart 1h low (identical exit bar to the engine&rsquo;s 1m detection &mdash; a 1h low is the min of its 1m lows, and the stop is a fixed level).</li>
+    <li><b>Forced exit</b> (dominant, ~70%) &mdash; when <b>close&nbsp;&lt;&nbsp;KAMA and momentum&nbsp;&lt;&nbsp;0</b>, close at the next 1h open. The momentum flip is the real engine of the system.</li>
+    <li><b>Trail</b> (rarely binds, ~1%) &mdash; a ratcheting close-based <b>5&times;ATR</b> trail; exit when close&nbsp;&le;&nbsp;trail. So wide the forced exit almost always fires first.</li>
+    <li><b>Sizing of record</b> &mdash; 1%-of-equity risk against the initial stop distance (2.8&times;ATR at the signal bar). No leverage, no regime multiplier.</li>
+  </ul>
+</div>
+<div class="card" style="margin-top:0">
+  <h3 style="margin-top:2px">Exit mix at center (242 trades)</h3>
+  <div class="tblwrap"><table><thead><tr><th>Exit type</th><th>Count</th><th>Share</th><th>Mechanics</th></tr></thead><tbody>
+  <tr><td>forced (close&lt;KAMA &amp; mom&lt;0)</td><td class="n">169</td><td class="n">69.8%</td><td>momentum/trend flip &mdash; fills next 1h open</td></tr>
+  <tr><td>initial stop (frozen, 1m/1h)</td><td class="n">71</td><td class="n">29.3%</td><td>&minus;1R-ish loss cutter, ambiguous&nbsp;=&nbsp;LOSS</td></tr>
+  <tr><td>trail (close &le; 5&times;ATR)</td><td class="n">2</td><td class="n">0.8%</td><td>the wide ratchet rarely binds</td></tr>
+  <tr><td>eod</td><td class="n">0</td><td class="n">0.0%</td><td>&mdash;</td></tr>
+  </tbody></table></div>
+</div>
+<div class="card" style="margin-top:0">
+  <h3 style="margin-top:2px">On-chart marks &amp; the status panel</h3>
+  <ul class="tight">
+    <li><b>KAMA line</b> &mdash; lime when rising, red when falling: the adaptive trend the system keys off.</li>
+    <li><b>Entry triangle</b> (green up) prints <b>at the signal bar</b> &mdash; the actionable moment; the fill is the next 1h open. A label at the fill bar quotes the entry price and stop.</li>
+    <li><b>Initial-stop line</b> (red) and <b>trail line</b> (orange) run for the life of each trade.</li>
+    <li><b>Squeeze dots</b> (gray, on the price axis) mark bars where the squeeze is ON (compressed).</li>
+    <li><b>Exit &times;</b> &mdash; red at a stop hit, blue at a forced momentum exit, orange at a trail exit.</li>
+    <li><b>Status panel</b> (top-right) &mdash; last-confirmed machine state: position, side, entry, initial stop, squeeze state, bars in trade. A read-out, not a bar-anchored drawing.</li>
+  </ul>
+</div>
+
+<h2>3 &middot; Fidelity &amp; no-repaint audit</h2>
+<div class="grid2">
+  <div class="card"><h3 style="margin-top:2px">Fidelity &mdash; the Python twin</h3>
+    <p style="margin:6px 0 0">A bar-by-bar Python mirror of <b>this Pine&rsquo;s</b> forward 1h state machine (<span class="mono">backtests/pine_mirror_dt3.py</span>, not a copy of the engine)
+    reproduces the frozen 242-trade center ledger <b>242 / 242 = 100%</b> exact &mdash; side, entry-time, exit-time and exit-reason all identical &mdash; with
+    <b>max&nbsp;|&Delta;R|&nbsp;=&nbsp;0.000000</b> and total R 68.1429 to the reference. The manual <b>KAMA recursion reproduces the engine bar-exact</b>
+    (max&nbsp;|diff|&nbsp;=&nbsp;0.0 vs the report&rsquo;s published hand-check table, bars 4300&ndash;4304). Deterministic across double runs (md5 <span class="mono">92c1730c&hellip;</span>). <span class="pill">100% match</span></p></div>
+  <div class="card"><h3 style="margin-top:2px">No-repaint &mdash; both files</h3>
+    <p style="margin:6px 0 0">Grep-verified on both <span class="mono">.pine</span> files: <b>zero</b> <span class="mono">request.security</span>, <span class="mono">varip</span>, <span class="mono">timenow</span>,
+    <span class="mono">barstate.isrealtime</span>; every decision/drawing/order/alert gated by <span class="mono">barstate.isconfirmed</span>; drawings append-only
+    (<span class="mono">label.new</span> only) with <b>zero</b> <span class="mono">.set_*()</span> / <span class="mono">.delete()</span>; nothing positioned at a past bar. <span class="pill">no repaint</span></p></div>
+</div>
+<div class="tblwrap"><table><thead><tr><th>Audit check</th><th>Rule</th><th>Result</th></tr></thead><tbody>
+<tr><td>request.security / varip / timenow / isrealtime</td><td class="n">= 0</td><td class="n">0 / 0 / 0 / 0 &#9989;</td></tr>
+<tr><td>Decisions under <span class="mono">barstate.isconfirmed</span></td><td class="n">all</td><td class="n">all &#9989;</td></tr>
+<tr><td>Retro-mutation <span class="mono">.set_*()</span> / <span class="mono">.delete()</span></td><td class="n">= 0</td><td class="n">0 / 0 &#9989;</td></tr>
+<tr><td>KAMA recursion bar-exact vs report table</td><td class="n">&lt; 0.01</td><td class="n">max |diff| 0.0 &#9989;</td></tr>
+<tr><td>Mirror match vs frozen center ledger</td><td class="n">&ge; 95%</td><td class="n">242/242 = 100% &#9989;</td></tr>
+<tr><td>Deterministic double run (mirror md5)</td><td class="n">identical</td><td class="n">92c1730c&hellip; = 92c1730c&hellip; &#9989;</td></tr>
+</tbody></table></div>
+
+<div class="callout bad">
+  <b>The 1-bar Strategy-Tester lag caveat &mdash; read before judging the Tester&rsquo;s P&amp;L.</b> The number of record is our Python backtest
+  (+0.282R center), which fills at the open of the bar <i>after</i> the confirmed signal and detects the initial stop on 1m granularity. The
+  Strategy-Tester twin submits its market order the moment that entry bar confirms, so TradingView fills it on the <b>following</b> open &mdash;
+  about one 1h bar later than the engine &mdash; and the forced/trail market closes fill a bar later too. Stop levels use the engine geometry
+  (signal close&nbsp;&minus;&nbsp;2.8&times;ATR, frozen), sizing is 1% risk. TradingView also caps 1h history, so you see recent years, not the full
+  2019&ndash;2024 record. <b>The chart is for SEEING the trades; the authoritative numbers are the backtest reports on this site.</b>
+</div>
+
+<h2>4 &middot; Install on TradingView</h2>
+<ol class="steps">
+  <li>Open a <b>BINANCE:BTCUSDT perpetual</b> chart on the <b>1-hour</b> timeframe &mdash; the exact feed and timeframe the edge was measured on.</li>
+  <li>Load full history (scroll back to ~2019 or set a wide range) so KAMA and the squeeze/momentum indicators seed &mdash; the first ~300 1h bars are a warm-up and do not trade.</li>
+  <li>Open <b>Pine Editor</b>, paste the <b>indicator</b> source (copy button below), <b>Save</b>, then <b>Add to chart</b>. It overlays the KAMA, marks entries/exits, shows squeeze dots and the status panel.</li>
+  <li>For the Strategy Tester picture, add the <b>strategy</b> source as a second script &mdash; identical signals, plus the trade list and P&amp;L (mind the 1-bar Tester-lag caveat above).</li>
+  <li>To alert: right-click the chart &rarr; <b>Add alert</b> &rarr; Condition = this indicator &rarr; pick <b>&ldquo;LONG signal&rdquo;</b> or <b>&ldquo;exit&rdquo;</b> &rarr; <b>Once per bar close</b>. The entry alert fires on the signal bar; enter at the next 1h open.</li>
+  <li>Leave the signal knobs on their validated center defaults. They are exposed as inputs so you can inspect &mdash; not so you re-tune the edge.</li>
+</ol>
+
+<h2>5 &middot; Full Pine source &mdash; Indicator (<span class="mono">DT3_KAMA_Squeeze_LIVE.pine</span>)</h2>
+<div class="copybar">
+  <span class="muted">Paste this whole block into the Pine Editor. This page is the copy of record.</span>
+  <button class="btn" id="copyBtnInd">Copy indicator source</button>
+</div>
+<pre class="src" id="pineInd">//@version=6
+// =============================================================================
+// DT3 &quot;Flagship KAMA + Squeeze&quot; — LIVE (indicator)  ·  DaviddTech &quot;KAMA Final
+// Video Replication v1&quot; port
+// -----------------------------------------------------------------------------
+// The VALIDATED DT3 KAMA + Squeeze, rebuilt as a causal Pine v6 indicator so the
+// signal a live trader gets is the signal that was backtested. It is a BTC 1h
+// LONG-ONLY trend-follower: it waits for a Bollinger/Keltner SQUEEZE to RELEASE
+// with rising positive momentum, price above a rising Kaufman Adaptive MA (KAMA)
+// and a tight efficiency ratio, then rides the move out via a momentum-flip
+// forced exit or a wide ATR trail, with a fixed ATR initial stop underneath.
+// Config of record = the report&#x27;s CENTER cell (the one that headlines the verdict):
+// efficiencyLength 32 / minEff 0.20 / initial-stop 2.8xATR / trail 5xATR, squeeze
+// length 16 (BB 2.0 / KC 1.5), momentum length 16, ATR(14).
+//   In-sample 2019-09 -&gt; 2024-12 (2025-26 LOCKED OUT), our causal cost-honest
+//   engine at 1% risk, 0.05% fee + 0.02% slip/fill: +0.282R/trade · PF 1.56 ·
+//   Sharpe 1.10 · n=242 · WR 33.1% · t=2.10 (center). Center-region mean expR
+//   +0.293 (all 8 neighbour cells &gt;0); best cell 24/0.20/(2.4,4) t=2.56; ALL 36
+//   declared grid cells have positive expR. These are the NUMBERS OF RECORD from
+//   backtests/bt_dt3_kama_squeeze.py — NOT the chart&#x27;s Strategy Tester (this file
+//   is an indicator; the strategy twin is separate).
+//
+// HONEST NUMBER vs THE HEADLINE CLAIM — READ THIS:
+//   DaviddTech&#x27;s own video headline for this system is &quot;+1451%&quot; (PF 2.42 /
+//   Sharpe 1.5 / 110 trades / 3y). That +1451% is a LEVERAGE ILLUSION: 10x margin
+//   times vol-regime size multipliers up to 7.4x. We test the SIGNAL at honest
+//   sizing — flat 1%-equity risk vs the initial stop, NO leverage, NO regime
+//   multipliers. The honest per-trade edge is +0.282R. The regime-sizing model
+//   exists in the source and is deliberately NOT tested here.
+//
+// TAIL CAVEAT (mandatory read): this is a FAT-TAIL bet, not a steady grind. Over
+//   the 242 center trades, the SINGLE largest trade contributes 13.06R = 19.2% of
+//   the +68.1R total; the top-3 are ~45%. Remove just the biggest winner and the
+//   center t-stat drops 2.10 -&gt; 1.85. WR is only 33%. This is real trend-following
+//   behaviour (the edge lives in the right tail) — size it as such.
+//
+// TESTED FEED — READ THIS: the edge was measured on BINANCE:BTCUSDT PERPETUAL, 1h.
+//   Chart THAT EXACT feed. The squeeze-release + KAMA + momentum stack is
+//   price/volatility-local: a different exchange&#x27;s candles release the squeeze and
+//   cross the KAMA at slightly different bars and will NOT reproduce the record.
+//   (Same lesson as the Annie V3 Bybit-vs-Binance divergence.)
+//
+// HOW IT TRADES (per the frozen spec, replicated to the trade):
+//   · KAMA (recursive, seed = first close): efficiencyRatio ER = |close-close[L]| /
+//     sum(|dclose|,L) with ER := 0 where the numerator is undefined (engine&#x27;s er=0
+//     warmup convention); SC = (ER*(2/3 - 2/51) + 2/51)^2 ; kama = kama[1] +
+//     SC*(close-kama[1]). kamaRising = kama &gt; kama[1].
+//   · Squeeze (len 16): BB = sma(close,16) +/- 2.0*stdev(close,16) [POPULATION
+//     stdev]; KC = sma(close,16) +/- 1.5*sma(TrueRange,16) [SMA of TR, not ATR].
+//     squeezeOn = BB fully inside KC. squeezeReleased = squeezeOn[1] AND
+//     count[1] &gt;= 2 AND not squeezeOn (a held squeeze that just let go).
+//   · Momentum: src = close - avg(avg(highest(high,16),lowest(low,16)),
+//     sma(close,16)); momentum = ta.linreg(src,16,0) (LSMA endpoint value).
+//   · LONG ENTRY GATE (all on the CLOSED bar): squeezeReleased AND momentum&gt;0 AND
+//     momentum&gt;momentum[1] AND close&gt;kama AND kamaRising AND ER&gt;minEff AND atr&gt;0.
+//     Long-only, flat-only (no pyramiding).
+//   · FILL = the OPEN of the NEXT 1h bar after the confirmed signal (causal). The
+//     initial stop geometry hangs off the SIGNAL-bar CLOSE (not the fill price):
+//     initStop = close[signal] - 2.8*ATR(14)[signal], FROZEN for the life of trade.
+//   · EXITS (each on a CLOSED bar, in priority order):
+//       (a) FROZEN initial stop — detected on the chart 1h low, filled AT the
+//           level. (The engine detects it intrabar on 1m, but a 1h bar&#x27;s low is the
+//           min of its 1m lows, and the stop is a FIXED level, so the FIRST 1h bar
+//           to breach it is exactly the 1h bar that contains the first 1m breach —
+//           the stop-exit bar/price/reason are identical. See pine_mirror_dt3.py.)
+//       (b) FORCED momentum-flip exit: close&lt;kama AND momentum&lt;0 -&gt; market close at
+//           the NEXT bar open. This is the dominant exit (~70%).
+//       (c) TRAIL: a ratcheting close-based trail trailLevel = max(trailLevel,
+//           close - 5*ATR), exit when close&lt;=trailLevel -&gt; next bar open. The wide
+//           5xATR trail rarely binds (the forced exit almost always fires first).
+//     A pending close-based exit (b/c, decided at a bar close) fills at the NEXT
+//     open, which is chronologically BEFORE any intrabar low that same next bar —
+//     so a pending close takes priority over the frozen stop on that bar.
+//   · Sizing of record: 1%-of-equity risk vs the initial stop distance
+//     (2.8*ATR[signal]); size = risk$ / (2.8*ATR[signal]).
+//
+// SIGNAL vs FILL (the 1-bar convention, so nothing looks late):
+//   The ENTRY ALERT + entry triangle fire AT THE SIGNAL BAR (the confirmed
+//   squeeze-release gate) — the actionable moment: a live trader places a market
+//   order on that close and fills at the NEXT 1h open. The internal state machine
+//   records the fill on that next bar, where the stop line begins. Exit x-marks
+//   print at the bar the exit actually happens (stop = the breach bar; forced/trail
+//   = the next-open fill bar).
+//
+// NO REPAINT (Igor&#x27;s hard rules, audited):
+//   · EVERY decision, drawing and alert is gated by barstate.isconfirmed.
+//   · Chart timeframe ONLY — no request.security, no varip, no timenow, no
+//     barstate.isrealtime anywhere.
+//   · Drawings are APPEND-ONLY: label.new only; ZERO .set_*() and ZERO .delete().
+//     Nothing is ever positioned at a past bar — every mark prints at the confirmed
+//     bar the machine learned it; the KAMA / stop / trail are causal plots. Printed
+//     marks never move or disappear.
+//   · The status panel is a read-out of the LAST-CONFIRMED state (barstate.islast),
+//     not a bar-anchored drawing — it cannot mutate history.
+//
+// FIDELITY: backtests/pine_mirror_dt3.py re-implements THIS file&#x27;s exact forward
+// 1h state machine in Python and reproduces the frozen 242-trade center ledger
+// 242/242 = 100% (side + entry-time + exit-time + reason), max |dR| = 0.000000,
+// KAMA bar-exact vs the report&#x27;s published hand-check table (max |diff| 0.0),
+// deterministic across double runs. The chart is for SEEING the trades; the
+// numbers of record are the backtest.
+// =============================================================================
+
+indicator(&quot;DT3 KAMA+Squeeze — LIVE&quot;, overlay = true,
+     max_lines_count = 500, max_labels_count = 500, max_boxes_count = 500)
+
+// ----------------------------- Inputs ----------------------------------------
+gK = &quot;KAMA (validated CENTER defaults — do not change to trade the edge)&quot;
+i_effLen   = input.int(32,   &quot;Efficiency length&quot;,       minval = 2, group = gK)
+i_fastLen  = input.int(2,    &quot;Fast length&quot;,             minval = 1, group = gK)
+i_slowLen  = input.int(50,   &quot;Slow length&quot;,             minval = 2, group = gK)
+i_slopeLb  = input.int(1,    &quot;Slope lookback&quot;,          minval = 1, group = gK)
+i_minEff   = input.float(0.20,&quot;Minimum efficiency ratio&quot;, minval = 0.0, maxval = 1.0, step = 0.01, group = gK)
+
+gSq = &quot;Squeeze + momentum&quot;
+i_sqLen    = input.int(16,   &quot;Squeeze / momentum length&quot;, minval = 2, group = gSq)
+i_bbMult   = input.float(2.0,&quot;Bollinger multiplier&quot;,    minval = 0.1, step = 0.1, group = gSq)
+i_kcMult   = input.float(1.5,&quot;Keltner multiplier&quot;,      minval = 0.1, step = 0.1, group = gSq)
+i_minSqBar = input.int(2,    &quot;Minimum completed squeeze bars&quot;, minval = 1, group = gSq)
+
+gR = &quot;Risk &amp; exit&quot;
+i_atrLen   = input.int(14,   &quot;ATR length&quot;,              minval = 1, group = gR)
+i_initMult = input.float(2.8,&quot;Initial stop (ATR mult)&quot;, minval = 0.1, step = 0.1, group = gR)
+i_trailMult= input.float(5.0,&quot;Close-based trail (ATR mult)&quot;, minval = 0.1, step = 0.1, group = gR)
+i_warmup   = input.int(300,  &quot;Warm-up bars (skip until indicators seed)&quot;, minval = 0, group = gR,
+     tooltip = &quot;The engine drops the first 300 1h bars while KAMA and the squeeze/momentum indicators settle. Chart full history from 2019-09 for an exact match to the record.&quot;)
+
+gV = &quot;Visuals&quot;
+i_showKama    = input.bool(true,  &quot;KAMA line&quot;, group = gV)
+i_showStop    = input.bool(true,  &quot;Initial-stop line while in a trade&quot;, group = gV)
+i_showTrail   = input.bool(true,  &quot;Trail line while in a trade&quot;, group = gV)
+i_showEntries = input.bool(true,  &quot;Entry triangles + labels&quot;, group = gV)
+i_showExits   = input.bool(true,  &quot;Exit x-marks&quot;, group = gV)
+i_showSqueeze = input.bool(true,  &quot;Squeeze dots on the price axis&quot;, group = gV)
+i_showState   = input.bool(true,  &quot;Status panel (top-right)&quot;, group = gV)
+
+// ----------------------------- Per-bar indicators ----------------------------
+// Computed EVERY bar in global scope so ta.* history stays intact; only READ
+// inside the confirmed block, so all DECISIONS use closed-bar values.
+
+// -- KAMA (recursive, seed = first close). ER := 0 where the directional-change
+//    numerator is undefined (matches the engine&#x27;s warmup convention exactly). ----
+directionalChange = na(close[i_effLen]) ? na : math.abs(close - close[i_effLen])
+volatilitySum     = math.sum(math.abs(ta.change(close)), i_effLen)
+efficiencyRatio   = (not na(directionalChange)) and (not na(volatilitySum)) and volatilitySum &gt; 0 ? directionalChange / volatilitySum : 0.0
+
+fastSC = 2.0 / (i_fastLen + 1.0)
+slowSC = 2.0 / (i_slowLen + 1.0)
+smoothingConstant = math.pow(efficiencyRatio * (fastSC - slowSC) + slowSC, 2)
+
+var float kama = na
+kama := na(kama[1]) ? close : kama[1] + smoothingConstant * (close - kama[1])
+kamaRising = not na(kama[i_slopeLb]) and kama &gt; kama[i_slopeLb]
+
+// -- Squeeze (BB inside KC) + momentum (LSMA endpoint) ------------------------
+bbBasis     = ta.sma(close, i_sqLen)
+bbDeviation = ta.stdev(close, i_sqLen) * i_bbMult        // Pine stdev = population
+bbUpper     = bbBasis + bbDeviation
+bbLower     = bbBasis - bbDeviation
+kcWidth     = ta.sma(ta.tr, i_sqLen) * i_kcMult          // SMA of TrueRange, not ATR
+kcUpper     = bbBasis + kcWidth
+kcLower     = bbBasis - kcWidth
+squeezeOn   = bbUpper &lt; kcUpper and bbLower &gt; kcLower
+
+var int squeezeBarCount = 0
+squeezeBarCount := squeezeOn ? nz(squeezeBarCount[1]) + 1 : 0
+squeezeReleased = squeezeOn[1] and nz(squeezeBarCount[1]) &gt;= i_minSqBar and not squeezeOn
+
+momentumSource = close - math.avg(math.avg(ta.highest(high, i_sqLen), ta.lowest(low, i_sqLen)), ta.sma(close, i_sqLen))
+momentum = ta.linreg(momentumSource, i_sqLen, 0)
+
+atrv = ta.atr(i_atrLen)
+
+plot(i_showKama ? kama : na, &quot;KAMA&quot;, color = kamaRising ? color.new(color.lime, 0) : color.new(color.red, 0), linewidth = 2)
+
+// closed-bar LONG-ENTRY gate (Pine longEntrySignal; sizing terms stripped)
+longGate = squeezeReleased and momentum &gt; 0 and momentum &gt; momentum[1] and close &gt; kama and kamaRising and efficiencyRatio &gt; i_minEff and not na(atrv) and atrv &gt; 0 and bar_index &gt;= i_warmup
+
+// ----------------------------- Persistent state ------------------------------
+// Pure running state (no arrays, no look-back), exactly like the Python mirror
+// pine_mirror_dt3.run_state_machine — forward only.
+var int   state       = 0          // 0 flat / 1 long
+var float entryRef    = na         // entry fill (== open of the fill bar)
+var float entryAtr    = na         // ATR at the signal bar (initial stop distance)
+var float initStop    = na         // FROZEN initial stop (from the signal-bar close)
+var float trailLevel  = na         // ratcheting close-based trail
+var int   sigBar      = na
+var int   fillBar     = na
+var int   pending     = 0          // 0 none / 1 forced / 2 trail (armed at b-1 close)
+
+var bool  pendEntry   = false      // long gate fired on the PREVIOUS confirmed bar
+var float pendInitStop= na
+var float pendTrail   = na
+var float pendAtr     = na
+var int   pendSig     = na
+
+// per-bar event flags (reset each bar; drive marks + alerts)
+signalLong    = false              // gated LONG signal, AT the signal bar (actionable)
+enterLongFill = false              // LONG fill recorded, AT the fill bar
+exitStopEv    = false              // frozen initial stop breached, AT the breach bar
+exitForcedEv  = false              // forced momentum-flip close, AT the next-open bar
+exitTrailEv   = false              // trail close, AT the next-open bar
+float exitPx  = na
+
+// process CONFIRMED bars only -&gt; no repaint, deterministic
+if barstate.isconfirmed
+    // (A) manage a position open BEFORE this bar: a pending close-based exit
+    //     (forced/trail, armed at b-1&#x27;s close) fills at THIS bar&#x27;s OPEN ----------
+    if state == 1 and pending != 0
+        exitPx := open
+        if pending == 1
+            exitForcedEv := true
+        else
+            exitTrailEv := true
+        state := 0
+        pending := 0
+
+    // (B) resolve a pending ENTRY armed at b-1 (only if flat now) ---------------
+    if pendEntry and state == 0
+        entryRef   := open              // fill = the fill bar&#x27;s open
+        entryAtr   := pendAtr
+        initStop   := pendInitStop      // FROZEN, anchored to the signal-bar close
+        trailLevel := pendTrail
+        sigBar     := pendSig
+        fillBar    := bar_index
+        state      := 1
+        enterLongFill := true
+    pendEntry := false
+
+    // (C) frozen-stop check on the current position (incl. the fill bar) --------
+    if state == 1 and low &lt;= initStop
+        exitPx := initStop              // fill AT the frozen stop level
+        exitStopEv := true
+        state := 0
+
+    // (D) still open at the CLOSE of this bar -&gt; ratchet trail + arm exit -------
+    if state == 1
+        trailCand = close - i_trailMult * atrv
+        trailLevel := na(trailLevel) ? trailCand : math.max(trailLevel, trailCand)
+        if close &lt; kama and momentum &lt; 0
+            pending := 1                // forced has priority over trail
+        else if close &lt;= trailLevel
+            pending := 2
+    else
+        // (E) flat at the CLOSE of this bar -&gt; arm a new entry for b+1 ----------
+        if longGate
+            pendEntry    := true
+            pendInitStop := close - i_initMult * atrv
+            pendTrail    := close - i_trailMult * atrv
+            pendAtr      := atrv
+            pendSig      := bar_index
+            signalLong   := true
+
+    // ---- causal, append-only drawings (nothing positioned at a past bar) ------
+    if i_showEntries and enterLongFill
+        label.new(bar_index, low, text = &quot;LONG &quot; + str.tostring(entryRef, format.mintick) + &quot;  · stop &quot; + str.tostring(initStop, format.mintick),
+             style = label.style_label_up, color = color.new(color.green, 0), textcolor = color.white, size = size.tiny)
+
+// ----------------------------- Marks (causal plots) --------------------------
+plotshape(i_showEntries and signalLong, title = &quot;LONG signal (fill next open)&quot;, style = shape.triangleup, location = location.belowbar, color = color.new(color.green, 0), size = size.tiny)
+plotshape(i_showExits and exitStopEv   ? exitPx : na, title = &quot;Stop exit&quot;,   style = shape.xcross, location = location.absolute, color = color.new(color.red, 0),    size = size.tiny)
+plotshape(i_showExits and exitForcedEv ? exitPx : na, title = &quot;Forced exit&quot;, style = shape.xcross, location = location.absolute, color = color.new(color.blue, 0),   size = size.tiny)
+plotshape(i_showExits and exitTrailEv  ? exitPx : na, title = &quot;Trail exit&quot;,  style = shape.xcross, location = location.absolute, color = color.new(color.orange, 0), size = size.tiny)
+
+// squeeze-on dots on the price axis (a small mark under the bar while compressed)
+plotshape(i_showSqueeze and squeezeOn, title = &quot;Squeeze ON&quot;, style = shape.circle, location = location.bottom, color = color.new(color.gray, 0), size = size.auto)
+
+// stop / trail lines only while a position is open (causal step lines; end at exit)
+plot(i_showStop  and state != 0 ? initStop   : na, &quot;Initial stop&quot;, color = color.new(color.red, 0),    style = plot.style_linebr, linewidth = 1)
+plot(i_showTrail and state != 0 ? trailLevel : na, &quot;Trail&quot;,        color = color.new(color.orange, 0), style = plot.style_linebr, linewidth = 1)
+
+// ----------------------------- Alerts ----------------------------------------
+// Entry alert fires AT THE SIGNAL BAR (the confirmed gate) — the actionable
+// moment; the fill is the next 1h open. Exit alert fires when the machine flattens.
+anyExit = exitStopEv or exitForcedEv or exitTrailEv
+alertcondition(signalLong, title = &quot;DT3 KAMA+Squeeze — LONG signal&quot;,
+     message = &quot;DT3 KAMA+Squeeze: LONG entry gate confirmed on {{ticker}} 1h at {{time}} — squeeze released, momentum rising, close above rising KAMA. Enter at the NEXT 1h open. Initial stop = signal close - 2.8xATR(14). Chart BINANCE:BTCUSDT perp.&quot;)
+alertcondition(anyExit, title = &quot;DT3 KAMA+Squeeze — exit&quot;,
+     message = &quot;DT3 KAMA+Squeeze: position exit on {{ticker}} 1h at {{time}} (fixed ATR initial stop, momentum-flip forced exit, or 5xATR close trail).&quot;)
+
+// ----------------------------- Status panel ----------------------------------
+// Read-out of the LAST-CONFIRMED machine state. State vars mutate only inside
+// barstate.isconfirmed, so intrabar ticks cannot change what this shows.
+var table st = table.new(position.top_right, 2, 6,
+     bgcolor = color.new(color.black, 15), border_width = 1,
+     border_color = color.new(color.gray, 60), frame_width = 1,
+     frame_color = color.new(color.gray, 40))
+
+if i_showState and barstate.islast
+    posTxt  = state == 1 ? &quot;LONG open&quot; : &quot;flat&quot;
+    sideTxt = state == 1 ? &quot;long&quot; : &quot;—&quot;
+    entTxt  = state != 0 and not na(entryRef) ? str.tostring(entryRef, format.mintick) : &quot;—&quot;
+    stopTxt = state != 0 and not na(initStop) ? str.tostring(initStop, format.mintick) : &quot;—&quot;
+    sqTxt   = squeezeOn ? &quot;ON (count &quot; + str.tostring(squeezeBarCount) + &quot;)&quot; : squeezeReleased ? &quot;RELEASED&quot; : &quot;off&quot;
+    barsTxt = state != 0 and not na(sigBar) ? str.tostring(bar_index - sigBar) : &quot;—&quot;
+    _hd = color.new(color.silver, 20)
+    _tx = color.white
+    table.cell(st, 0, 0, &quot;DT3 position&quot;, text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 0, posTxt,         text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 1, &quot;side&quot;,         text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 1, sideTxt,        text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 2, &quot;entry&quot;,        text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 2, entTxt,         text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 3, &quot;initial stop&quot;, text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 3, stopTxt,        text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 4, &quot;squeeze&quot;,      text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 4, sqTxt,          text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 5, &quot;bars in trade&quot;,text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 5, barsTxt,        text_color = _tx, text_size = size.small, text_halign = text.align_left)
+</pre>
+
+<h2>6 &middot; Full Pine source &mdash; Strategy twin (<span class="mono">DT3_KAMA_Squeeze_Strategy.pine</span>)</h2>
+<div class="copybar">
+  <span class="muted">Identical signal core; adds strategy.* orders for the Tester. Paste as a separate script.</span>
+  <button class="btn" id="copyBtnStrat">Copy strategy source</button>
+</div>
+<pre class="src" id="pineStrat">//@version=6
+// =============================================================================
+// DT3 &quot;Flagship KAMA + Squeeze&quot; — Strategy (Tester twin)  ·  DaviddTech &quot;KAMA
+// Final Video Replication v1&quot;
+// -----------------------------------------------------------------------------
+// strategy() twin of &quot;DT3 KAMA+Squeeze — LIVE&quot; so TradingView&#x27;s Strategy Tester
+// shows every trade: entry/exit arrows, trade list, P&amp;L. The SIGNAL CORE is
+// IDENTICAL to the indicator (and to backtests/pine_mirror_dt3.py, which
+// reproduces the frozen 242-trade center ledger 242/242 = 100%).
+//
+// Config of record = the report&#x27;s CENTER cell: efficiencyLength 32 / minEff 0.20 /
+// initial-stop 2.8xATR / trail 5xATR, squeeze length 16 (BB 2.0 / KC 1.5),
+// momentum length 16, ATR(14). In-sample 2019-09 -&gt; 2024-12 (2025-26 LOCKED OUT),
+// our causal cost-honest engine: +0.282R/trade · PF 1.56 · Sharpe 1.10 · n=242 ·
+// WR 33.1% · t=2.10. Those are the NUMBERS OF RECORD (bt_dt3_kama_squeeze.py).
+//
+// HONEST NUMBER vs THE HEADLINE CLAIM: DaviddTech&#x27;s video headline is &quot;+1451%&quot;.
+// That is a LEVERAGE ILLUSION — 10x margin times vol-regime size multipliers up to
+// 7.4x. We test the SIGNAL at honest sizing (flat 1%-equity risk vs the initial
+// stop, NO leverage, NO regime multipliers): the honest per-trade edge is +0.282R.
+//
+// TAIL CAVEAT (mandatory read): a FAT-TAIL bet, not a steady grind. The single
+// largest of the 242 center trades is 13.06R = 19.2% of the total R; remove it and
+// the center t drops 2.10 -&gt; 1.85. WR is only 33%. Size it as a right-tail bet.
+//
+// TESTED FEED — READ THIS: chart BINANCE:BTCUSDT PERPETUAL, 1h. The squeeze +
+// KAMA + momentum stack is price/volatility-local; another exchange&#x27;s candles
+// release the squeeze at different bars and will not reproduce the record.
+//
+// HOW FILLS WORK IN THE TESTER — the 1-bar Strategy-Tester lag caveat (read before
+// judging its P&amp;L): the record&#x27;s fill is the OPEN of the bar AFTER the confirmed
+// signal. This strategy submits its market order the moment that entry (fill) bar
+// confirms, so the Tester fills on the FOLLOWING open — about one 1h bar later than
+// the engine&#x27;s fill; and the forced/trail market closes fill one bar later too.
+// Stop LEVEL uses the engine geometry (signal close - 2.8xATR(14), frozen), sizing
+// is 1%-of-equity risk vs the initial stop distance. TradingView also caps 1h
+// history, so you see recent years, not the full 2019-2024 record. The Tester is
+// for SEEING the trades; the numbers of record are the backtest reports on the
+// site (+0.282R center), NOT this chart&#x27;s delayed-fill P&amp;L.
+//
+// NO REPAINT (Igor&#x27;s hard rules, audited): every decision, drawing, order and
+// alert is gated by barstate.isconfirmed; chart timeframe ONLY (no request.security,
+// varip, timenow, barstate.isrealtime); drawings APPEND-ONLY (label.new only; ZERO
+// .set_*()/.delete()); nothing positioned at a past bar; the status panel is a
+// last-confirmed read-out. Identical to the indicator&#x27;s core.
+// =============================================================================
+
+strategy(&quot;DT3 KAMA+Squeeze — Strategy&quot;, overlay = true,
+     initial_capital = 10000, currency = currency.USD, pyramiding = 0,
+     commission_type = strategy.commission.percent, commission_value = 0.05,
+     slippage = 2, max_lines_count = 500, max_labels_count = 500, max_boxes_count = 500)
+
+// ----------------------------- Inputs ----------------------------------------
+gK = &quot;KAMA (validated CENTER defaults — do not change to trade the edge)&quot;
+i_effLen   = input.int(32,   &quot;Efficiency length&quot;,       minval = 2, group = gK)
+i_fastLen  = input.int(2,    &quot;Fast length&quot;,             minval = 1, group = gK)
+i_slowLen  = input.int(50,   &quot;Slow length&quot;,             minval = 2, group = gK)
+i_slopeLb  = input.int(1,    &quot;Slope lookback&quot;,          minval = 1, group = gK)
+i_minEff   = input.float(0.20,&quot;Minimum efficiency ratio&quot;, minval = 0.0, maxval = 1.0, step = 0.01, group = gK)
+
+gSq = &quot;Squeeze + momentum&quot;
+i_sqLen    = input.int(16,   &quot;Squeeze / momentum length&quot;, minval = 2, group = gSq)
+i_bbMult   = input.float(2.0,&quot;Bollinger multiplier&quot;,    minval = 0.1, step = 0.1, group = gSq)
+i_kcMult   = input.float(1.5,&quot;Keltner multiplier&quot;,      minval = 0.1, step = 0.1, group = gSq)
+i_minSqBar = input.int(2,    &quot;Minimum completed squeeze bars&quot;, minval = 1, group = gSq)
+
+gR = &quot;Risk &amp; exit&quot;
+i_atrLen   = input.int(14,   &quot;ATR length&quot;,              minval = 1, group = gR)
+i_initMult = input.float(2.8,&quot;Initial stop (ATR mult)&quot;, minval = 0.1, step = 0.1, group = gR)
+i_trailMult= input.float(5.0,&quot;Close-based trail (ATR mult)&quot;, minval = 0.1, step = 0.1, group = gR)
+i_warmup   = input.int(300,  &quot;Warm-up bars (skip until indicators seed)&quot;, minval = 0, group = gR,
+     tooltip = &quot;The engine drops the first 300 1h bars while KAMA and the squeeze/momentum indicators settle. Chart full history from 2019-09 for an exact match to the record.&quot;)
+
+gSize = &quot;Strategy sizing&quot;
+i_riskPct = input.float(1.0, &quot;Risk per trade (% of equity)&quot;, minval = 0.01, maxval = 10.0, step = 0.1, group = gSize)
+
+gV = &quot;Visuals&quot;
+i_showKama    = input.bool(true,  &quot;KAMA line&quot;, group = gV)
+i_showStop    = input.bool(true,  &quot;Initial-stop line while in a trade&quot;, group = gV)
+i_showTrail   = input.bool(true,  &quot;Trail line while in a trade&quot;, group = gV)
+i_showEntries = input.bool(true,  &quot;Entry triangles + labels&quot;, group = gV)
+i_showExits   = input.bool(true,  &quot;Exit x-marks&quot;, group = gV)
+i_showSqueeze = input.bool(true,  &quot;Squeeze dots on the price axis&quot;, group = gV)
+i_showState   = input.bool(true,  &quot;Status panel (top-right)&quot;, group = gV)
+
+// ----------------------------- Per-bar indicators ----------------------------
+// Computed EVERY bar in global scope so ta.* history stays intact; only READ
+// inside the confirmed block, so all DECISIONS use closed-bar values. IDENTICAL
+// to the indicator.
+directionalChange = na(close[i_effLen]) ? na : math.abs(close - close[i_effLen])
+volatilitySum     = math.sum(math.abs(ta.change(close)), i_effLen)
+efficiencyRatio   = (not na(directionalChange)) and (not na(volatilitySum)) and volatilitySum &gt; 0 ? directionalChange / volatilitySum : 0.0
+
+fastSC = 2.0 / (i_fastLen + 1.0)
+slowSC = 2.0 / (i_slowLen + 1.0)
+smoothingConstant = math.pow(efficiencyRatio * (fastSC - slowSC) + slowSC, 2)
+
+var float kama = na
+kama := na(kama[1]) ? close : kama[1] + smoothingConstant * (close - kama[1])
+kamaRising = not na(kama[i_slopeLb]) and kama &gt; kama[i_slopeLb]
+
+bbBasis     = ta.sma(close, i_sqLen)
+bbDeviation = ta.stdev(close, i_sqLen) * i_bbMult        // Pine stdev = population
+bbUpper     = bbBasis + bbDeviation
+bbLower     = bbBasis - bbDeviation
+kcWidth     = ta.sma(ta.tr, i_sqLen) * i_kcMult          // SMA of TrueRange, not ATR
+kcUpper     = bbBasis + kcWidth
+kcLower     = bbBasis - kcWidth
+squeezeOn   = bbUpper &lt; kcUpper and bbLower &gt; kcLower
+
+var int squeezeBarCount = 0
+squeezeBarCount := squeezeOn ? nz(squeezeBarCount[1]) + 1 : 0
+squeezeReleased = squeezeOn[1] and nz(squeezeBarCount[1]) &gt;= i_minSqBar and not squeezeOn
+
+momentumSource = close - math.avg(math.avg(ta.highest(high, i_sqLen), ta.lowest(low, i_sqLen)), ta.sma(close, i_sqLen))
+momentum = ta.linreg(momentumSource, i_sqLen, 0)
+
+atrv = ta.atr(i_atrLen)
+
+plot(i_showKama ? kama : na, &quot;KAMA&quot;, color = kamaRising ? color.new(color.lime, 0) : color.new(color.red, 0), linewidth = 2)
+
+longGate = squeezeReleased and momentum &gt; 0 and momentum &gt; momentum[1] and close &gt; kama and kamaRising and efficiencyRatio &gt; i_minEff and not na(atrv) and atrv &gt; 0 and bar_index &gt;= i_warmup
+
+// ----------------------------- Persistent state ------------------------------
+// Pure running state — forward only. IDENTICAL to the indicator&#x27;s core.
+var int   state       = 0          // 0 flat / 1 long
+var float entryRef    = na
+var float entryAtr    = na
+var float initStop    = na         // FROZEN initial stop (from the signal-bar close)
+var float trailLevel  = na
+var int   sigBar      = na
+var int   fillBar     = na
+var int   pending     = 0          // 0 none / 1 forced / 2 trail (armed at b-1 close)
+
+var bool  pendEntry   = false
+var float pendInitStop= na
+var float pendTrail   = na
+var float pendAtr     = na
+var int   pendSig     = na
+
+// per-bar event flags (reset each bar; drive marks + alerts + orders)
+signalLong    = false
+enterLongFill = false
+exitStopEv    = false
+exitForcedEv  = false
+exitTrailEv   = false
+float exitPx  = na
+
+// process CONFIRMED bars only -&gt; no repaint, deterministic
+if barstate.isconfirmed
+    // (A) manage a position open BEFORE this bar: pending close-based exit at open
+    if state == 1 and pending != 0
+        exitPx := open
+        if pending == 1
+            exitForcedEv := true
+        else
+            exitTrailEv := true
+        state := 0
+        pending := 0
+
+    // (B) resolve a pending ENTRY armed at b-1 (only if flat now)
+    if pendEntry and state == 0
+        entryRef   := open
+        entryAtr   := pendAtr
+        initStop   := pendInitStop      // FROZEN, anchored to the signal-bar close
+        trailLevel := pendTrail
+        sigBar     := pendSig
+        fillBar    := bar_index
+        state      := 1
+        enterLongFill := true
+    pendEntry := false
+
+    // (C) frozen-stop check on the current position (incl. the fill bar)
+    if state == 1 and low &lt;= initStop
+        exitPx := initStop
+        exitStopEv := true
+        state := 0
+
+    // (D) still open at the CLOSE of this bar -&gt; ratchet trail + arm exit
+    if state == 1
+        trailCand = close - i_trailMult * atrv
+        trailLevel := na(trailLevel) ? trailCand : math.max(trailLevel, trailCand)
+        if close &lt; kama and momentum &lt; 0
+            pending := 1                // forced has priority over trail
+        else if close &lt;= trailLevel
+            pending := 2
+    else
+        // (E) flat at the CLOSE of this bar -&gt; arm a new entry for b+1
+        if longGate
+            pendEntry    := true
+            pendInitStop := close - i_initMult * atrv
+            pendTrail    := close - i_trailMult * atrv
+            pendAtr      := atrv
+            pendSig      := bar_index
+            signalLong   := true
+
+    // ---- causal, append-only drawings (nothing positioned at a past bar) ------
+    if i_showEntries and enterLongFill
+        label.new(bar_index, low, text = &quot;LONG &quot; + str.tostring(entryRef, format.mintick) + &quot;  · stop &quot; + str.tostring(initStop, format.mintick),
+             style = label.style_label_up, color = color.new(color.green, 0), textcolor = color.white, size = size.tiny)
+
+    // ---- STRATEGY ORDERS (submitted at the fill bar -&gt; Tester fills next open;
+    //      the documented 1-bar Tester lag). Stop = engine geometry; 1% risk. -----
+    if enterLongFill and not na(initStop)
+        sd = math.abs(entryRef - initStop)
+        q  = sd &gt; 0 ? strategy.equity * i_riskPct / 100.0 / sd : 0.0
+        if q &gt; 0
+            strategy.entry(&quot;DT3&quot;, strategy.long, qty = q, comment = &quot;long&quot;)
+            strategy.exit(&quot;stop&quot;, &quot;DT3&quot;, stop = initStop, comment = &quot;INITIAL_STOP&quot;)
+    else if exitForcedEv or exitTrailEv
+        // forced momentum-flip / trail closed the position at market (next open)
+        strategy.close(&quot;DT3&quot;, comment = exitForcedEv ? &quot;KAMA_MOM_EXIT&quot; : &quot;ATR_TRAIL&quot;)
+
+// ----------------------------- Marks (causal plots) --------------------------
+plotshape(i_showEntries and signalLong, title = &quot;LONG signal (fill next open)&quot;, style = shape.triangleup, location = location.belowbar, color = color.new(color.green, 0), size = size.tiny)
+plotshape(i_showExits and exitStopEv   ? exitPx : na, title = &quot;Stop exit&quot;,   style = shape.xcross, location = location.absolute, color = color.new(color.red, 0),    size = size.tiny)
+plotshape(i_showExits and exitForcedEv ? exitPx : na, title = &quot;Forced exit&quot;, style = shape.xcross, location = location.absolute, color = color.new(color.blue, 0),   size = size.tiny)
+plotshape(i_showExits and exitTrailEv  ? exitPx : na, title = &quot;Trail exit&quot;,  style = shape.xcross, location = location.absolute, color = color.new(color.orange, 0), size = size.tiny)
+
+plotshape(i_showSqueeze and squeezeOn, title = &quot;Squeeze ON&quot;, style = shape.circle, location = location.bottom, color = color.new(color.gray, 0), size = size.auto)
+
+plot(i_showStop  and state != 0 ? initStop   : na, &quot;Initial stop&quot;, color = color.new(color.red, 0),    style = plot.style_linebr, linewidth = 1)
+plot(i_showTrail and state != 0 ? trailLevel : na, &quot;Trail&quot;,        color = color.new(color.orange, 0), style = plot.style_linebr, linewidth = 1)
+
+// ----------------------------- Alerts ----------------------------------------
+anyExit = exitStopEv or exitForcedEv or exitTrailEv
+alertcondition(signalLong, title = &quot;DT3 KAMA+Squeeze — LONG signal&quot;,
+     message = &quot;DT3 KAMA+Squeeze: LONG entry gate confirmed on {{ticker}} 1h at {{time}} — squeeze released, momentum rising, close above rising KAMA. Enter at the NEXT 1h open. Initial stop = signal close - 2.8xATR(14). Chart BINANCE:BTCUSDT perp.&quot;)
+alertcondition(anyExit, title = &quot;DT3 KAMA+Squeeze — exit&quot;,
+     message = &quot;DT3 KAMA+Squeeze: position exit on {{ticker}} 1h at {{time}} (fixed ATR initial stop, momentum-flip forced exit, or 5xATR close trail).&quot;)
+
+// ----------------------------- Status panel ----------------------------------
+var table st = table.new(position.top_right, 2, 6,
+     bgcolor = color.new(color.black, 15), border_width = 1,
+     border_color = color.new(color.gray, 60), frame_width = 1,
+     frame_color = color.new(color.gray, 40))
+
+if i_showState and barstate.islast
+    posTxt  = state == 1 ? &quot;LONG open&quot; : &quot;flat&quot;
+    sideTxt = state == 1 ? &quot;long&quot; : &quot;—&quot;
+    entTxt  = state != 0 and not na(entryRef) ? str.tostring(entryRef, format.mintick) : &quot;—&quot;
+    stopTxt = state != 0 and not na(initStop) ? str.tostring(initStop, format.mintick) : &quot;—&quot;
+    sqTxt   = squeezeOn ? &quot;ON (count &quot; + str.tostring(squeezeBarCount) + &quot;)&quot; : squeezeReleased ? &quot;RELEASED&quot; : &quot;off&quot;
+    barsTxt = state != 0 and not na(sigBar) ? str.tostring(bar_index - sigBar) : &quot;—&quot;
+    _hd = color.new(color.silver, 20)
+    _tx = color.white
+    table.cell(st, 0, 0, &quot;DT3 position&quot;, text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 0, posTxt,         text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 1, &quot;side&quot;,         text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 1, sideTxt,        text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 2, &quot;entry&quot;,        text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 2, entTxt,         text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 3, &quot;initial stop&quot;, text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 3, stopTxt,        text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 4, &quot;squeeze&quot;,      text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 4, sqTxt,          text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 5, &quot;bars in trade&quot;,text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 5, barsTxt,        text_color = _tx, text_size = size.small, text_halign = text.align_left)
+</pre>
+
+<div class="foot">
+  DaviddTech &middot; <span class="mono">DT3_KAMA_Squeeze_LIVE.pine</span> + <span class="mono">DT3_KAMA_Squeeze_Strategy.pine</span> &middot; causal Pine&nbsp;v6 port of the validated
+  &ldquo;KAMA Final Video Replication&rdquo; flagship. Config of record: center cell 32/0.20/(2.8,5), ATR(14), +0.282R / PF 1.56 / t 2.10, IS 2019-09&rarr;2024-12 (2025&ndash;26 locked out).
+  The &ldquo;+1451%&rdquo; headline is a 10&times;-leverage illusion; the honest number is +0.282R and it is a fat-tail bet (one trade = 19% of total R).
+  Fidelity 242/242 = 100% vs the frozen center ledger (<span class="mono">backtests/pine_mirror_dt3.py</span>); KAMA bar-exact; no-repaint audited; deterministic. Tested feed BINANCE:BTCUSDT perp, 1h. Self-contained.
+</div>
+</div>
+
+
+<script>
+  function wireCopy(btnId, preId){
+    var btn=document.getElementById(btnId);
+    var pre=document.getElementById(preId);
+    if(!btn||!pre)return;
+    btn.addEventListener('click',function(){
+      var txt=pre.innerText;
+      function done(){var o=btn.textContent;btn.textContent='Copied!';setTimeout(function(){btn.textContent=o;},1400);}
+      if(navigator.clipboard&&navigator.clipboard.writeText){
+        navigator.clipboard.writeText(txt).then(done,function(){fallback();});
+      }else{fallback();}
+      function fallback(){
+        var r=document.createRange();r.selectNodeContents(pre);
+        var s=window.getSelection();s.removeAllRanges();s.addRange(r);
+        try{document.execCommand('copy');done();}catch(e){}
+      }
+    });
+  }
+  wireCopy('copyBtnInd','pineInd');
+  wireCopy('copyBtnStrat','pineStrat');
+</script>
+<script>
+(function(){
+  var btn=document.getElementById('themeToggle');
+  if(!btn)return;
+  var mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;
+  function stored(){try{var t=localStorage.getItem('codexTheme');return (t==='light'||t==='dark'||t==='system')?t:'system';}catch(e){return 'system';}}
+  function eff(m){return (m==='light'||m==='dark')?m:((mq&&mq.matches)?'dark':'light');}
+  function apply(){var m=stored();document.documentElement.setAttribute('data-theme',eff(m));btn.textContent=(m==='light')?'◐ Light':(m==='dark')?'◑ Dark':'◓ Auto';}
+  apply();
+  btn.addEventListener('click',function(){var order={light:'dark',dark:'system',system:'light'};var n=order[stored()];try{localStorage.setItem('codexTheme',n);}catch(e){}apply();});
+  if(mq){var h=function(){if(stored()==='system')apply();};if(mq.addEventListener)mq.addEventListener('change',h);else if(mq.addListener)mq.addListener(h);}
+})();
+</script>
+
+</body>
+</html>
