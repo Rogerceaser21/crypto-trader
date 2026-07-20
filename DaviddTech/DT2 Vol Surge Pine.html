@@ -1,0 +1,729 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DT2 Volatility-Surge Breakout &mdash; Pine v6 (indicator + strategy)</title>
+<style>
+  :root{
+    --bg:#0e1117; --panel:#161b22; --panel2:#1c2230; --ink:#e6edf3; --muted:#9aa4b2;
+    --line:#2a3140; --accent:#6aa9ff; --up:#3fb950; --dn:#f85149; --warn:#e3b341; --m3:#26a69a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  .wrap{max-width:940px;margin:0 auto;padding:34px 22px 90px;}
+  header{border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:8px}
+  .eyebrow{letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:var(--accent);font-weight:700}
+  h1{font-size:30px;margin:8px 0 6px;line-height:1.2}
+  h2{font-size:21px;margin:38px 0 12px;padding-top:8px;border-top:1px solid var(--line)}
+  h3{font-size:16px;margin:22px 0 8px;color:var(--ink)}
+  p{color:var(--ink)}
+  .sub{color:var(--muted);font-size:15px;max-width:74ch}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:14px 0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:720px){.grid2{grid-template-columns:1fr}}
+  code,kbd{background:#0b0f16;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px}
+  kbd{color:var(--accent)}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:14px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--panel2);color:var(--muted);font-weight:600;font-size:12.5px;text-transform:uppercase;letter-spacing:.04em}
+  td.n{font-family:ui-monospace,Menlo,monospace;white-space:nowrap}
+  .statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:10px 0}
+  .stat{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .stat .v{font-size:23px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--ink)}
+  .stat .k{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+  .stat .v.good{color:var(--up)}
+  ol.steps{counter-reset:s;list-style:none;padding-left:0;margin:0}
+  ol.steps li{position:relative;padding:10px 0 10px 46px;border-bottom:1px solid var(--line)}
+  ol.steps li:last-child{border-bottom:0}
+  ol.steps li::before{counter-increment:s;content:counter(s);position:absolute;left:0;top:10px;
+    width:30px;height:30px;border-radius:50%;background:var(--accent);color:#0b0f16;font-weight:800;
+    display:flex;align-items:center;justify-content:center;font-size:14px}
+  .callout{border-left:4px solid var(--warn);background:rgba(227,179,65,.08);padding:12px 16px;border-radius:8px;margin:12px 0}
+  .callout.good{border-left-color:var(--m3);background:rgba(38,166,154,.08)}
+  .callout.bad{border-left-color:var(--dn);background:rgba(248,81,73,.09)}
+  .callout.feed{border-left-color:var(--accent);background:rgba(106,169,255,.10)}
+  .callout b{color:var(--ink)}
+  pre.src{background:#0b0f16;border:1px solid var(--line);border-radius:10px;padding:16px;overflow:auto;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.5;color:#c9d3e0;max-height:560px;white-space:pre}
+  .copybar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:14px 0 6px}
+  .btn{background:var(--accent);color:#0b0f16;border:0;border-radius:8px;padding:9px 16px;font-weight:700;cursor:pointer;font-size:14px}
+  .btn:active{transform:translateY(1px)}
+  .foot{color:var(--muted);font-size:12.5px;margin-top:50px;border-top:1px solid var(--line);padding-top:16px}
+  .muted{color:var(--muted)}
+  ul.tight{margin:6px 0 6px 0;padding-left:20px} ul.tight li{margin:4px 0}
+  .pill{display:inline-block;font-size:11px;font-weight:700;border-radius:20px;padding:2px 10px;color:#0b0f16;background:var(--up)}
+  .pill.no{background:var(--dn);color:#fff}
+  .mono{font-family:ui-monospace,Menlo,monospace}
+  /* ---- Theme toggle ---- */
+  html[data-theme="light"]{
+    --bg:#f7f9fc; --panel:#ffffff; --panel2:#eef1f6; --ink:#1a2230; --muted:#5b6472;
+    --line:#d7dde6; --accent:#2f6fe0; --up:#1e7d34; --dn:#c92c22; --warn:#a6740b; --m3:#178f83;
+  }
+  html[data-theme="light"] code, html[data-theme="light"] kbd{background:#eef1f5;color:var(--ink)}
+  html[data-theme="light"] pre.src{background:#eef1f5;color:#1a2230}
+  html[data-theme="light"] .callout{background:rgba(166,116,11,.10)}
+  html[data-theme="light"] .callout.good{background:rgba(23,143,131,.10)}
+  html[data-theme="light"] .callout.bad{background:rgba(201,44,34,.09)}
+  html[data-theme="light"] .callout.feed{background:rgba(47,111,224,.10)}
+  html[data-theme="light"] .btn,
+  html[data-theme="light"] ol.steps li::before,
+  html[data-theme="light"] .pill{color:#fff}
+  .theme-toggle{position:fixed;top:16px;right:20px;z-index:100;background:var(--panel);
+    border:1px solid var(--line);color:var(--ink);border-radius:20px;padding:6px 14px;
+    font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.35);
+    font-family:inherit;letter-spacing:.02em}
+  html[data-theme="light"] .theme-toggle{box-shadow:0 2px 10px rgba(0,0,0,.10)}
+  .theme-toggle:active{transform:translateY(1px)}
+@media(max-width:560px){.theme-toggle{top:10px;right:12px;padding:6px 10px;font-size:12px}body{padding-top:44px}}
+</style>
+
+<script>
+(function(){try{var t=localStorage.getItem('codexTheme');var e=(t==='light'||t==='dark')?t:((window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light');document.documentElement.setAttribute('data-theme',e);}catch(e){}})();
+</script>
+
+</head>
+<body>
+
+<button type="button" id="themeToggle" class="theme-toggle" aria-label="Cycle theme: light, dark, or system">&#9683; Auto</button>
+<div class="wrap">
+<header>
+  <div class="eyebrow">DaviddTech &middot; DT2 Volatility-Surge Breakout &middot; Pine v6 port</div>
+  <h1>DT2 &ldquo;Volatility-Surge Breakout&rdquo; &mdash; Pine v6 (indicator + strategy)</h1>
+  <p class="sub">The validated DT2 Volatility-Surge Breakout &mdash; DaviddTech&rsquo;s library strategy <span class="mono">C25-021-ATR-PERCENTILE-SURGE</span> &mdash; rebuilt as a
+  causal Pine&nbsp;v6 <b>indicator</b> plus a Strategy&nbsp;Tester <b>twin</b> with an identical signal core. BTC 4h <b>ATR-percentile breakout</b>: enter in the EMA20
+  trend direction when the ATR percentile surges up through a threshold, ride the expansion, exit when volatility normalises. Every decision, drawing and alert
+  fires on <b>confirmed, closed bars only</b> &mdash; no repaint. This page is the <b>copy of record</b> and the paste source for both files.</p>
+</header>
+
+<div class="callout feed" style="margin-top:16px">
+  <b>Tested feed &mdash; chart this exact one: <span class="mono">BINANCE:BTCUSDT</span> perpetual, 4h.</b> The edge was measured on Binance
+  BTCUSDT-perp candles. The surge trigger is <i>volatility-local</i>: a different exchange&rsquo;s ATR crosses the percentile threshold at slightly different bars and will
+  <b>not</b> reproduce the record. Chart the same feed the backtest used. (Same lesson as the Annie&nbsp;V3 Bybit-vs-Binance divergence.)
+</div>
+
+<h2>1 &middot; Honest, in-sample stats (config of record)</h2>
+<p>Config of record = the report&rsquo;s <b>center cell</b> &mdash; the exact combination the DT2 verdict headlines: <span class="mono">pctLen&nbsp;50 / pctThr&nbsp;80 / slMult&nbsp;2.5</span>,
+<span class="mono">maxBars&nbsp;42</span>, <span class="mono">ATR(14)</span>, <span class="mono">EMA(20)</span>. In-sample <b>2019-09&nbsp;&rarr;&nbsp;2024-12</b> (2025&ndash;26 locked out), our causal cost-honest engine, 1% risk, 0.05% fee + 0.02% slip per fill:</p>
+<div class="statgrid">
+  <div class="stat"><div class="v good">+0.296R</div><div class="k">per trade (center)</div></div>
+  <div class="stat"><div class="v">1.888</div><div class="k">profit factor</div></div>
+  <div class="stat"><div class="v">1.29</div><div class="k">Sharpe</div></div>
+  <div class="stat"><div class="v">198</div><div class="k">IS trades</div></div>
+  <div class="stat"><div class="v">49.0%</div><div class="k">win rate</div></div>
+  <div class="stat"><div class="v">2.24</div><div class="k">t-stat (center)</div></div>
+</div>
+<p class="muted" style="margin:8px 0 0">Surface-wide, not a lone spike: <b>27 / 27</b> declared grid cells had positive expectancy (range +0.169&hellip;+0.501R) and <b>25 of 27</b> are individually
+significant (t&nbsp;&ge;&nbsp;2.0). Best cell 70/70/2.0 reaches <b>+0.430R, t&nbsp;=&nbsp;2.81</b> (Sharpe&nbsp;1.62, MAR&nbsp;&asymp;&nbsp;2.56). Center max drawdown <b>8.6%</b>; both sides carry edge
+(long n=109 +0.347R, short n=89 +0.234R). Weekly-R correlation with the DT1 Trend Rider is <b>&minus;0.003</b> &mdash; essentially zero, so DT2 is a genuine <b>diversifier</b>, a
+different edge (vol-percentile mean-reversion of the expansion move) from DT1&rsquo;s EMA-cross trend. These are the <b>numbers of record</b> from <span class="mono">backtests/bt_dt2_vol_surge.py</span> &mdash; NOT the chart&rsquo;s Strategy Tester.</p>
+
+<h2>2 &middot; What it does &amp; how it trades</h2>
+<div class="card">
+  <ul class="tight">
+    <li><b>Volatility percentile</b> &mdash; <span class="mono">atr = ta.atr(14)</span>; <span class="mono">atrPct = ta.percentrank(atr, 50)</span> = the percent of the previous 50 ATR values that are <b>&le;</b> the current ATR (excludes the current bar), 0&ndash;100.</li>
+    <li><b>Surge trigger</b> &mdash; <span class="mono">atrPct</span> crosses <b>up</b> through <span class="mono">pctThr&nbsp;80</span> on a <b>closed</b> 4h bar (<span class="mono">atrPct&nbsp;&gt;&nbsp;80 and atrPct[1]&nbsp;&le;&nbsp;80</span>).</li>
+    <li><b>Direction</b> &mdash; <span class="mono">close&nbsp;&gt;&nbsp;EMA(20)</span> &rarr; long, else short, evaluated at the signal bar. Longs and shorts both trade.</li>
+    <li><b>Fill</b> &mdash; the <b>open of the next 4h bar</b> after the confirmed surge (causal). The stop geometry hangs off <span class="mono">entryRef</span>&nbsp;=&nbsp;the <b>signal-bar close</b>, not the fill price.</li>
+    <li><b>Moving hard stop</b> &mdash; <span class="mono">entryRef&nbsp;&mp;&nbsp;2.5&times;ATR(14)</span>, <b>re-armed every bar</b> with the current ATR (entryRef fixed, ATR moves &rarr; the stop moves). Realized R is <b>not</b> pinned to &minus;1: if ATR expands the stop is wider (loss&nbsp;&gt;&nbsp;1R); if it contracts the stop ratchets in (loss&nbsp;&lt;&nbsp;1R). No stop is active on the fill bar itself.</li>
+    <li><b>Vol-normalisation exit</b> &mdash; <span class="mono">atrPct&nbsp;&lt;&nbsp;50</span> on a closed bar &rarr; market close at the next open. This is the primary exit (the move matured) &mdash; it fires far more than the stop.</li>
+    <li><b>Time stop</b> &mdash; <span class="mono">bar_index&nbsp;&minus;&nbsp;signalBar&nbsp;&ge;&nbsp;42</span> bars &rarr; market close at the next open. The clock counts from the signal bar.</li>
+    <li><b>Exit priority</b> &mdash; a pending market-close (vol-normalisation / time) executes at the bar <b>open</b>, chronologically first, and wins over the stop that same bar (the engine&rsquo;s ambiguous-is-loss rule).</li>
+    <li><b>Sizing of record</b> &mdash; 1%-of-equity risk against the <b>initial</b> stop distance (<span class="mono">2.5&times;ATR</span> at the signal bar); the strategy twin sizes the same way.</li>
+  </ul>
+</div>
+<div class="card" style="margin-top:0">
+  <h3 style="margin-top:2px">On-chart marks &amp; the status panel</h3>
+  <ul class="tight">
+    <li><b>EMA(20)</b> (orange) &mdash; the direction filter longs/shorts key off.</li>
+    <li><b>Entry triangle</b> (green up / red down) prints <b>at the signal bar</b> &mdash; the actionable surge; the fill is the next 4h open. A small label at the fill bar quotes the entry (signal close) and initial stop.</li>
+    <li><b>Moving stop line</b> (red step) runs for the life of each trade at the current <span class="mono">entryRef&nbsp;&mp;&nbsp;2.5&times;ATR</span> &mdash; you can watch it ratchet as ATR changes.</li>
+    <li><b>Exit &times;</b> &mdash; <b>red</b> at a moving-stop hit, <b>blue</b> at the atrPct&lt;50 vol-normalisation close, <b>orange</b> at a time-stop close.</li>
+    <li><b>Status panel</b> (top-right) &mdash; last-confirmed machine state: position, side, entry (ref), moving stop, ATR-percentile state (surge zone / cooling / normalised), bars in trade. A read-out, not a bar-anchored drawing.</li>
+  </ul>
+</div>
+
+<h2>3 &middot; Fidelity &amp; no-repaint audit</h2>
+<div class="grid2">
+  <div class="card"><h3 style="margin-top:2px">Fidelity &mdash; the Python twin</h3>
+    <p style="margin:6px 0 0">A bar-by-bar Python mirror of <b>this Pine&rsquo;s</b> forward 4h state machine (<span class="mono">backtests/pine_mirror_dt2.py</span>, not a copy of the engine)
+    reproduces the frozen 198-trade center ledger <b>198 / 198 = 100%</b> exact &mdash; side, entry-time, exit-time and exit-reason all identical &mdash; with
+    <b>max&nbsp;|&Delta;R|&nbsp;=&nbsp;0.000000</b> and total R 58.6904 to the reference. Exit mix reproduced exactly (atrPct&lt;50&nbsp;139 &middot; stop&nbsp;47 &middot; time&nbsp;12). Deterministic across double runs (md5 <span class="mono">9b7d5341&hellip;</span>). <span class="pill">100% match</span></p></div>
+  <div class="card"><h3 style="margin-top:2px">No-repaint &mdash; both files</h3>
+    <p style="margin:6px 0 0">Grep-verified on both <span class="mono">.pine</span> files: <b>zero</b> <span class="mono">request.security</span>, <span class="mono">varip</span>, <span class="mono">timenow</span>,
+    <span class="mono">barstate.isrealtime</span> in executable code; every decision/drawing/order/alert gated by <span class="mono">barstate.isconfirmed</span>; drawings append-only
+    (<span class="mono">label.new</span> only) with <b>zero</b> <span class="mono">.set_*()</span> / <span class="mono">.delete()</span>; nothing positioned at a past bar; the moving stop is a causal step plot. <span class="pill">no repaint</span></p></div>
+</div>
+<div class="tblwrap"><table><thead><tr><th>Audit check</th><th>Rule</th><th>Result</th></tr></thead><tbody>
+<tr><td>request.security / varip / timenow / isrealtime (executable code)</td><td class="n">= 0</td><td class="n">0 / 0 / 0 / 0 &#9989;</td></tr>
+<tr><td>Decisions / orders / alerts under <span class="mono">barstate.isconfirmed</span></td><td class="n">all</td><td class="n">all &#9989;</td></tr>
+<tr><td>Retro-mutation <span class="mono">.set_*()</span> / <span class="mono">.delete()</span></td><td class="n">= 0</td><td class="n">0 / 0 &#9989;</td></tr>
+<tr><td>Mirror match vs frozen center ledger (side + entry + exit + reason)</td><td class="n">&ge; 95%</td><td class="n">198/198 = 100% &#9989;</td></tr>
+<tr><td>max |&Delta;R| on the matched set</td><td class="n">&asymp; 0</td><td class="n">0.000000 &#9989;</td></tr>
+<tr><td>Deterministic double run (mirror ledger md5)</td><td class="n">identical</td><td class="n">9b7d5341&hellip; = 9b7d5341&hellip; &#9989;</td></tr>
+</tbody></table></div>
+
+<div class="callout bad">
+  <b>The 1-bar Strategy-Tester lag caveat &mdash; read before judging the Tester&rsquo;s P&amp;L.</b> The number of record is our Python backtest
+  (+0.296R center), which fills at the open of the bar <i>after</i> the confirmed surge and detects the moving stop on 1m granularity. The
+  Strategy-Tester twin submits its market order the moment that entry bar confirms, so TradingView fills it on the <b>following</b> open &mdash;
+  about one 4h bar later than the engine &mdash; refreshes the moving stop each bar (<span class="mono">strategy.exit</span>) and closes the atrPct&lt;50 / time exits at the next open, resolving the stop on 4h bars.
+  Stop geometry uses the engine values (<span class="mono">entryRef&nbsp;&mp;&nbsp;2.5&times;ATR</span>), sizing is 1% risk. TradingView also caps 4h history, so you see recent years, not the full 2019&ndash;2024 record. <b>The chart is for
+  SEEING the trades; the authoritative numbers are the backtest reports on this site.</b>
+</div>
+
+<h2>4 &middot; Install on TradingView</h2>
+<ol class="steps">
+  <li>Open a <b>BINANCE:BTCUSDT perpetual</b> chart on the <b>4-hour</b> timeframe &mdash; the exact feed and timeframe the edge was measured on.</li>
+  <li>Load full history (scroll back to ~2019 or set a wide range) so the ATR percentile has room to seed &mdash; <span class="mono">atrPct</span> is undefined until roughly the first <span class="mono">14&nbsp;+&nbsp;pctLen</span> bars, which do not trade.</li>
+  <li>Open <b>Pine Editor</b>, paste the <b>indicator</b> source (copy button below), <b>Save</b>, then <b>Add to chart</b>. It overlays the EMA, marks surges/exits and shows the status panel.</li>
+  <li>For the Strategy Tester picture, add the <b>strategy</b> source as a second script &mdash; identical signals, plus the trade list and P&amp;L (mind the 1-bar Tester-lag caveat above).</li>
+  <li>To alert: right-click the chart &rarr; <b>Add alert</b> &rarr; Condition = this indicator &rarr; pick <b>&ldquo;LONG signal&rdquo;</b>, <b>&ldquo;SHORT signal&rdquo;</b>, <b>&ldquo;entry (either side)&rdquo;</b> or <b>&ldquo;exit&rdquo;</b> &rarr; <b>Once per bar close</b>. Entry alerts fire on the surge bar; enter at the next 4h open.</li>
+  <li>Leave the signal knobs on their validated center defaults. They are exposed as inputs so you can inspect &mdash; not so you re-tune the edge.</li>
+</ol>
+
+<h2>5 &middot; Full Pine source &mdash; Indicator (<span class="mono">DT2_Vol_Surge_LIVE.pine</span>)</h2>
+<div class="copybar">
+  <span class="muted">Paste this whole block into the Pine Editor. This page is the copy of record.</span>
+  <button class="btn" id="copyBtnInd">Copy indicator source</button>
+</div>
+<pre class="src" id="pineInd">//@version=6
+// =============================================================================
+// DT2 "Volatility-Surge Breakout" — LIVE (indicator)  ·  DaviddTech "C25-021" port
+// -----------------------------------------------------------------------------
+// The VALIDATED DT2 Volatility-Surge Breakout, rebuilt as a causal Pine v6
+// indicator so the signal a live trader gets is the signal that was backtested.
+// It is a BTC 4h ATR-percentile breakout: when the ATR percentile crosses UP
+// through a threshold (a volatility surge) it enters in the direction of the
+// EMA20 trend, rides the expansion, and exits when volatility NORMALISES.
+// Config of record = the report's CENTER cell (the one that headlines the
+// verdict): pctLen 50 / pctThr 80 / slMult 2.5, maxBars 42, ATR(14), EMA(20).
+//   In-sample 2019-09 -&gt; 2024-12 (2025-26 LOCKED OUT), our causal cost-honest
+//   engine: +0.296R/trade · PF 1.888 · Sharpe 1.29 · n=198 · WR 49.0% · t=2.24
+//   (center); best cell 70/70/2.0 t=2.81; 27/27 grid cells expR&gt;0, 25/27 t&gt;=2.0.
+//   These are the NUMBERS OF RECORD from backtests/bt_dt2_vol_surge.py — NOT the
+//   chart's Strategy Tester (this file is an indicator; the strategy twin is
+//   separate). Weekly-R correlation vs DT1 ~ 0.00 (a genuine diversifier).
+//
+// TESTED FEED — READ THIS: the edge was measured on BINANCE:BTCUSDT PERPETUAL,
+// 4h. Chart THAT EXACT feed. The surge trigger is volume/volatility-local: a
+// different exchange's ATR crosses the percentile threshold at slightly different
+// bars and will not reproduce the record. (Same lesson as the Annie V3
+// Bybit-vs-Binance divergence.)
+//
+// HOW IT TRADES (per the frozen spec, replicated to the trade):
+//   · atr    = ta.atr(14) ;  atrPct = ta.percentrank(atr, pctLen)  — the percent
+//     of the PREVIOUS pctLen ATR values that are &lt;= the current ATR (excludes the
+//     current bar), range 0..100.
+//   · surge  = atrPct crosses UP through pctThr on a CLOSED 4h bar
+//              (atrPct &gt; pctThr AND atrPct[1] &lt;= pctThr).
+//   · dir    = close &gt; ta.ema(close,20) ? +1 : -1, evaluated AT the signal bar.
+//     longSig = surge and dir==+1 ; shortSig = surge and dir==-1.
+//   · pyramiding 0: a new surge is IGNORED while a position is open.
+//   · entryRef := close  (the SIGNAL-bar 4h close — the stop geometry hangs off
+//     this, NOT off the fill price). FILL = the OPEN of the NEXT 4h bar after the
+//     confirmed signal (causal, no look-ahead).
+//   · EXITS (three, in priority order each bar):
+//       (a) MOVING hard stop = entryRef -/+ slMult*atr, RE-ARMED every bar with
+//           the CURRENT bar's atr (entryRef is fixed; atr moves -&gt; the stop moves).
+//           The level armed at the close of bar b-1 is the level tested on bar b.
+//           No stop is active on the fill bar itself. Realized R is NOT pinned to
+//           -1: if ATR expanded the stop is wider (loss &gt; 1R); if ATR contracted
+//           it ratcheted in (loss &lt; 1R).
+//       (b) atrPct &lt; 50 on a closed bar -&gt; market close at the NEXT bar open
+//           (the volatility-normalisation exit — it fires far more than the stop).
+//       (c) time stop: bar_index - signalBar &gt;= maxBars -&gt; market close at the
+//           next bar open. The clock counts from the SIGNAL bar.
+//     A pending market-close (a/b resolve at the bar OPEN) takes priority over the
+//     stop that same bar — the open fill is chronologically first (engine's
+//     ambiguous=loss rule; a gap through the stop is already the worse loss price).
+//   · Sizing in the record is 1%-of-equity risk vs the INITIAL stop distance
+//     (slMult*atr at the signal bar); size = risk$ / (slMult*atr_signal).
+//
+// SIGNAL vs FILL (the 1-bar convention, so nothing looks late):
+//   The ENTRY ALERT + entry triangle fire AT THE SIGNAL BAR (the confirmed surge)
+//   — the actionable moment: a live trader places a market order on that close and
+//   fills at the NEXT 4h open. The internal state machine records the fill on that
+//   next bar, where the stop line begins. Exit ×-marks print at the bar the exit
+//   actually happens (stop = the breach bar; atrPct&lt;50 / time = the next-open bar).
+//
+// NO REPAINT (Igor's hard rules, audited):
+//   · EVERY decision, drawing and alert is gated by barstate.isconfirmed.
+//   · Chart timeframe ONLY — no request.security, no varip, no timenow, no
+//     barstate.isrealtime anywhere.
+//   · Drawings are APPEND-ONLY: label.new only; ZERO .set_*() and ZERO .delete().
+//     Nothing is ever positioned at a past bar — every mark prints at the confirmed
+//     bar the machine learned it; the stop line and EMA are causal plots. Printed
+//     marks never move or disappear.
+//   · The status panel is a read-out of the LAST-CONFIRMED state (barstate.islast),
+//     not a bar-anchored drawing — it cannot mutate history.
+//
+// FIDELITY: backtests/pine_mirror_dt2.py re-implements THIS file's exact forward
+// 4h state machine in Python and reproduces the frozen 198-trade center ledger
+// 198/198 = 100% (side + entry-time + exit-time + reason), max |dR| = 0.000000,
+// deterministic across double runs. The chart is for SEEING the trades; the
+// numbers of record are the backtest.
+// =============================================================================
+
+indicator("DT2 Vol-Surge — LIVE", overlay = true,
+     max_lines_count = 500, max_labels_count = 500, max_boxes_count = 500)
+
+// ----------------------------- Inputs ----------------------------------------
+gS = "Signal (validated CENTER defaults — do not change to trade the edge)"
+i_pctLen   = input.int(50,   "ATR-percentile lookback (pctLen)", minval = 2, group = gS)
+i_pctThr   = input.float(80, "Surge threshold (pctThr)",         minval = 1, maxval = 100, step = 1, group = gS)
+i_slMult   = input.float(2.5,"Stop ATR multiple (slMult)",       minval = 0.1, step = 0.1, group = gS)
+i_maxBars  = input.int(42,   "Time stop (bars from signal, maxBars)", minval = 1, group = gS)
+i_closeThr = input.float(50, "Vol-normalisation exit (atrPct &lt; X)",   minval = 1, maxval = 100, step = 1, group = gS)
+i_atrLen   = input.int(14,   "ATR length",                       minval = 1, group = gS)
+i_emaLen   = input.int(20,   "EMA length (direction filter)",    minval = 2, group = gS)
+
+gV = "Visuals"
+i_showEma    = input.bool(true,  "EMA(20) direction line", group = gV)
+i_showStop   = input.bool(true,  "Moving stop line while in a trade", group = gV)
+i_showEntries= input.bool(true,  "Entry triangles + labels", group = gV)
+i_showExits  = input.bool(true,  "Exit ×-marks", group = gV)
+i_showState  = input.bool(true,  "Status panel (top-right)", group = gV)
+
+// ----------------------------- Per-bar indicators ----------------------------
+// Computed EVERY bar in global scope so ta.* history stays intact; only READ
+// inside the confirmed block, so all DECISIONS use closed-bar values.
+atrv    = ta.atr(i_atrLen)
+ema20v  = ta.ema(close, i_emaLen)
+atrPctv = ta.percentrank(atrv, i_pctLen)
+// surge == the engine's crossover of atrPct over the constant pctThr (na-masked)
+surge   = not na(atrPctv) and not na(atrPctv[1]) and atrPctv &gt; i_pctThr and atrPctv[1] &lt;= i_pctThr
+
+plot(i_showEma ? ema20v : na, "EMA(20)", color = color.new(color.orange, 0), linewidth = 1)
+
+// ----------------------------- Persistent state ------------------------------
+// Pure running state (no arrays, no look-back), exactly like the Python mirror
+// pine_mirror_dt2.run_state_machine — forward only.
+var int   state      = 0          // 0 flat / +1 long / -1 short
+var float entryRef   = na         // signal-bar close (stop geometry anchor)
+var float entryAtr   = na         // ATR at the signal bar (initial stop distance)
+var int   sigBar     = na         // bar_index of the signal bar (time-stop clock)
+var int   fillBar    = na         // bar_index of the fill bar
+var float activeStop = na         // moving stop tested THIS bar (armed at b-1); na on fill bar
+var int   pendClose  = 0          // 0 none / 1 atrPct&lt;50 / 2 time-stop, armed at b-1
+
+var int   pendDir    = 0          // surge fired on the PREVIOUS confirmed bar
+var float pendRef    = na
+var float pendAtr    = na
+var int   pendSig    = na
+
+// per-bar event flags (reset each bar; drive marks + alerts)
+signalLong     = false            // gated LONG surge, AT the signal bar (actionable)
+signalShort    = false            // gated SHORT surge, AT the signal bar (actionable)
+enterLongFill  = false            // LONG fill recorded, AT the fill bar
+enterShortFill = false            // SHORT fill recorded, AT the fill bar
+exitStopEv     = false            // moving stop breached, AT the breach bar
+exitNormEv     = false            // atrPct&lt;50 close, AT the next-open bar
+exitTimeEv     = false            // time-stop close, AT the next-open bar
+float exitPx   = na
+float initStop = na
+
+// process CONFIRMED bars only -&gt; no repaint, deterministic
+if barstate.isconfirmed
+    // (1) manage an OPEN position on THIS bar ---------------------------------
+    if state != 0
+        if pendClose != 0
+            exitPx := open                       // market close -&gt; this bar's open
+            if pendClose == 1
+                exitNormEv := true
+            else
+                exitTimeEv := true
+            state := 0
+            activeStop := na
+            pendClose := 0
+        else if not na(activeStop) and ((state == 1 and low &lt;= activeStop) or (state == -1 and high &gt;= activeStop))
+            exitStopEv := true
+            exitPx := activeStop                 // fill AT the (moving) stop level
+            state := 0
+            activeStop := na
+
+    // (2) resolve a pending ENTRY armed at b-1 (only if flat now) --------------
+    if pendDir != 0 and state == 0
+        entryRef := pendRef                      // Pine entryRef := close (signal bar)
+        entryAtr := pendAtr
+        sigBar   := pendSig
+        fillBar  := bar_index
+        state    := pendDir
+        activeStop := na                         // NO stop on the fill bar
+        pendClose  := 0
+        initStop := pendDir == 1 ? entryRef - i_slMult * entryAtr : entryRef + i_slMult * entryAtr
+        if pendDir == 1
+            enterLongFill := true
+        else
+            enterShortFill := true
+    pendDir := 0
+
+    // (3) still open at the CLOSE of this bar -&gt; arm stop + close-cond for b+1 -
+    if state != 0
+        activeStop := state == 1 ? entryRef - i_slMult * atrv : entryRef + i_slMult * atrv
+        if (not na(atrPctv)) and atrPctv &lt; i_closeThr
+            pendClose := 1                        // vol-normalisation exit
+        else if (bar_index - sigBar) &gt;= i_maxBars
+            pendClose := 2                        // time stop
+    else
+        // (4) flat -&gt; detect a new surge at the CLOSE of this bar, arm for b+1 -
+        if surge and not na(atrv) and i_slMult * atrv &gt; 0
+            pendDir := close &gt; ema20v ? 1 : -1
+            pendRef := close
+            pendAtr := atrv
+            pendSig := bar_index
+            if pendDir == 1
+                signalLong := true
+            else
+                signalShort := true
+
+    // ---- causal, append-only drawings (nothing positioned at a past bar) ----
+    if i_showEntries and enterLongFill
+        label.new(bar_index, low, text = "LONG " + str.tostring(entryRef, format.mintick) + "  · stop " + str.tostring(initStop, format.mintick),
+             style = label.style_label_up, color = color.new(color.green, 0), textcolor = color.white, size = size.tiny)
+    if i_showEntries and enterShortFill
+        label.new(bar_index, high, text = "SHORT " + str.tostring(entryRef, format.mintick) + "  · stop " + str.tostring(initStop, format.mintick),
+             style = label.style_label_down, color = color.new(color.red, 0), textcolor = color.white, size = size.tiny)
+
+// ----------------------------- Marks (causal plots) --------------------------
+plotshape(i_showEntries and signalLong,  title = "LONG signal (fill next open)",  style = shape.triangleup,   location = location.belowbar, color = color.new(color.green, 0), size = size.tiny)
+plotshape(i_showEntries and signalShort, title = "SHORT signal (fill next open)", style = shape.triangledown, location = location.abovebar, color = color.new(color.red, 0),   size = size.tiny)
+plotshape(i_showExits and exitStopEv ? exitPx : na, title = "Stop exit",              style = shape.xcross, location = location.absolute, color = color.new(color.red, 0),    size = size.tiny)
+plotshape(i_showExits and exitNormEv ? exitPx : na, title = "Vol-normalisation exit", style = shape.xcross, location = location.absolute, color = color.new(color.blue, 0),   size = size.tiny)
+plotshape(i_showExits and exitTimeEv ? exitPx : na, title = "Time-stop exit",          style = shape.xcross, location = location.absolute, color = color.new(color.orange, 0), size = size.tiny)
+
+// moving stop line only while a position is open (causal step line; ends at exit)
+plot(i_showStop and state != 0 ? activeStop : na, "Moving stop", color = color.new(color.red, 0), style = plot.style_linebr, linewidth = 1)
+
+// ----------------------------- Alerts ----------------------------------------
+// Entry alerts fire AT THE SIGNAL BAR (the confirmed surge) — the actionable
+// moment; the fill is the next 4h open. Exit alert fires when the machine flattens.
+eitherEntry = signalLong or signalShort
+anyExit     = exitStopEv or exitNormEv or exitTimeEv
+alertcondition(signalLong,  title = "DT2 Vol-Surge — LONG signal",
+     message = "DT2 Vol-Surge: LONG volatility surge confirmed on {{ticker}} 4h at {{time}} — enter at the NEXT 4h open (dir: close above EMA20). Moving stop = entryRef - 2.5xATR(14). Chart BINANCE:BTCUSDT perp.")
+alertcondition(signalShort, title = "DT2 Vol-Surge — SHORT signal",
+     message = "DT2 Vol-Surge: SHORT volatility surge confirmed on {{ticker}} 4h at {{time}} — enter at the NEXT 4h open (dir: close below EMA20). Moving stop = entryRef + 2.5xATR(14). Chart BINANCE:BTCUSDT perp.")
+alertcondition(eitherEntry, title = "DT2 Vol-Surge — entry (either side)",
+     message = "DT2 Vol-Surge entry signal confirmed on {{ticker}} 4h at {{time}} — fill at the next 4h open.")
+alertcondition(anyExit, title = "DT2 Vol-Surge — exit",
+     message = "DT2 Vol-Surge: position exit on {{ticker}} 4h at {{time}} (moving ATR stop, atrPct&lt;50 vol-normalisation, or time stop).")
+
+// ----------------------------- Status panel ----------------------------------
+// Read-out of the LAST-CONFIRMED machine state. State vars mutate only inside
+// barstate.isconfirmed, so intrabar ticks cannot change what this shows.
+var table st = table.new(position.top_right, 2, 6,
+     bgcolor = color.new(color.black, 15), border_width = 1,
+     border_color = color.new(color.gray, 60), frame_width = 1,
+     frame_color = color.new(color.gray, 40))
+
+if i_showState and barstate.islast
+    posTxt  = state == 1 ? "LONG open" : state == -1 ? "SHORT open" : "flat"
+    sideTxt = state == 1 ? "long" : state == -1 ? "short" : "—"
+    entTxt  = state != 0 and not na(entryRef) ? str.tostring(entryRef, format.mintick) : "—"
+    stopTxt = state != 0 and not na(activeStop) ? str.tostring(activeStop, format.mintick) : "—"
+    pctTxt  = na(atrPctv) ? "—" : str.tostring(atrPctv, "#.0") +
+         (atrPctv &gt;= i_pctThr ? " · surge zone" : atrPctv &lt; i_closeThr ? " · normalised (exit)" : " · cooling")
+    barsTxt = state != 0 and not na(sigBar) ? str.tostring(bar_index - sigBar) : "—"
+    _hd = color.new(color.silver, 20)
+    _tx = color.white
+    table.cell(st, 0, 0, "DT2 position", text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 0, posTxt,         text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 1, "side",         text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 1, sideTxt,        text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 2, "entry (ref)",  text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 2, entTxt,         text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 3, "moving stop",  text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 3, stopTxt,        text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 4, "ATR pctile",   text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 4, pctTxt,         text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 5, "bars in trade",text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 5, barsTxt,        text_color = _tx, text_size = size.small, text_halign = text.align_left)
+</pre>
+
+<h2>6 &middot; Full Pine source &mdash; Strategy twin (<span class="mono">DT2_Vol_Surge_Strategy.pine</span>)</h2>
+<div class="copybar">
+  <span class="muted">Identical signal core; adds strategy.* orders for the Tester. Paste as a separate script.</span>
+  <button class="btn" id="copyBtnStrat">Copy strategy source</button>
+</div>
+<pre class="src" id="pineStrat">//@version=6
+// =============================================================================
+// DT2 "Volatility-Surge Breakout" — Strategy (Tester twin)  ·  DaviddTech "C25-021"
+// -----------------------------------------------------------------------------
+// strategy() twin of "DT2 Vol-Surge — LIVE" so TradingView's Strategy Tester
+// shows every trade: entry/exit arrows, trade list, P&amp;L. The SIGNAL CORE is
+// IDENTICAL to the indicator (and to backtests/pine_mirror_dt2.py, which
+// reproduces the frozen 198-trade center ledger 198/198 = 100%).
+//
+// Config of record = the report's CENTER cell: pctLen 50 / pctThr 80 / slMult 2.5,
+// maxBars 42, ATR(14), EMA(20). In-sample 2019-09 -&gt; 2024-12 (2025-26 LOCKED OUT),
+// our causal cost-honest engine: +0.296R/trade · PF 1.888 · Sharpe 1.29 · n=198 ·
+// WR 49.0% · t=2.24. Those are the NUMBERS OF RECORD (backtests/bt_dt2_vol_surge.py).
+//
+// TESTED FEED — READ THIS: chart BINANCE:BTCUSDT PERPETUAL, 4h. The surge trigger
+// is volatility-local; another exchange's ATR crosses the percentile threshold at
+// different bars and will not reproduce the record.
+//
+// HOW FILLS WORK IN THE TESTER — the 1-bar Strategy-Tester lag caveat (read before
+// judging its P&amp;L): the record's fill is the OPEN of the bar AFTER the confirmed
+// surge. This strategy submits its market order the moment that entry (fill) bar
+// confirms, so the Tester fills on the FOLLOWING open — about one 4h bar later than
+// the engine's fill. The MOVING stop is refreshed every bar (strategy.exit with the
+// current entryRef -/+ slMult*ATR); the atrPct&lt;50 and time-stop exits are
+// strategy.close at the next open. Stop geometry hangs off entryRef = the SIGNAL-bar
+// close (engine geometry); sizing is 1%-of-equity risk vs the INITIAL stop distance.
+// TradingView also caps 4h history, so you see recent years, not the full 2019-2024
+// record. The Tester is for SEEING the trades; the numbers of record are the backtest
+// reports on the site (+0.296R center), NOT this chart's delayed-fill P&amp;L.
+//
+// NO REPAINT (Igor's hard rules, audited): every decision, drawing, order and alert
+// is gated by barstate.isconfirmed; chart timeframe ONLY (no request.security, varip,
+// timenow, barstate.isrealtime); drawings APPEND-ONLY (label.new only; ZERO
+// .set_*()/.delete()); nothing positioned at a past bar; the status panel is a
+// last-confirmed read-out. Identical signal core to the indicator.
+// =============================================================================
+
+strategy("DT2 Vol-Surge — Strategy", overlay = true,
+     initial_capital = 10000, currency = currency.USD,
+     commission_type = strategy.commission.percent, commission_value = 0.05,
+     slippage = 2, pyramiding = 0,
+     max_lines_count = 500, max_labels_count = 500, max_boxes_count = 500)
+
+// ----------------------------- Inputs ----------------------------------------
+gS = "Signal (validated CENTER defaults — do not change to trade the edge)"
+i_pctLen   = input.int(50,   "ATR-percentile lookback (pctLen)", minval = 2, group = gS)
+i_pctThr   = input.float(80, "Surge threshold (pctThr)",         minval = 1, maxval = 100, step = 1, group = gS)
+i_slMult   = input.float(2.5,"Stop ATR multiple (slMult)",       minval = 0.1, step = 0.1, group = gS)
+i_maxBars  = input.int(42,   "Time stop (bars from signal, maxBars)", minval = 1, group = gS)
+i_closeThr = input.float(50, "Vol-normalisation exit (atrPct &lt; X)",   minval = 1, maxval = 100, step = 1, group = gS)
+i_atrLen   = input.int(14,   "ATR length",                       minval = 1, group = gS)
+i_emaLen   = input.int(20,   "EMA length (direction filter)",    minval = 2, group = gS)
+
+gR = "Strategy sizing"
+i_riskPct = input.float(1.0, "Risk per trade (% of equity)", minval = 0.01, maxval = 10.0, step = 0.1, group = gR)
+
+gV = "Visuals"
+i_showEma    = input.bool(true,  "EMA(20) direction line", group = gV)
+i_showStop   = input.bool(true,  "Moving stop line while in a trade", group = gV)
+i_showEntries= input.bool(true,  "Entry triangles + labels", group = gV)
+i_showExits  = input.bool(true,  "Exit ×-marks", group = gV)
+i_showState  = input.bool(true,  "Status panel (top-right)", group = gV)
+
+// ----------------------------- Per-bar indicators ----------------------------
+// Computed EVERY bar in global scope so ta.* history stays intact; only READ
+// inside the confirmed block, so all DECISIONS use closed-bar values.
+atrv    = ta.atr(i_atrLen)
+ema20v  = ta.ema(close, i_emaLen)
+atrPctv = ta.percentrank(atrv, i_pctLen)
+surge   = not na(atrPctv) and not na(atrPctv[1]) and atrPctv &gt; i_pctThr and atrPctv[1] &lt;= i_pctThr
+
+plot(i_showEma ? ema20v : na, "EMA(20)", color = color.new(color.orange, 0), linewidth = 1)
+
+// ----------------------------- Persistent state ------------------------------
+// Pure running state (no arrays, no look-back), exactly like the Python mirror
+// pine_mirror_dt2.run_state_machine — forward only. IDENTICAL to the indicator.
+var int   state      = 0
+var float entryRef   = na
+var float entryAtr   = na
+var int   sigBar     = na
+var int   fillBar    = na
+var float activeStop = na
+var int   pendClose  = 0
+
+var int   pendDir    = 0
+var float pendRef    = na
+var float pendAtr    = na
+var int   pendSig    = na
+
+// per-bar event flags (reset each bar; drive marks + alerts + orders)
+signalLong     = false
+signalShort    = false
+enterLongFill  = false
+enterShortFill = false
+exitStopEv     = false
+exitNormEv     = false
+exitTimeEv     = false
+float exitPx   = na
+float initStop = na
+
+// process CONFIRMED bars only -&gt; no repaint, deterministic
+if barstate.isconfirmed
+    // (1) manage an OPEN position on THIS bar ---------------------------------
+    if state != 0
+        if pendClose != 0
+            exitPx := open
+            if pendClose == 1
+                exitNormEv := true
+            else
+                exitTimeEv := true
+            state := 0
+            activeStop := na
+            pendClose := 0
+        else if not na(activeStop) and ((state == 1 and low &lt;= activeStop) or (state == -1 and high &gt;= activeStop))
+            exitStopEv := true
+            exitPx := activeStop
+            state := 0
+            activeStop := na
+
+    // (2) resolve a pending ENTRY armed at b-1 (only if flat now) --------------
+    if pendDir != 0 and state == 0
+        entryRef := pendRef
+        entryAtr := pendAtr
+        sigBar   := pendSig
+        fillBar  := bar_index
+        state    := pendDir
+        activeStop := na
+        pendClose  := 0
+        initStop := pendDir == 1 ? entryRef - i_slMult * entryAtr : entryRef + i_slMult * entryAtr
+        if pendDir == 1
+            enterLongFill := true
+        else
+            enterShortFill := true
+    pendDir := 0
+
+    // (3) still open at the CLOSE of this bar -&gt; arm stop + close-cond for b+1 -
+    if state != 0
+        activeStop := state == 1 ? entryRef - i_slMult * atrv : entryRef + i_slMult * atrv
+        if (not na(atrPctv)) and atrPctv &lt; i_closeThr
+            pendClose := 1
+        else if (bar_index - sigBar) &gt;= i_maxBars
+            pendClose := 2
+    else
+        // (4) flat -&gt; detect a new surge at the CLOSE of this bar, arm for b+1 -
+        if surge and not na(atrv) and i_slMult * atrv &gt; 0
+            pendDir := close &gt; ema20v ? 1 : -1
+            pendRef := close
+            pendAtr := atrv
+            pendSig := bar_index
+            if pendDir == 1
+                signalLong := true
+            else
+                signalShort := true
+
+    // ---- causal, append-only drawings (nothing positioned at a past bar) ----
+    if i_showEntries and enterLongFill
+        label.new(bar_index, low, text = "LONG " + str.tostring(entryRef, format.mintick) + "  · stop " + str.tostring(initStop, format.mintick),
+             style = label.style_label_up, color = color.new(color.green, 0), textcolor = color.white, size = size.tiny)
+    if i_showEntries and enterShortFill
+        label.new(bar_index, high, text = "SHORT " + str.tostring(entryRef, format.mintick) + "  · stop " + str.tostring(initStop, format.mintick),
+             style = label.style_label_down, color = color.new(color.red, 0), textcolor = color.white, size = size.tiny)
+
+    // ---- STRATEGY ORDERS (submitted at the fill bar -&gt; Tester fills next open;
+    //      the documented 1-bar Tester lag). Moving stop refreshed each bar; the
+    //      vol-normalisation / time-stop exits flatten at the next open. -------
+    if enterLongFill and not na(initStop)
+        sd = math.abs(entryRef - initStop)
+        q  = sd &gt; 0 ? strategy.equity * i_riskPct / 100.0 / sd : 0.0
+        if q &gt; 0
+            strategy.entry("DT2", strategy.long, qty = q, comment = "long surge")
+    if enterShortFill and not na(initStop)
+        sd = math.abs(entryRef - initStop)
+        q  = sd &gt; 0 ? strategy.equity * i_riskPct / 100.0 / sd : 0.0
+        if q &gt; 0
+            strategy.entry("DT2", strategy.short, qty = q, comment = "short surge")
+    // refresh the MOVING stop every bar the machine holds a position
+    if state != 0 and not na(activeStop)
+        strategy.exit("stop", "DT2", stop = activeStop, comment = "ATR moving stop")
+    // market-close exits -&gt; flatten at the next open
+    if exitNormEv
+        strategy.close("DT2", comment = "atrPct&lt;50")
+    if exitTimeEv
+        strategy.close("DT2", comment = "time stop")
+
+// ----------------------------- Marks (causal plots) --------------------------
+plotshape(i_showEntries and signalLong,  title = "LONG signal (fill next open)",  style = shape.triangleup,   location = location.belowbar, color = color.new(color.green, 0), size = size.tiny)
+plotshape(i_showEntries and signalShort, title = "SHORT signal (fill next open)", style = shape.triangledown, location = location.abovebar, color = color.new(color.red, 0),   size = size.tiny)
+plotshape(i_showExits and exitStopEv ? exitPx : na, title = "Stop exit",              style = shape.xcross, location = location.absolute, color = color.new(color.red, 0),    size = size.tiny)
+plotshape(i_showExits and exitNormEv ? exitPx : na, title = "Vol-normalisation exit", style = shape.xcross, location = location.absolute, color = color.new(color.blue, 0),   size = size.tiny)
+plotshape(i_showExits and exitTimeEv ? exitPx : na, title = "Time-stop exit",          style = shape.xcross, location = location.absolute, color = color.new(color.orange, 0), size = size.tiny)
+
+plot(i_showStop and state != 0 ? activeStop : na, "Moving stop", color = color.new(color.red, 0), style = plot.style_linebr, linewidth = 1)
+
+// ----------------------------- Alerts ----------------------------------------
+eitherEntry = signalLong or signalShort
+anyExit     = exitStopEv or exitNormEv or exitTimeEv
+alertcondition(signalLong,  title = "DT2 Vol-Surge — LONG signal",
+     message = "DT2 Vol-Surge: LONG volatility surge confirmed on {{ticker}} 4h at {{time}} — enter at the NEXT 4h open. Moving stop = entryRef - 2.5xATR(14). Chart BINANCE:BTCUSDT perp.")
+alertcondition(signalShort, title = "DT2 Vol-Surge — SHORT signal",
+     message = "DT2 Vol-Surge: SHORT volatility surge confirmed on {{ticker}} 4h at {{time}} — enter at the NEXT 4h open. Moving stop = entryRef + 2.5xATR(14). Chart BINANCE:BTCUSDT perp.")
+alertcondition(eitherEntry, title = "DT2 Vol-Surge — entry (either side)",
+     message = "DT2 Vol-Surge entry signal confirmed on {{ticker}} 4h at {{time}} — fill at the next 4h open.")
+alertcondition(anyExit, title = "DT2 Vol-Surge — exit",
+     message = "DT2 Vol-Surge: position exit on {{ticker}} 4h at {{time}} (moving ATR stop, atrPct&lt;50 vol-normalisation, or time stop).")
+
+// ----------------------------- Status panel ----------------------------------
+var table st = table.new(position.top_right, 2, 6,
+     bgcolor = color.new(color.black, 15), border_width = 1,
+     border_color = color.new(color.gray, 60), frame_width = 1,
+     frame_color = color.new(color.gray, 40))
+
+if i_showState and barstate.islast
+    posTxt  = state == 1 ? "LONG open" : state == -1 ? "SHORT open" : "flat"
+    sideTxt = state == 1 ? "long" : state == -1 ? "short" : "—"
+    entTxt  = state != 0 and not na(entryRef) ? str.tostring(entryRef, format.mintick) : "—"
+    stopTxt = state != 0 and not na(activeStop) ? str.tostring(activeStop, format.mintick) : "—"
+    pctTxt  = na(atrPctv) ? "—" : str.tostring(atrPctv, "#.0") +
+         (atrPctv &gt;= i_pctThr ? " · surge zone" : atrPctv &lt; i_closeThr ? " · normalised (exit)" : " · cooling")
+    barsTxt = state != 0 and not na(sigBar) ? str.tostring(bar_index - sigBar) : "—"
+    _hd = color.new(color.silver, 20)
+    _tx = color.white
+    table.cell(st, 0, 0, "DT2 position", text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 0, posTxt,         text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 1, "side",         text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 1, sideTxt,        text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 2, "entry (ref)",  text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 2, entTxt,         text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 3, "moving stop",  text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 3, stopTxt,        text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 4, "ATR pctile",   text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 4, pctTxt,         text_color = _tx, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 0, 5, "bars in trade",text_color = _hd, text_size = size.small, text_halign = text.align_left)
+    table.cell(st, 1, 5, barsTxt,        text_color = _tx, text_size = size.small, text_halign = text.align_left)
+</pre>
+
+<div class="foot">
+  DaviddTech &middot; <span class="mono">DT2_Vol_Surge_LIVE.pine</span> + <span class="mono">DT2_Vol_Surge_Strategy.pine</span> &middot; causal Pine&nbsp;v6 port of the validated
+  &ldquo;C25-021-ATR-PERCENTILE-SURGE&rdquo; Volatility-Surge Breakout. Config of record: center cell 50/80/2.5, maxBars&nbsp;42, ATR(14)/EMA(20), +0.296R / PF 1.888 / t 2.24, IS 2019-09&rarr;2024-12 (2025&ndash;26 locked out).
+  Fidelity 198/198 = 100% vs the frozen center ledger (<span class="mono">backtests/pine_mirror_dt2.py</span>); no-repaint audited; deterministic. Tested feed BINANCE:BTCUSDT perp, 4h. Self-contained.
+</div>
+</div>
+
+
+<script>
+  function wireCopy(btnId, preId){
+    var btn=document.getElementById(btnId);
+    var pre=document.getElementById(preId);
+    if(!btn||!pre)return;
+    btn.addEventListener('click',function(){
+      var txt=pre.innerText;
+      function done(){var o=btn.textContent;btn.textContent='Copied!';setTimeout(function(){btn.textContent=o;},1400);}
+      if(navigator.clipboard&&navigator.clipboard.writeText){
+        navigator.clipboard.writeText(txt).then(done,function(){fallback();});
+      }else{fallback();}
+      function fallback(){
+        var r=document.createRange();r.selectNodeContents(pre);
+        var s=window.getSelection();s.removeAllRanges();s.addRange(r);
+        try{document.execCommand('copy');done();}catch(e){}
+      }
+    });
+  }
+  wireCopy('copyBtnInd','pineInd');
+  wireCopy('copyBtnStrat','pineStrat');
+</script>
+<script>
+(function(){
+  var btn=document.getElementById('themeToggle');
+  if(!btn)return;
+  var mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;
+  function stored(){try{var t=localStorage.getItem('codexTheme');return (t==='light'||t==='dark'||t==='system')?t:'system';}catch(e){return 'system';}}
+  function eff(m){return (m==='light'||m==='dark')?m:((mq&&mq.matches)?'dark':'light');}
+  function apply(){var m=stored();document.documentElement.setAttribute('data-theme',eff(m));btn.textContent=(m==='light')?'\u25D0 Light':(m==='dark')?'\u25D1 Dark':'\u25D3 Auto';}
+  apply();
+  btn.addEventListener('click',function(){var order={light:'dark',dark:'system',system:'light'};var n=order[stored()];try{localStorage.setItem('codexTheme',n);}catch(e){}apply();});
+  if(mq){var h=function(){if(stored()==='system')apply();};if(mq.addEventListener)mq.addEventListener('change',h);else if(mq.addListener)mq.addListener(h);}
+})();
+</script>
+
+</body>
+</html>
