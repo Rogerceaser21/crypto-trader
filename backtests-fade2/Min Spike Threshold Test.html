@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Min-Spike Threshold Test &mdash; 1% vs 0.10%</title>
+<style>
+  :root{
+    --bg:#0e1117; --panel:#161b22; --panel2:#1c2230; --ink:#e6edf3; --muted:#9aa4b2;
+    --line:#2a3140; --accent:#6aa9ff; --up:#3fb950; --dn:#f85149; --warn:#e3b341; --m3:#26a69a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  .wrap{max-width:940px;margin:0 auto;padding:34px 22px 90px;}
+  header{border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:8px}
+  .eyebrow{letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:var(--accent);font-weight:700}
+  h1{font-size:30px;margin:8px 0 6px;line-height:1.2}
+  h2{font-size:21px;margin:38px 0 12px;padding-top:8px;border-top:1px solid var(--line)}
+  h3{font-size:16px;margin:22px 0 8px;color:var(--ink)}
+  p{color:var(--ink)}
+  .sub{color:var(--muted);font-size:15px;max-width:74ch}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:14px 0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:720px){.grid2{grid-template-columns:1fr}}
+  code,kbd{background:#0b0f16;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px}
+  kbd{color:var(--accent)}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:14px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--panel2);color:var(--muted);font-weight:600;font-size:12.5px;text-transform:uppercase;letter-spacing:.04em}
+  td.n{font-family:ui-monospace,Menlo,monospace;white-space:nowrap}
+  .statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:10px 0}
+  .stat{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .stat .v{font-size:23px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--ink)}
+  .stat .k{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+  .stat .v.good{color:var(--up)}
+  ol.steps{counter-reset:s;list-style:none;padding-left:0;margin:0}
+  ol.steps li{position:relative;padding:10px 0 10px 46px;border-bottom:1px solid var(--line)}
+  ol.steps li:last-child{border-bottom:0}
+  ol.steps li::before{counter-increment:s;content:counter(s);position:absolute;left:0;top:10px;
+    width:30px;height:30px;border-radius:50%;background:var(--accent);color:#0b0f16;font-weight:800;
+    display:flex;align-items:center;justify-content:center;font-size:14px}
+  .callout{border-left:4px solid var(--warn);background:rgba(227,179,65,.08);padding:12px 16px;border-radius:8px;margin:12px 0}
+  .callout.good{border-left-color:var(--m3);background:rgba(38,166,154,.08)}
+  .callout.bad{border-left-color:var(--dn);background:rgba(248,81,73,.09)}
+  .callout b{color:var(--ink)}
+  pre.src{background:#0b0f16;border:1px solid var(--line);border-radius:10px;padding:16px;overflow:auto;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.5;color:#c9d3e0;max-height:560px;white-space:pre}
+  .copybar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:14px 0 6px}
+  .btn{background:var(--accent);color:#0b0f16;border:0;border-radius:8px;padding:9px 16px;font-weight:700;cursor:pointer;font-size:14px}
+  .btn:active{transform:translateY(1px)}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;margin:6px 0 2px;font-size:13px;color:var(--muted)}
+  .legend span{display:inline-flex;align-items:center;gap:7px}
+  .sw{width:26px;height:0;border-top-width:3px;border-top-style:solid;display:inline-block}
+  .sw.dash{border-top-style:dashed}
+  .foot{color:var(--muted);font-size:12.5px;margin-top:50px;border-top:1px solid var(--line);padding-top:16px}
+  .muted{color:var(--muted)}
+  ul.tight{margin:6px 0 6px 0;padding-left:20px} ul.tight li{margin:4px 0}
+  .pill{display:inline-block;font-size:11px;font-weight:700;border-radius:20px;padding:2px 10px;color:#0b0f16;background:var(--up)}
+  .pill.no{background:var(--dn);color:#fff}
+  /* ---- Theme toggle ---- */
+  html[data-theme="light"]{
+    --bg:#f7f9fc; --panel:#ffffff; --panel2:#eef1f6; --ink:#1a2230; --muted:#5b6472;
+    --line:#d7dde6; --accent:#2f6fe0; --up:#1e7d34; --dn:#c92c22; --warn:#a6740b; --m3:#178f83;
+  }
+  html[data-theme="light"] code, html[data-theme="light"] kbd{background:#eef1f5;color:var(--ink)}
+  html[data-theme="light"] pre.src{background:#eef1f5;color:#1a2230}
+  html[data-theme="light"] .callout{background:rgba(166,116,11,.10)}
+  html[data-theme="light"] .callout.good{background:rgba(23,143,131,.10)}
+  html[data-theme="light"] .callout.bad{background:rgba(201,44,34,.09)}
+  html[data-theme="light"] .btn,
+  html[data-theme="light"] ol.steps li::before,
+  html[data-theme="light"] .pill{color:#fff}
+  .theme-toggle{position:fixed;top:16px;right:20px;z-index:100;background:var(--panel);
+    border:1px solid var(--line);color:var(--ink);border-radius:20px;padding:6px 14px;
+    font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.35);
+    font-family:inherit;letter-spacing:.02em}
+  html[data-theme="light"] .theme-toggle{box-shadow:0 2px 10px rgba(0,0,0,.10)}
+  .theme-toggle:active{transform:translateY(1px)}
+@media(max-width:560px){.theme-toggle{top:10px;right:12px;padding:6px 10px;font-size:12px}body{padding-top:44px}}
+</style>
+<script>
+(function(){try{var t=localStorage.getItem('codexTheme');var e=(t==='light'||t==='dark')?t:((window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light');document.documentElement.setAttribute('data-theme',e);}catch(e){}})();
+</script>
+</head><body>
+<button type="button" id="themeToggle" class="theme-toggle" aria-label="Cycle theme">&#9683; Auto</button>
+<div class="wrap">
+<header>
+  <div class="eyebrow">Annie Trading &middot; declared test &middot; 2026-07-20</div>
+  <h1>Should a peak need 1% beyond the box? &mdash; &#10060; No</h1>
+  <p class="sub"><b>Verdict: requiring a bigger spike destroys the edge, monotonically.</b> At Igor's proposed 1%: trades 167&rarr;128,
+  expectancy +0.347R&rarr;+0.195R, total +57.95R&rarr;+25.01R, significance t 2.84&rarr;<b>1.50 (below the 2.0 bar — no longer a validated
+  edge)</b>. The 40 dropped weeks were a <b>+21.3R profitable book</b>, and 14 surviving weeks get WORSE entries (&minus;12.6R) because the
+  commit fires later. Third independent confirmation that <b>small pokes fade best</b> (F8, G2, now this). The validated 0.10% stays.</p>
+</header>
+
+<h2>1 &middot; The declared grid &mdash; 2.5R target (the V3 default)</h2>
+<div class="tblwrap"><table>
+<thead><tr><th>min spike beyond box</th><th>trades</th><th>per trade</th><th>total</th><th>PF</th><th>t-stat</th><th>weeks dropped (their R at baseline)</th><th>entries shifted (R damage)</th></tr></thead>
+<tbody>
+<tr><td class="n">0.10% <span class="pill">baseline — the validated rule</span></td><td class="n">167</td><td class="n">+0.347R</td><td class="n">+57.95R</td><td class="n">1.64</td><td class="n"><b>2.84</b></td><td class="n">—</td><td class="n">—</td></tr>
+<tr><td class="n">0.50%</td><td class="n">153</td><td class="n">+0.333R</td><td class="n">+50.98R</td><td class="n">1.63</td><td class="n">2.65</td><td class="n">14 (−1.8R book)</td><td class="n">10 (−8.8R)</td></tr>
+<tr style="outline:2px solid var(--dn)"><td class="n"><b>1.00% — the proposed rule</b></td><td class="n">128</td><td class="n"><b>+0.195R</b></td><td class="n"><b>+25.01R</b></td><td class="n">1.36</td><td class="n"><b>1.50 ✗</b></td><td class="n">40 (<b>+21.3R</b> book)</td><td class="n">14 (−12.6R)</td></tr>
+<tr><td class="n">1.50%</td><td class="n">99</td><td class="n">+0.114R</td><td class="n">+11.24R</td><td class="n">1.21</td><td class="n">0.81 ✗</td><td class="n">69 (+38.6R book)</td><td class="n">14 (−9.1R)</td></tr>
+</tbody></table></div>
+<div class="callout bad"><b>Why it fails twice over.</b> (1) The filter throws away winners: the 40 weeks whose spike stayed between 0.10%
+and 1% earned <b>+21.3R</b> in the baseline &mdash; small pokes are the BEST fades, exactly what the SD-gate test (G2) found on live entries.
+(2) It poisons the survivors: waiting for the running extreme to clear 1% means the machine commits <i>later</i>, so 14 of the remaining
+weeks enter on a worse bar &mdash; another <b>&minus;12.6R</b>. Bigger-spike-only is a double tax.</div>
+
+<h2>2 &middot; Same grid at 1.9R</h2>
+<div class="tblwrap"><table>
+<thead><tr><th>min spike</th><th>trades</th><th>per trade</th><th>total</th><th>t-stat</th></tr></thead>
+<tbody>
+<tr><td class="n">0.10% baseline</td><td class="n">167</td><td class="n">+0.257R</td><td class="n">+42.85R</td><td class="n">2.46</td></tr>
+<tr><td class="n">0.50%</td><td class="n">153</td><td class="n">+0.243R</td><td class="n">+37.19R</td><td class="n">2.26</td></tr>
+<tr><td class="n">1.00%</td><td class="n">128</td><td class="n">+0.117R</td><td class="n">+15.02R</td><td class="n">1.03 ✗</td></tr>
+<tr><td class="n">1.50%</td><td class="n">99</td><td class="n">+0.014R</td><td class="n">+1.39R</td><td class="n">0.11 ✗</td></tr>
+</tbody></table></div>
+
+<h2>3 &middot; What 1% would have done in the two live weeks</h2>
+<div class="card"><ul class="tight">
+  <li><b>Last week (the acid-test week):</b> spike reached 2.88% below the box &rarr; qualifies &rarr; the Tue 01:15 UTC long fires either way.</li>
+  <li><b>This week:</b> box top 64,859.7 + 1% = 65,508. Monday's high 65,100 = +0.37% &rarr; <b>no peak, no trade at all</b> &mdash; the machine
+  would still be dark. Under 0.10% it committed SHORT and (on the Bybit feed) entered.</li>
+</ul></div>
+
+<h2>4 &middot; Rigor</h2>
+<div class="card"><ul class="tight">
+  <li>Grid declared before running: min-spike {0.10, 0.50, 1.00, 1.50%} &times; TP {1.9R, 2.5R}; nothing added after seeing results.</li>
+  <li>Engine: the V3 streaming reference machine (f10 detect_week_streaming) + canonical bt_weekly execution; only
+  <code>MIN_SPIKE_FRAC</code> varied &mdash; the same single constant the pine reads.</li>
+  <li>In-sample 2019-09 &rarr; 2024-12-31 only; the locked 2025-26 OOS was not touched.</li>
+  <li><b>Anchor gate passed:</b> the 0.10% cells reproduce the canonical V3 ledgers trade-for-trade (167/167, R exact).</li>
+  <li>Deterministic: double run, summary md5 <code>49d4b24e</code> identical. Script <code>backtests/bt_minspike_test.py</code>,
+  ledgers <code>backtests/minspike_led_*.csv</code>.</li>
+</ul></div>
+
+<p class="foot">Requested by Igor 2026-07-20 ("price must be 1% beyond the weekend box before a peak prints") &mdash; tested same day.
+Related: <a href="Annie%20Monday%20Fade%20V3%20%E2%80%94%20How%20It%20Decides.html">How V3 Decides</a> &middot;
+<a href="backtests-fade2/V3%20Config%20Table.html">V3 Config Table (G2)</a>.</p>
+</div>
+<script>
+(function(){var b=document.getElementById('themeToggle');if(!b)return;function cur(){try{return localStorage.getItem('codexTheme')||'auto'}catch(e){return 'auto'}}
+function apply(m){var e=(m==='auto')?((window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light'):m;
+document.documentElement.setAttribute('data-theme',e);b.innerHTML=(m==='auto')?'&#9683; Auto':(m==='dark'?'&#9789; Dark':'&#9788; Light');}
+b.addEventListener('click',function(){var o=['auto','dark','light'];var n=o[(o.indexOf(cur())+1)%3];try{localStorage.setItem('codexTheme',n)}catch(e){}apply(n);});apply(cur());})();
+</script>
+</body></html>
