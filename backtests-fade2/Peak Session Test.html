@@ -141,4 +141,5 @@ function apply(m){var e=(m==='auto')?((window.matchMedia&&window.matchMedia('(pr
 document.documentElement.setAttribute('data-theme',e);b.innerHTML=(m==='auto')?'&#9683; Auto':(m==='dark'?'&#9789; Dark':'&#9788; Light');}
 b.addEventListener('click',function(){var o=['auto','dark','light'];var n=o[(o.indexOf(cur())+1)%3];try{localStorage.setItem('codexTheme',n)}catch(e){}apply(n);});apply(cur());})();
 </script>
+<script defer id="site-nav" data-root="../" src="../nav.js"></script>
 </body></html>
